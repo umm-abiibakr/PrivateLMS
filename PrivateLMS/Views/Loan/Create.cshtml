@@ -1,0 +1,44 @@
+﻿@model PrivateLMS.ViewModels.LoanViewModel
+@{
+    ViewData["Title"] = "Borrow Book";
+}
+
+<div class="container mt-5">
+    <h2>Borrow Book</h2>
+    <div class="card">
+        <div class="card-header">
+            <strong>@Model.BookTitle</strong>
+        </div>
+        <div class="card-body">
+            <form asp-action="Create" method="post">
+                <input type="hidden" asp-for="BookId" />
+                @*  <input type="hidden" asp-for="BookTitle" /> *@
+
+                <div class="mb-3">
+                    <label asp-for="LoanerName" class="form-label"></label>
+                    <input asp-for="LoanerName" class="form-control" />
+                    <span asp-validation-for="LoanerName" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="LoanerEmail" class="form-label"></label>
+                    <input asp-for="LoanerEmail" class="form-control" />
+                    <span asp-validation-for="LoanerEmail" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Phone" class="form-label"></label>
+                    <input asp-for="Phone" class="form-control" />
+                    <span asp-validation-for="Phone" class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Confirm Borrow</button>
+                <a asp-action="Index" asp-controller="Books" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

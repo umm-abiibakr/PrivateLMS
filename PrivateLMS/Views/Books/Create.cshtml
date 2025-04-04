@@ -1,0 +1,79 @@
+﻿@model PrivateLMS.Models.Book
+@{
+    ViewData["Title"] = "Add New Book";
+}
+
+<div class="container mt-5">
+    <!-- Form Card -->
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <!-- Card Header -->
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-book-fill"></i> Add New Book
+                    </h4>
+                </div>
+
+                <!-- Card Body with Form -->
+                <div class="card-body">
+                    <form asp-action="Create" asp-controller="Books" method="post" class="needs-validation" novalidate>
+                        <!-- Validation Summary -->
+                        <div asp-validation-summary="All" class="alert alert-danger d-none"></div>
+
+                        <!-- Title Field -->
+                        <div class="mb-3">
+                            <label asp-for="Title" class="form-label"></label>
+                            <input asp-for="Title" class="form-control" placeholder="Enter book title" autofocus />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+
+                        <!-- Author Field -->
+                        <div class="mb-3">
+                            <label asp-for="Author" class="form-label"></label>
+                            <input asp-for="Author" class="form-control" placeholder="Enter author's name" />
+                            <span asp-validation-for="Author" class="text-danger"></span>
+                        </div>
+
+                        <!-- Language Field -->
+                        <div class="mb-3">
+                            <label asp-for="Language" class="form-label"></label>
+                            <input asp-for="Language" class="form-control" placeholder="Enter author's name" />
+                            <span asp-validation-for="Language" class="text-danger"></span>
+                        </div>
+
+                        <!-- ISBN Field -->
+                        <div class="mb-3">
+                            <label asp-for="ISBN" class="form-label"></label>
+                            <input asp-for="ISBN" class="form-control" placeholder="e.g., 978-1234567890" />
+                            <span asp-validation-for="ISBN" class="text-danger"></span>
+                        </div>
+
+                        <!-- Published Date Field -->
+                        <div class="mb-4">
+                            <label asp-for="PublishedDate" class="form-label"></label>
+                            <input asp-for="PublishedDate" class="form-control" type="date" />
+                            <span asp-validation-for="PublishedDate" class="text-danger"></span>
+                        </div>
+
+                        <!-- Form Buttons -->
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary me-2">
+                                <i class="bi bi-plus-circle"></i> Add Book
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

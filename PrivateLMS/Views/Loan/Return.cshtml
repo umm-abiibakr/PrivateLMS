@@ -1,0 +1,23 @@
+﻿@model PrivateLMS.ViewModels.ReturnViewModel
+@{
+    ViewData["Title"] = "Return Book";
+}
+
+<div class="container mt-5">
+    <h2>Return Book</h2>
+    <div class="card">
+        <div class="card-header">
+            <strong>@Model.BookTitle</strong>
+        </div>
+        <div class="card-body">
+            <p><strong>Borrower Name:</strong> @Model.LoanerName</p>
+            <p><strong>Borrow Date:</strong> @Model.LoanDate?.ToString("yyyy-MM-dd HH:mm:ss")</p>
+
+            <form asp-action="Return" method="post">
+                <input type="hidden" asp-for="LoanRecordId" />
+                <button type="submit" class="btn btn-success">Confirm Return</button>
+                <a asp-action="Index" asp-controller="Books" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>

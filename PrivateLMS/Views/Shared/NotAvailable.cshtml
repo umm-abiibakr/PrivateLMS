@@ -1,0 +1,19 @@
+﻿@{
+    ViewData["Title"] = "Book Not Available";
+    var errorMessage = ViewBag.ErrorMessage as string;
+}
+
+<div class="container text-center mt-5">
+    <h1 class="display-4 text-warning">Book Not Available</h1>
+    <p class="lead">
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            @errorMessage
+        }
+        else
+        {
+            <text>The book you are trying to borrow is currently not available.</text>
+        }
+    </p>
+    <a asp-action="Index" asp-controller="Books" class="btn btn-primary">Back to Book List</a>
+</div>

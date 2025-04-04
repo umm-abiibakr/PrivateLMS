@@ -1,0 +1,59 @@
+﻿@model PrivateLMS.Models.Book
+@{
+    ViewData["Title"] = "Book Details";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <!-- Book -->
+        <div class="col-md-3 text-center">
+            <img src="https://covers.openlibrary.org/b/ISBN/9780201616224-M.jpg" alt="@Model.Title" class="img-fluid rounded shadow">
+        </div>
+
+        <!-- Book Information -->
+        <div class="col-md-9">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title">@Model.Title</h3>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">Author:</dt>
+                        <dd class="col-sm-8">@Model.Author</dd>
+
+                        <dt class="col-sm-4">ISBN:</dt>
+                        <dd class="col-sm-8">@Model.ISBN</dd>
+
+                        <dt class="col-sm-4">Language:</dt>
+                        <dd class="col-sm-8">@Model.Language</dd>
+
+                        <dt class="col-sm-4">Published Date:</dt>
+                        <dd class="col-sm-8">@Model.PublishedDate.ToString("yyyy-MM-dd")</dd>
+
+                        <dt class="col-sm-4">Availability:</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.IsAvailable)
+                            {
+                                <span class="badge bg-success">Available</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Checked Out</span>
+                            }
+                        </dd>
+                    </dl>
+                </div>
+                <div class="card-footer">
+                    <a asp-action="Edit" asp-route-id="@Model.BookId" class="btn btn-warning me-2">
+                        <i class="bi bi-pencil-square"></i> Edit
+                    </a>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left-circle"></i> Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">

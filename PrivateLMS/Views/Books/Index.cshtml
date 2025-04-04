@@ -1,0 +1,75 @@
+﻿@model IEnumerable<PrivateLMS.Models.Book>
+
+@{
+    ViewData["Title"] = "Books List";
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<table class="table table-striped table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>ISBN</th>
+            <th>Language</th>
+            <th>Published Date</th>
+            <th>Availability</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var book in Model)
+        {
+            <tr id="bookRow-@book.BookId">
+                <td>@book.Title</td>
+                <td>@book.Author</td>
+                <td>@book.ISBN</td>
+                <td>@book.Language</td>
+                <td>@book.PublishedDate.ToString("yyyy-MM-dd")</td>
+                <td>
+                    @if (book.IsAvailable)
+                    {
+                        <span class="badge bg-success">Available</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Loaned</span>
+                    }
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@book.BookId" class="btn btn-info btn-sm">Details</a>
+                    <a asp-action="Edit" asp-route-id="@book.BookId" class="btn btn-warning btn-sm">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@book.BookId" class="btn btn-danger btn-sm">Delete</a>
+
+                    @if (book.IsAvailable)
+                    {
+                        <a asp-controller="Loan" asp-action="Create" asp-route-bookId="@book.BookId" class="btn btn-primary btn-sm">Loan</a>
+                    }
+                    else
+                    {
+                        var activeLoanRecord = book.LoanRecords?.FirstOrDefault(br => br.ReturnDate == null);
+                        if (activeLoanRecord != null)
+                        {
+                            <a asp-controller="Loan" asp-action="Return" asp-route-loanRecordId="@activeLoanRecord.LoanRecordId" class="btn btn-success btn-sm">Return</a>
+                        }
+                        else
+                        {
+                            <span class="text-muted">No active loan record</span>
+                        }
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="Create" class="btn btn-primary">Add New Book</a>

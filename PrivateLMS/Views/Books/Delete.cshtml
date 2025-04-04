@@ -1,0 +1,74 @@
+﻿@model PrivateLMS.Models.Book
+@{
+    ViewData["Title"] = "Delete Book";
+}
+
+<div class="container mt-5">
+    <!-- Delete Confirmation Card -->
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-danger">
+                <!-- Card Header -->
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-exclamation-triangle-fill"></i> Confirm Delete
+                    </h4>
+                </div>
+
+                <!-- Card Body -->
+                <div class="card-body">
+                    <!-- Alert Message -->
+                    <div class="alert alert-danger" role="alert">
+                        <h4 class="alert-heading">Are you sure you want to delete this book?</h4>
+                        <p>Once deleted, this action cannot be undone.</p>
+                    </div>
+
+                    <!-- Book Details -->
+                    <dl class="row">
+                        <dt class="col-sm-4">Title:</dt>
+                        <dd class="col-sm-8">@Model.Title</dd>
+
+                        <dt class="col-sm-4">Author:</dt>
+                        <dd class="col-sm-8">@Model.Author</dd>
+
+                        <dt class="col-sm-4">Language:</dt>
+                        <dd class="col-sm-8">@Model.Language</dd>
+
+                        <dt class="col-sm-4">ISBN:</dt>
+                        <dd class="col-sm-8">@Model.ISBN</dd>
+
+                        <dt class="col-sm-4">Published Date:</dt>
+                        <dd class="col-sm-8">@Model.PublishedDate.ToString("yyyy-MM-dd")</dd>
+
+                        <dt class="col-sm-4">Availability:</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.IsAvailable)
+                            {
+                                <span class="badge bg-success">Available</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Checked Out</span>
+                            }
+                        </dd>
+                    </dl>
+                </div>
+
+                <!-- Card Footer with Actions -->
+                <div class="card-footer d-flex justify-content-end">
+                    <form asp-action="Delete" asp-controller="Books" method="post" class="me-2">
+                        <input type="hidden" asp-for="BookId" />
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash-fill"></i> Delete
+                        </button>
+                    </form>
+                    <a asp-action="Index" asp-controller="Books" class="btn btn-secondary">
+                        <i class="bi bi-x-circle-fill"></i> Cancel
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
