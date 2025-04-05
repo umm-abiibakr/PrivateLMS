@@ -1,0 +1,18 @@
+@model PrivateLMS.Models.PublisherViewModel
+
+<h2>Create Publisher</h2>
+
+<form asp-action="Create" method="post">
+    <div class="mb-3">
+        <label asp-for="PublisherName" class="form-label"></label>
+        <input asp-for="PublisherName" class="form-control" />
+        <span asp-validation-for="PublisherName" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Location" class="form-label"></label>
+        <input asp-for="Location" class="form-control" />
+        <span asp-validation-for="Location" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-success">Save</button>
+    <a asp-action="Index" class="btn btn-secondary">Back</a>
+</form>

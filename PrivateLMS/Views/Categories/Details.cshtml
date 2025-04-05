@@ -1,0 +1,35 @@
+@model PrivateLMS.Models.CategoryViewModel
+
+<h2>Category Details</h2>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">Category Name</dt>
+        <dd class="col-sm-10">@Model.CategoryName</dd>
+
+        <dt class="col-sm-2">Book Count</dt>
+        <dd class="col-sm-10">@Model.BookCount</dd>
+
+        <dt class="col-sm-2">Books</dt>
+        <dd class="col-sm-10">
+            @if (Model.Books.Any())
+            {
+                <ul>
+                    @foreach (var book in Model.Books)
+                    {
+                        <li>@book</li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p>No books in this category.</p>
+            }
+        </dd>
+    </dl>
+</div>
+
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.CategoryId" class="btn btn-warning">Edit</a>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</div>

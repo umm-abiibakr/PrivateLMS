@@ -1,0 +1,19 @@
+﻿@model PrivateLMS.Models.User
+@{
+    ViewData["Title"] = "Step 4: Confirmation";
+}
+
+<div class="container mt-5">
+    <h2>Step 4: Confirmation and Acceptance</h2>
+    <form asp-action="Step4" method="post">
+        <div asp-validation-summary="All" class="text-danger"></div>
+
+        <div class="form-check mb-3">
+            <input asp-for="TermsAccepted" class="form-check-input" type="checkbox" />
+            <label asp-for="TermsAccepted" class="form-check-label">I accept the terms and conditions</label>
+            <span asp-validation-for="TermsAccepted" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-success">Complete Registration</button>
+    </form>
+</div>

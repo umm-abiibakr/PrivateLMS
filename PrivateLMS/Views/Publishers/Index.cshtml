@@ -1,0 +1,30 @@
+@model IEnumerable<PrivateLMS.Models.PublisherViewModel>
+
+<h2>Publishers</h2>
+
+<a asp-action="Create" class="btn btn-primary">Add Publisher</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Publisher Name</th>
+            <th>Location</th>
+            <th>Book Title</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var publisher in Model)
+        {
+            <tr>
+                <td>@publisher.PublisherName</td>
+                <td>@publisher.Location</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@publisher.PublisherId" class="btn btn-info">Details</a>
+                    <a asp-action="Edit" asp-route-id="@publisher.PublisherId" class="btn btn-warning">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@publisher.PublisherId" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

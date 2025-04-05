@@ -12,7 +12,7 @@ using PrivateLMS.Data;
 namespace PrivateLMS.Migrations
 {
     [DbContext(typeof(LibraryDbContext))]
-    [Migration("20250404204930_InitialCreate")]
+    [Migration("20250405051438_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -105,6 +105,43 @@ namespace PrivateLMS.Migrations
                         });
                 });
 
+            modelBuilder.Entity("PrivateLMS.Models.BookCategory", b =>
+                {
+                    b.Property<int>("BookId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.HasKey("BookId", "CategoryId");
+
+                    b.HasIndex("CategoryId");
+
+                    b.ToTable("BookCategory");
+
+                    b.HasData(
+                        new
+                        {
+                            BookId = 1,
+                            CategoryId = 1
+                        },
+                        new
+                        {
+                            BookId = 2,
+                            CategoryId = 2
+                        },
+                        new
+                        {
+                            BookId = 3,
+                            CategoryId = 3
+                        },
+                        new
+                        {
+                            BookId = 4,
+                            CategoryId = 3
+                        });
+                });
+
             modelBuilder.Entity("PrivateLMS.Models.Category", b =>
                 {
                     b.Property<int>("CategoryId")
@@ -113,18 +150,31 @@ namespace PrivateLMS.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CategoryId"));
 
-                    b.Property<int>("BookId")
-                        .HasColumnType("int");
-
                     b.Property<string>("CategoryName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("CategoryId");
 
-                    b.HasIndex("BookId");
-
                     b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            CategoryId = 1,
+                            CategoryName = "Islamic Principles"
+                        },
+                        new
+                        {
+                            CategoryId = 2,
+                            CategoryName = "Hadith"
+                        },
+                        new
+                        {
+                            CategoryId = 3,
+                            CategoryName = "Tafsir"
+                        });
                 });
 
             modelBuilder.Entity("PrivateLMS.Models.LoanRecord", b =>
@@ -174,6 +224,9 @@ namespace PrivateLMS.Migrations
                     b.Property<int>("BookId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("BookId1")
+                        .HasColumnType("int");
+
                     b.Property<string>("Location")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -186,18 +239,157 @@ namespace PrivateLMS.Migrations
 
                     b.HasIndex("BookId");
 
+                    b.HasIndex("BookId1");
+
                     b.ToTable("Publishers");
+
+                    b.HasData(
+                        new
+                        {
+                            PublisherId = 1,
+                            BookId = 1,
+                            Location = "Riyadh",
+                            PublisherName = "Dar Al-Ifta"
+                        },
+                        new
+                        {
+                            PublisherId = 2,
+                            BookId = 2,
+                            Location = "Kano",
+                            PublisherName = "Islamic Heritage Press"
+                        },
+                        new
+                        {
+                            PublisherId = 3,
+                            BookId = 3,
+                            Location = "Cairo",
+                            PublisherName = "Tabari Publications"
+                        },
+                        new
+                        {
+                            PublisherId = 4,
+                            BookId = 4,
+                            Location = "London",
+                            PublisherName = "Kathir Books"
+                        });
                 });
 
-            modelBuilder.Entity("PrivateLMS.Models.Category", b =>
+            modelBuilder.Entity("PrivateLMS.Models.User", b =>
+                {
+                    b.Property<int>("UserId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ConfirmPassword")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DateOfBirth")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Gender")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PostalCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TermsAccepted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = 1,
+                            Address = "123 Admin St.",
+                            City = "Admin City",
+                            ConfirmPassword = "password",
+                            Country = "Admin Country",
+                            DateOfBirth = new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "admin@privatelms.com",
+                            FirstName = "Admin",
+                            Gender = "Male",
+                            LastName = "User",
+                            Password = "password",
+                            PhoneNumber = "1234567890",
+                            PostalCode = "12345",
+                            Role = "Admin",
+                            State = "Admin State",
+                            TermsAccepted = true,
+                            Username = "admin"
+                        });
+                });
+
+            modelBuilder.Entity("PrivateLMS.Models.BookCategory", b =>
                 {
                     b.HasOne("PrivateLMS.Models.Book", "Book")
-                        .WithMany("Categories")
+                        .WithMany("BookCategories")
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("PrivateLMS.Models.Category", "Category")
+                        .WithMany("BookCategories")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Book");
+
+                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("PrivateLMS.Models.LoanRecord", b =>
@@ -214,21 +406,30 @@ namespace PrivateLMS.Migrations
             modelBuilder.Entity("PrivateLMS.Models.Publisher", b =>
                 {
                     b.HasOne("PrivateLMS.Models.Book", "Book")
-                        .WithMany("Publishers")
+                        .WithMany()
                         .HasForeignKey("BookId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("PrivateLMS.Models.Book", null)
+                        .WithMany("Publishers")
+                        .HasForeignKey("BookId1");
 
                     b.Navigation("Book");
                 });
 
             modelBuilder.Entity("PrivateLMS.Models.Book", b =>
                 {
-                    b.Navigation("Categories");
+                    b.Navigation("BookCategories");
 
                     b.Navigation("LoanRecords");
 
                     b.Navigation("Publishers");
+                });
+
+            modelBuilder.Entity("PrivateLMS.Models.Category", b =>
+                {
+                    b.Navigation("BookCategories");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,19 +1,13 @@
 @{
-    ViewData["Title"] = "Page Not Found";
-    var errorMessage = ViewBag.ErrorMessage as string;
+    ViewData["Title"] = "Not Found";
 }
 
-<div class="container text-center mt-5">
-    <h1 class="display-4 text-danger">Resource Not Found</h1>
-    <p class="lead">
-        @if (!string.IsNullOrEmpty(errorMessage))
-        {
-            @errorMessage
-        }
-        else
-        {
-            <text>The page you are looking for does not exist.</text>
-        }
-    </p>
-    <a asp-action="Index" asp-controller="Books" class="btn btn-primary">Back to Book List</a>
-</div>
+<h2>Not Found</h2>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<p>The requested resource could not be found.</p>
+<a asp-controller="Books" asp-action="Index" class="btn btn-primary">Back to Home</a>

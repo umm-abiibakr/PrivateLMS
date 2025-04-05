@@ -9,23 +9,37 @@ namespace PrivateLMS.Controllers
     {
         private readonly LibraryDbContext _context;
 
-        // Injecting the LibraryContext and Logger to interact with the database and log events.
         public BooksController(LibraryDbContext context)
         {
             _context = context;
         }
 
-        // Retrieves and displays all books.
         // GET: Books
         public async Task<IActionResult> Index()
         {
             try
             {
                 var books = await _context.Books
+                    .Include(b => b.BookCategories)
+                        .ThenInclude(bc => bc.Category)
                     .Include(b => b.LoanRecords)
                     .AsNoTracking()
                     .ToListAsync();
-                return View(books);
+
+                var bookViewModels = books.Select(book => new BookViewModel
+                {
+                    BookId = book.BookId,
+                    Title = book.Title,
+                    Author = book.Author,
+                    ISBN = book.ISBN,
+                    Language = book.Language,
+                    PublishedDate = book.PublishedDate,
+                    IsAvailable = book.IsAvailable,
+                    AvailableCategories = book.BookCategories.Select(bc => bc.Category).ToList(),
+                    LoanRecords = book.LoanRecords.ToList()
+                }).ToList();
+
+                return View(bookViewModels);
             }
             catch (Exception ex)
             {
@@ -37,7 +51,7 @@ namespace PrivateLMS.Controllers
         // GET: Books/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || id == 0)
+            if (id == null)
             {
                 TempData["ErrorMessage"] = "Book ID was not provided.";
                 return View("NotFound");
@@ -45,7 +59,11 @@ namespace PrivateLMS.Controllers
 
             try
             {
-                var book = await _context.Books.FirstOrDefaultAsync(m => m.BookId == id);
+                var book = await _context.Books
+                    .Include(b => b.BookCategories)
+                        .ThenInclude(bc => bc.Category)
+                    .Include(b => b.LoanRecords)
+                    .FirstOrDefaultAsync(m => m.BookId == id);
 
                 if (book == null)
                 {
@@ -53,7 +71,20 @@ namespace PrivateLMS.Controllers
                     return View("NotFound");
                 }
 
-                return View(book);
+                var viewModel = new BookViewModel
+                {
+                    BookId = book.BookId,
+                    Title = book.Title,
+                    Author = book.Author,
+                    ISBN = book.ISBN,
+                    Language = book.Language,
+                    PublishedDate = book.PublishedDate,
+                    IsAvailable = book.IsAvailable,
+                    AvailableCategories = book.BookCategories.Select(bc => bc.Category).ToList(),
+                    LoanRecords = book.LoanRecords.ToList()
+                };
+
+                return View(viewModel);
             }
             catch (Exception ex)
             {
@@ -65,18 +96,34 @@ namespace PrivateLMS.Controllers
         // GET: Books/Create
         public IActionResult Create()
         {
-            return View();
+            var viewModel = new BookViewModel
+            {
+                AvailableCategories = _context.Categories.ToList()
+            };
+            return View(viewModel);
         }
 
-        // POST: Books/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Book book)
+        public async Task<IActionResult> Create(BookViewModel viewModel)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
+                    var book = new Book
+                    {
+                        Title = viewModel.Title,
+                        Author = viewModel.Author,
+                        ISBN = viewModel.ISBN,
+                        Language = viewModel.Language,
+                        PublishedDate = viewModel.PublishedDate,
+                        IsAvailable = viewModel.IsAvailable,
+                        BookCategories = viewModel.SelectedCategoryIds
+                            .Select(categoryId => new BookCategory { CategoryId = categoryId })
+                            .ToList()
+                    };
+
                     _context.Books.Add(book);
                     await _context.SaveChangesAsync();
                     TempData["SuccessMessage"] = $"Successfully added the book: {book.Title}.";
@@ -85,32 +132,50 @@ namespace PrivateLMS.Controllers
                 catch (Exception ex)
                 {
                     TempData["ErrorMessage"] = $"An error occurred while adding the book: {ex.Message}";
-                    return View(book);
+                    return View(viewModel);
                 }
             }
-            TempData["ErrorMessage"] = string.Join("; ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
-            return View(book);
+
+            viewModel.AvailableCategories = _context.Categories.ToList();
+            TempData["ErrorMessage"] = "Please fix the errors and try again.";
+            return View(viewModel);
         }
 
         // GET: Books/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || id == 0)
+            if (id == null)
             {
-                TempData["ErrorMessage"] = "Book ID was not provided for editing.";
+                TempData["ErrorMessage"] = "Book ID was not provided.";
                 return View("NotFound");
             }
 
             try
             {
-                var book = await _context.Books.AsNoTracking().FirstOrDefaultAsync(m => m.BookId == id);
+                var book = await _context.Books
+                    .Include(b => b.BookCategories)
+                    .FirstOrDefaultAsync(b => b.BookId == id);
 
                 if (book == null)
                 {
-                    TempData["ErrorMessage"] = $"No book found with ID {id} for editing.";
+                    TempData["ErrorMessage"] = $"No book found with ID {id}.";
                     return View("NotFound");
                 }
-                return View(book);
+
+                var viewModel = new BookViewModel
+                {
+                    BookId = book.BookId,
+                    Title = book.Title,
+                    Author = book.Author,
+                    ISBN = book.ISBN,
+                    Language = book.Language,
+                    PublishedDate = book.PublishedDate,
+                    IsAvailable = book.IsAvailable,
+                    AvailableCategories = _context.Categories.ToList(),
+                    SelectedCategoryIds = book.BookCategories.Select(bc => bc.CategoryId).ToList()
+                };
+
+                return View(viewModel);
             }
             catch (Exception ex)
             {
@@ -122,11 +187,11 @@ namespace PrivateLMS.Controllers
         // POST: Books/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int? id, Book book)
+        public async Task<IActionResult> Edit(int id, BookViewModel viewModel)
         {
-            if (id == null || id == 0)
+            if (id != viewModel.BookId)
             {
-                TempData["ErrorMessage"] = "Book ID was not provided for updating.";
+                TempData["ErrorMessage"] = "Book ID mismatch.";
                 return View("NotFound");
             }
 
@@ -134,52 +199,51 @@ namespace PrivateLMS.Controllers
             {
                 try
                 {
-                    var existingBook = await _context.Books.FindAsync(id);
+                    var book = await _context.Books
+                        .Include(b => b.BookCategories)
+                        .FirstOrDefaultAsync(b => b.BookId == id);
 
-                    if (existingBook == null)
+                    if (book == null)
                     {
-                        TempData["ErrorMessage"] = $"No book found with ID {id} for updating.";
+                        TempData["ErrorMessage"] = $"No book found with ID {id}.";
                         return View("NotFound");
                     }
 
-                    existingBook.Title = book.Title;
-                    existingBook.Author = book.Author;
-                    existingBook.ISBN = book.ISBN;
-                    existingBook.PublishedDate = book.PublishedDate;
-                    existingBook.Language = book.Language;
-                    existingBook.IsAvailable = book.IsAvailable;
+                    // Update book properties
+                    book.Title = viewModel.Title;
+                    book.Author = viewModel.Author;
+                    book.ISBN = viewModel.ISBN;
+                    book.Language = viewModel.Language;
+                    book.PublishedDate = viewModel.PublishedDate;
+                    book.IsAvailable = viewModel.IsAvailable;
 
+                    // Update categories
+                    book.BookCategories.Clear(); // Remove existing categories
+                    book.BookCategories = viewModel.SelectedCategoryIds
+                        .Select(categoryId => new BookCategory { BookId = book.BookId, CategoryId = categoryId })
+                        .ToList();
+
+                    _context.Update(book);
                     await _context.SaveChangesAsync();
                     TempData["SuccessMessage"] = $"Successfully updated the book: {book.Title}.";
                     return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateConcurrencyException ex)
-                {
-                    if (!BookExists(book.BookId))
-                    {
-                        TempData["ErrorMessage"] = $"No book found with ID {book.BookId} during concurrency check.";
-                        return View("NotFound");
-                    }
-                    else
-                    {
-                        TempData["ErrorMessage"] = $"A concurrency error occurred during the update: {ex.Message}";
-                        return View("Error");
-                    }
-                }
                 catch (Exception ex)
                 {
                     TempData["ErrorMessage"] = $"An error occurred while updating the book: {ex.Message}";
-                    return View("Error");
+                    return View(viewModel);
                 }
             }
-            TempData["ErrorMessage"] = string.Join("; ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
-            return View(book);
+
+            viewModel.AvailableCategories = _context.Categories.ToList();
+            TempData["ErrorMessage"] = "Please fix the errors and try again.";
+            return View(viewModel);
         }
 
         // GET: Books/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || id == 0)
+            if (id == null)
             {
                 TempData["ErrorMessage"] = "Book ID was not provided for deletion.";
                 return View("NotFound");
@@ -187,7 +251,10 @@ namespace PrivateLMS.Controllers
 
             try
             {
-                var book = await _context.Books.AsNoTracking().FirstOrDefaultAsync(m => m.BookId == id);
+                var book = await _context.Books
+                    .Include(b => b.BookCategories)
+                        .ThenInclude(bc => bc.Category)
+                    .FirstOrDefaultAsync(m => m.BookId == id);
 
                 if (book == null)
                 {
@@ -195,45 +262,25 @@ namespace PrivateLMS.Controllers
                     return View("NotFound");
                 }
 
-                return View(book);
+                var viewModel = new BookViewModel
+                {
+                    BookId = book.BookId,
+                    Title = book.Title,
+                    Author = book.Author,
+                    ISBN = book.ISBN,
+                    Language = book.Language,
+                    PublishedDate = book.PublishedDate,
+                    IsAvailable = book.IsAvailable,
+                    AvailableCategories = book.BookCategories.Select(bc => bc.Category).ToList()
+                };
+
+                return View(viewModel);
             }
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = $"An error occurred while loading the book for deletion: {ex.Message}";
                 return View("Error");
             }
-        }
-
-        // POST: Books/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            try
-            {
-                var book = await _context.Books.FindAsync(id);
-                if (book == null)
-                {
-                    TempData["ErrorMessage"] = $"No book found with ID {id} for deletion.";
-                    return View("NotFound");
-                }
-
-                _context.Books.Remove(book);
-                await _context.SaveChangesAsync();
-
-                TempData["SuccessMessage"] = $"Successfully deleted the book: {book.Title}.";
-                return RedirectToAction(nameof(Index));
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = $"An error occurred while deleting the book: {ex.Message}";
-                return View("Error");
-            }
-        }
-
-        private bool BookExists(int id)
-        {
-            return _context.Books.Any(e => e.BookId == id);
         }
     }
 }
