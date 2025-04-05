@@ -1,4 +1,4 @@
-@model PrivateLMS.Models.Book
+@model PrivateLMS.Models.BookViewModel
 @{
     ViewData["Title"] = "Delete Book";
 }
@@ -49,6 +49,24 @@
                             else
                             {
                                 <span class="badge bg-danger">Checked Out</span>
+                            }
+                        </dd>
+
+                        <!-- Categories -->
+                        <dt class="col-sm-4">Categories:</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.AvailableCategories != null && Model.AvailableCategories.Count > 0)
+                            {
+                                <ul>
+                                    @foreach (var category in Model.AvailableCategories)
+                                    {
+                                        <li>@category.CategoryName</li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <span class="text-muted">No categories</span>
                             }
                         </dd>
                     </dl>

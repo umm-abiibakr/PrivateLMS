@@ -1,4 +1,4 @@
-@model PrivateLMS.Models.Book
+@model PrivateLMS.Models.BookViewModel
 @{
     ViewData["Title"] = "Add New Book";
 }
@@ -31,7 +31,7 @@
                         <!-- Author Field -->
                         <div class="mb-3">
                             <label asp-for="Author" class="form-label"></label>
-                            <input asp-for="Author" class="form-control" placeholder="Enter book language" />
+                            <input asp-for="Author" class="form-control" placeholder="Enter author name" />
                             <span asp-validation-for="Author" class="text-danger"></span>
                         </div>
 
@@ -54,6 +54,18 @@
                             <label asp-for="PublishedDate" class="form-label"></label>
                             <input asp-for="PublishedDate" class="form-control" type="date" />
                             <span asp-validation-for="PublishedDate" class="text-danger"></span>
+                        </div>
+
+                        <!-- Category Selection -->
+                        <div class="mb-4">
+                            <label asp-for="SelectedCategoryIds" class="form-label">Categories</label>
+                            <select asp-for="SelectedCategoryIds" class="form-control" multiple>
+                                @foreach (var category in Model.AvailableCategories)
+                                {
+                                    <option value="@category.CategoryId">@category.CategoryName</option>
+                                }
+                            </select>
+                            <span asp-validation-for="SelectedCategoryIds" class="text-danger"></span>
                         </div>
 
                         <!-- Form Buttons -->

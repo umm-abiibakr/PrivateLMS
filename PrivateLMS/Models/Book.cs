@@ -36,8 +36,8 @@ namespace PrivateLMS.Models
         // Navigation Property
         [BindNever]
         public ICollection<LoanRecord>? LoanRecords { get; set; }
-        public ICollection<Publisher>? Publishers { get; set; }
-        public ICollection<Category>? Categories { get; set; }
-
+        public ICollection<BookCategory>? BookCategories { get; set; }
+        public int? PublisherId { get; set; } // FK to Publisher, nullable for flexibility
+        public Publisher Publisher { get; set; }
     }
 }

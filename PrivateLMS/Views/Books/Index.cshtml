@@ -1,4 +1,4 @@
-@model IEnumerable<PrivateLMS.Models.Book>
+@model IEnumerable<PrivateLMS.Models.BookViewModel>
 
 @{
     ViewData["Title"] = "Books List";
@@ -23,6 +23,7 @@
             <th>Language</th>
             <th>Published Date</th>
             <th>Availability</th>
+            <th>Categories</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -43,6 +44,23 @@
                     else
                     {
                         <span class="badge bg-danger">Loaned</span>
+                    }
+                </td>
+                <td>
+                    @if (book.AvailableCategories != null && book.AvailableCategories.Count > 0)
+                    {
+                        <ul class="list-inline">
+                            @foreach (var category in book.AvailableCategories)
+                            {
+                                <li class="list-inline-item">
+                                    <span class="badge bg-info">@category.CategoryName</span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <span class="text-muted">No categories</span>
                     }
                 </td>
                 <td>
