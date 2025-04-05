@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PrivateLMS.Data;
 using PrivateLMS.Models;
@@ -77,7 +77,7 @@ namespace PrivateLMS.Controllers
 
                 if (!book.IsAvailable)
                 {
-                    TempData["ErrorMessage"] = $"The book '{book.Title}' is abready loaned.";
+                    TempData["ErrorMessage"] = $"The book '{book.Title}' is already loaned.";
                     return View("NotAvailable");
                 }
 
@@ -130,7 +130,7 @@ namespace PrivateLMS.Controllers
 
                 if (loanRecord.ReturnDate != null)
                 {
-                    TempData["ErrorMessage"] = $"The loan record for '{loanRecord.Book.Title}' has abready been returned.";
+                    TempData["ErrorMessage"] = $"The loan record for '{loanRecord.Book.Title}' has already been returned.";
                     return View("AbreadyReturned");
                 }
 
@@ -176,7 +176,7 @@ namespace PrivateLMS.Controllers
 
                 if (loanRecord.ReturnDate != null)
                 {
-                    TempData["ErrorMessage"] = $"The loan record for '{loanRecord.Book.Title}' has abready been returned.";
+                    TempData["ErrorMessage"] = $"The loan record for '{loanRecord.Book.Title}' has already been returned.";
                     return View("AbreadyReturned");
                 }
 

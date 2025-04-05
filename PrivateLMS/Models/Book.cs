@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.ComponentModel.DataAnnotations;
 
 namespace PrivateLMS.Models
@@ -21,7 +21,7 @@ namespace PrivateLMS.Models
         public string Author { get; set; }
 
         [Required(ErrorMessage = "The ISBN field is required.")]
-        [RegularExpression(@"^\d{3}-\d{10}$", ErrorMessage = "ISBN must be in the format XXX-XXXXXXXXXX.")]
+        [RegularExpression(@"^(97(8|9))?\d{9}(\d|X)$", ErrorMessage = "ISBN must be a valid 10 or 13 digit number.")]
         public string ISBN { get; set; }
 
         [Required(ErrorMessage = "The Published Date field is required.")]

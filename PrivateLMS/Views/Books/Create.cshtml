@@ -1,4 +1,4 @@
-﻿@model PrivateLMS.Models.Book
+@model PrivateLMS.Models.Book
 @{
     ViewData["Title"] = "Add New Book";
 }
@@ -31,14 +31,14 @@
                         <!-- Author Field -->
                         <div class="mb-3">
                             <label asp-for="Author" class="form-label"></label>
-                            <input asp-for="Author" class="form-control" placeholder="Enter author's name" />
+                            <input asp-for="Author" class="form-control" placeholder="Enter book language" />
                             <span asp-validation-for="Author" class="text-danger"></span>
                         </div>
 
                         <!-- Language Field -->
                         <div class="mb-3">
                             <label asp-for="Language" class="form-label"></label>
-                            <input asp-for="Language" class="form-control" placeholder="Enter author's name" />
+                            <input asp-for="Language" class="form-control" placeholder="Enter book language" />
                             <span asp-validation-for="Language" class="text-danger"></span>
                         </div>
 

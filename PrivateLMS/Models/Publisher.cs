@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using PrivateLMS.Models;
 using System.ComponentModel.DataAnnotations;
 

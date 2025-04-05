@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PrivateLMS.Data;
 using PrivateLMS.Models;
@@ -29,7 +29,7 @@ namespace PrivateLMS.Controllers
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = "An error occurred while loading the books.";
+                TempData["ErrorMessage"] = $"An error occurred while loading the books: {ex.Message}";
                 return View("Error");
             }
         }
@@ -45,8 +45,7 @@ namespace PrivateLMS.Controllers
 
             try
             {
-                var book = await _context.Books
-                    .FirstOrDefaultAsync(m => m.BookId == id);
+                var book = await _context.Books.FirstOrDefaultAsync(m => m.BookId == id);
 
                 if (book == null)
                 {
@@ -58,7 +57,7 @@ namespace PrivateLMS.Controllers
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = "An error occurred while loading the book details.";
+                TempData["ErrorMessage"] = $"An error occurred while loading the book details: {ex.Message}";
                 return View("Error");
             }
         }
@@ -78,19 +77,18 @@ namespace PrivateLMS.Controllers
             {
                 try
                 {
-                    // BookId and IsAvailable are not bound due to [BindNever]
                     _context.Books.Add(book);
                     await _context.SaveChangesAsync();
-
                     TempData["SuccessMessage"] = $"Successfully added the book: {book.Title}.";
                     return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
                 {
-                    TempData["ErrorMessage"] = "An error occurred while adding the book.";
+                    TempData["ErrorMessage"] = $"An error occurred while adding the book: {ex.Message}";
                     return View(book);
                 }
             }
+            TempData["ErrorMessage"] = string.Join("; ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
             return View(book);
         }
 
@@ -116,7 +114,7 @@ namespace PrivateLMS.Controllers
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = "An error occurred while loading the book for editing.";
+                TempData["ErrorMessage"] = $"An error occurred while loading the book for editing: {ex.Message}";
                 return View("Error");
             }
         }
@@ -144,11 +142,12 @@ namespace PrivateLMS.Controllers
                         return View("NotFound");
                     }
 
-                    // Updating fields that can be edited
                     existingBook.Title = book.Title;
                     existingBook.Author = book.Author;
                     existingBook.ISBN = book.ISBN;
                     existingBook.PublishedDate = book.PublishedDate;
+                    existingBook.Language = book.Language;
+                    existingBook.IsAvailable = book.IsAvailable;
 
                     await _context.SaveChangesAsync();
                     TempData["SuccessMessage"] = $"Successfully updated the book: {book.Title}.";
@@ -163,16 +162,17 @@ namespace PrivateLMS.Controllers
                     }
                     else
                     {
-                        TempData["ErrorMessage"] = "A concurrency error occurred during the update.";
+                        TempData["ErrorMessage"] = $"A concurrency error occurred during the update: {ex.Message}";
                         return View("Error");
                     }
                 }
                 catch (Exception ex)
                 {
-                    TempData["ErrorMessage"] = "An error occurred while updating the book.";
+                    TempData["ErrorMessage"] = $"An error occurred while updating the book: {ex.Message}";
                     return View("Error");
                 }
             }
+            TempData["ErrorMessage"] = string.Join("; ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
             return View(book);
         }
 
@@ -187,9 +187,7 @@ namespace PrivateLMS.Controllers
 
             try
             {
-                var book = await _context.Books
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(m => m.BookId == id);
+                var book = await _context.Books.AsNoTracking().FirstOrDefaultAsync(m => m.BookId == id);
 
                 if (book == null)
                 {
@@ -201,7 +199,7 @@ namespace PrivateLMS.Controllers
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = "An error occurred while loading the book for deletion.";
+                TempData["ErrorMessage"] = $"An error occurred while loading the book for deletion: {ex.Message}";
                 return View("Error");
             }
         }
@@ -228,7 +226,7 @@ namespace PrivateLMS.Controllers
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = "An error occurred while deleting the book.";
+                TempData["ErrorMessage"] = $"An error occurred while deleting the book: {ex.Message}";
                 return View("Error");
             }
         }
@@ -239,4 +237,3 @@ namespace PrivateLMS.Controllers
         }
     }
 }
-

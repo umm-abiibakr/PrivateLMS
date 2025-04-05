@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using PrivateLMS.Models;
 using System.ComponentModel.DataAnnotations;
 
@@ -16,11 +16,11 @@ namespace PrivateLMS.Models
         public string LoanerName { get; set; }
 
         [Required(ErrorMessage = "Please enter Loaner Email Address")]
-        [EmailAddress(ErrorMessage = "Please enter a Email Address")]
+        [EmailAddress(ErrorMessage = "Please enter a valid Email Address")]
         public string LoanerEmail { get; set; }
 
         [Required(ErrorMessage = "Please enter Loaner Phone Number")]
-        [Phone(ErrorMessage = "Please enter a Valid Phone Number")]
+        [Phone(ErrorMessage = "Please enter a valid phone number")]
         public string Phone { get; set; }
 
         [BindNever]
