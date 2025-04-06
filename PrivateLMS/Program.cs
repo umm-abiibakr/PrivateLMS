@@ -13,12 +13,13 @@ builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30); // Set session timeout
     options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true; 
+    options.Cookie.IsEssential = true;
 });
 
 // Register ApplicationDbContext with SQL Server provider
 builder.Services.AddDbContext<LibraryDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")),
+    ServiceLifetime.Scoped); // Explicitly set the lifetime
 
 var app = builder.Build();
 

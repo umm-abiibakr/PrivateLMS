@@ -1,100 +1,61 @@
 @model PrivateLMS.Models.BookViewModel
-@{
-    ViewData["Title"] = "Edit Book";
-}
 
-<div class="container mt-5">
-    <!-- Form Card -->
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow-sm">
-                <!-- Card Header -->
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">
-                        <i class="bi bi-pencil-square"></i> Edit Book
-                    </h4>
-                </div>
+<h2>Edit Book</h2>
 
-                <!-- Card Body with Form -->
-                <div class="card-body">
-                    <form asp-action="Edit" asp-controller="Books" method="post" class="needs-validation" novalidate>
-                        <!-- Validation Summary -->
-                        <div asp-validation-summary="All" class="alert alert-danger d-none"></div>
-
-                        <!-- Hidden BookId Field -->
-                        <input type="hidden" asp-for="BookId" />
-
-                        <!-- Title Field -->
-                        <div class="mb-3">
-                            <label asp-for="Title" class="form-label">Title</label>
-                            <input asp-for="Title" class="form-control" />
-                            <span asp-validation-for="Title" class="text-danger"></span>
-                        </div>
-
-                        <!-- Author Field -->
-                        <div class="mb-3">
-                            <label asp-for="Author" class="form-label">Author</label>
-                            <input asp-for="Author" class="form-control" />
-                            <span asp-validation-for="Author" class="text-danger"></span>
-                        </div>
-
-                        <!-- Language Field -->
-                        <div class="mb-3">
-                            <label asp-for="Language" class="form-label">Language</label>
-                            <input asp-for="Language" class="form-control" />
-                            <span asp-validation-for="Language" class="text-danger"></span>
-                        </div>
-
-                        <!-- ISBN Field -->
-                        <div class="mb-3">
-                            <label asp-for="ISBN" class="form-label">ISBN</label>
-                            <input asp-for="ISBN" class="form-control" placeholder="e.g., 978-1234567890" />
-                            <span asp-validation-for="ISBN" class="text-danger"></span>
-                        </div>
-
-                        <!-- Published Date Field -->
-                        <div class="mb-4">
-                            <label asp-for="PublishedDate" class="form-label">Published Date</label>
-                            <input asp-for="PublishedDate" class="form-control" type="date" />
-                            <span asp-validation-for="PublishedDate" class="text-danger"></span>
-                        </div>
-
-                        <!-- Category Selection -->
-                        <div class="mb-4">
-                            <label asp-for="SelectedCategoryIds" class="form-label">Categories</label>
-                            <select asp-for="SelectedCategoryIds" class="form-control" multiple>
-                                @foreach (var category in Model.AvailableCategories)
-                                {
-                                    <option value="@category.CategoryId" selected="@Model.SelectedCategoryIds.Contains(category.CategoryId)">@category.CategoryName</option>
-                                }
-                            </select>
-                            <span asp-validation-for="SelectedCategoryIds" class="text-danger"></span>
-                        </div>
-
-                        <!-- Availability Toggle -->
-                        <div class="mb-4 form-check">
-                            <input asp-for="IsAvailable" class="form-check-input" type="checkbox" id="isAvailableCheck">
-                            <label asp-for="IsAvailable" class="form-check-label">Available</label>
-                        </div>
-
-                        <!-- Form Buttons -->
-                        <div class="d-flex justify-content-end">
-                            <button type="submit" class="btn btn-primary me-2">
-                                <i class="bi bi-save"></i> Save Changes
-                            </button>
-                            <a asp-action="Index" class="btn btn-secondary">
-                                <i class="bi bi-x-circle"></i> Cancel
-                            </a>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+<form asp-action="Edit" method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="BookId" />
+    <div class="mb-3">
+        <label asp-for="Title" class="form-label"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
     </div>
-</div>
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+    <div class="mb-3">
+        <label asp-for="Author" class="form-label"></label>
+        <input asp-for="Author" class="form-control" />
+        <span asp-validation-for="Author" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="ISBN" class="form-label"></label>
+        <input asp-for="ISBN" class="form-control" />
+        <span asp-validation-for="ISBN" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Language" class="form-label"></label>
+        <input asp-for="Language" class="form-control" />
+        <span asp-validation-for="Language" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="PublishedDate" class="form-label"></label>
+        <input asp-for="PublishedDate" type="date" class="form-control" />
+        <span asp-validation-for="PublishedDate" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="IsAvailable" class="form-label"></label>
+        <input asp-for="IsAvailable" type="checkbox" class="form-check-input" />
+        <span asp-validation-for="IsAvailable" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="CoverImage" class="form-label">Book Cover</label>
+        @if (!string.IsNullOrEmpty(Model.CoverImagePath))
+        {
+            <img src="@Model.CoverImagePath" alt="@Model.Title Cover" style="max-width: 200px;" />
+            <p>Replace current cover:</p>
+        }
+        <input asp-for="CoverImage" type="file" class="form-control" accept="image/*" />
+        <span asp-validation-for="CoverImage" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="PublisherId" class="form-label">Publisher</label>
+        <select asp-for="PublisherId" class="form-control" asp-items="@(new SelectList(Model.AvailablePublishers, "PublisherId", "PublisherName"))">
+            <option value="">Select a Publisher</option>
+        </select>
+        <span asp-validation-for="PublisherId" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Categories</label>
+        <select asp-for="SelectedCategoryIds" class="form-control" multiple asp-items="@(new SelectList(Model.AvailableCategories, "CategoryId", "CategoryName"))"></select>
+        <span asp-validation-for="SelectedCategoryIds" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Update</button>
+    <a asp-action="Index" class="btn btn-secondary">Back</a>
+</form>

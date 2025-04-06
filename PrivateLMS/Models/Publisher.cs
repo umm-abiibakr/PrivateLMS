@@ -12,5 +12,7 @@ namespace PrivateLMS.Models
 
         [Required(ErrorMessage = "Please enter Publisher Location")]
         public string Location { get; set; }
+
+        public string? LogoImagePath { get; set; } 
     }
 }

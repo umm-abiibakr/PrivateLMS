@@ -12,6 +12,6 @@ namespace PrivateLMS.Models
 
         public int BookCount { get; set; }
 
-        public List<string> Books { get; set; } = new List<string>(); 
+        public List<string> Books { get; set; } = new List<string>(); // Added for Details page
     }
 }

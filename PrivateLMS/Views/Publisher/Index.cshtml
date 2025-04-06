@@ -7,6 +7,7 @@
 <table class="table table-striped">
     <thead>
         <tr>
+            <th>Logo</th>
             <th>Publisher Name</th>
             <th>Location</th>
             <th>Actions</th>
@@ -16,6 +17,16 @@
         @foreach (var publisher in Model)
         {
             <tr>
+                <td>
+                    @if (!string.IsNullOrEmpty(publisher.LogoImagePath))
+                    {
+                        <img src="@publisher.LogoImagePath" alt="@publisher.PublisherName Logo" style="max-width: 50px;" />
+                    }
+                    else
+                    {
+                        <span>No Logo</span>
+                    }
+                </td>
                 <td>@publisher.PublisherName</td>
                 <td>@publisher.Location</td>
                 <td>

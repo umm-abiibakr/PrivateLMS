@@ -1,93 +1,47 @@
 @model IEnumerable<PrivateLMS.Models.BookViewModel>
 
-@{
-    ViewData["Title"] = "Books List";
-}
+<h2 class="text-center mb-4">Books</h2>
 
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        @TempData["SuccessMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
+<div class="text-end mb-3">
+    <a asp-action="Create" class="btn btn-primary">Add Book</a>
+</div>
 
-<h2>@ViewData["Title"]</h2>
-
-<table class="table table-striped table-hover">
-    <thead class="table-dark">
-        <tr>
-            <th>Title</th>
-            <th>Author</th>
-            <th>ISBN</th>
-            <th>Language</th>
-            <th>Published Date</th>
-            <th>Availability</th>
-            <th>Categories</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var book in Model)
-        {
-            <tr id="bookRow-@book.BookId">
-                <td>@book.Title</td>
-                <td>@book.Author</td>
-                <td>@book.ISBN</td>
-                <td>@book.Language</td>
-                <td>@book.PublishedDate.ToString("yyyy-MM-dd")</td>
-                <td>
-                    @if (book.IsAvailable)
-                    {
-                        <span class="badge bg-success">Available</span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-danger">Loaned</span>
-                    }
-                </td>
-                <td>
-                    @if (book.AvailableCategories != null && book.AvailableCategories.Count > 0)
-                    {
-                        <ul class="list-inline">
-                            @foreach (var category in book.AvailableCategories)
-                            {
-                                <li class="list-inline-item">
-                                    <span class="badge bg-info">@category.CategoryName</span>
-                                </li>
-                            }
-                        </ul>
-                    }
-                    else
-                    {
-                        <span class="text-muted">No categories</span>
-                    }
-                </td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@book.BookId" class="btn btn-info btn-sm">Details</a>
-                    <a asp-action="Edit" asp-route-id="@book.BookId" class="btn btn-warning btn-sm">Edit</a>
-                    <a asp-action="Delete" asp-route-id="@book.BookId" class="btn btn-danger btn-sm">Delete</a>
-
-                    @if (book.IsAvailable)
-                    {
-                        <a asp-controller="Loan" asp-action="Create" asp-route-bookId="@book.BookId" class="btn btn-primary btn-sm">Loan</a>
-                    }
-                    else
-                    {
-                        var activeLoanRecord = book.LoanRecords?.FirstOrDefault(br => br.ReturnDate == null);
-                        if (activeLoanRecord != null)
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    @foreach (var book in Model)
+    {
+        <div class="col">
+            <div class="card h-100 text-center">
+                @if (!string.IsNullOrEmpty(book.CoverImagePath))
+                {
+                    <img src="@book.CoverImagePath" class="card-img-top mx-auto d-block" alt="@book.Title Cover" style="max-height: 200px; max-width: 100%; object-fit: cover;" />
+                }
+                else
+                {
+                    <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <span>No Cover</span>
+                    </div>
+                }
+                <div class="card-body">
+                    <h5 class="card-title">@book.Title</h5>
+                    <p class="card-text">
+                        @if (book.IsAvailable)
                         {
-                            <a asp-controller="Loan" asp-action="Return" asp-route-loanRecordId="@activeLoanRecord.LoanRecordId" class="btn btn-success btn-sm">Return</a>
+                            <span class="badge bg-success">Available</span>
                         }
                         else
                         {
-                            <span class="text-muted">No active loan record</span>
+                            <span class="badge bg-danger">Not Available</span>
                         }
-                    }
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-
-<a asp-action="Create" class="btn btn-primary">Add New Book</a>
+                    </p>
+                    <div>
+                        <a asp-action="Details" asp-route-id="@book.BookId" class="btn btn-info btn-sm">View Details</a>
+                        @if (book.IsAvailable)
+                        {
+                            <a asp-action="Loan" asp-route-id="@book.BookId" class="btn btn-primary btn-sm">Loan</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

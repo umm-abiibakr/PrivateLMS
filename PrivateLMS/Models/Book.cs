@@ -31,13 +31,15 @@ namespace PrivateLMS.Models
 
         [BindNever]
         [Display(Name = "Available")]
-        public bool IsAvailable { get; set; } = true; 
+        public bool IsAvailable { get; set; } = true;
 
-        // Navigation Property
+        public string? CoverImagePath { get; set; } // Added for book cover image
+
+        // Navigation Properties
         [BindNever]
         public ICollection<LoanRecord>? LoanRecords { get; set; }
         public ICollection<BookCategory>? BookCategories { get; set; }
-        public int? PublisherId { get; set; } // FK to Publisher, nullable for flexibility
-        public Publisher Publisher { get; set; }
+        public int? PublisherId { get; set; }
+        public Publisher? Publisher { get; set; }
     }
 }

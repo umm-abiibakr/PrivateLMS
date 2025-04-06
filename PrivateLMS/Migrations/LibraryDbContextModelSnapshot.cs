@@ -35,6 +35,9 @@ namespace PrivateLMS.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<string>("CoverImagePath")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ISBN")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -229,6 +232,9 @@ namespace PrivateLMS.Migrations
 
                     b.Property<string>("Location")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LogoImagePath")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PublisherName")
