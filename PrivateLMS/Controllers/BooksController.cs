@@ -2,16 +2,20 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PrivateLMS.Data;
 using PrivateLMS.Models;
+using System.IO;
+using Microsoft.AspNetCore.Hosting;
 
 namespace PrivateLMS.Controllers
 {
     public class BooksController : Controller
     {
         private readonly LibraryDbContext _context;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public BooksController(LibraryDbContext context)
+        public BooksController(LibraryDbContext context, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         // GET: Books
@@ -20,9 +24,6 @@ namespace PrivateLMS.Controllers
             try
             {
                 var books = await _context.Books
-                    .Include(b => b.BookCategories)
-                        .ThenInclude(bc => bc.Category)
-                    .Include(b => b.LoanRecords)
                     .AsNoTracking()
                     .ToListAsync();
 
@@ -30,13 +31,8 @@ namespace PrivateLMS.Controllers
                 {
                     BookId = book.BookId,
                     Title = book.Title,
-                    Author = book.Author,
-                    ISBN = book.ISBN,
-                    Language = book.Language,
-                    PublishedDate = book.PublishedDate,
-                    IsAvailable = book.IsAvailable,
-                    AvailableCategories = book.BookCategories.Select(bc => bc.Category).ToList(),
-                    LoanRecords = book.LoanRecords.ToList()
+                    CoverImagePath = book.CoverImagePath,
+                    IsAvailable = book.IsAvailable
                 }).ToList();
 
                 return View(bookViewModels);
@@ -62,6 +58,7 @@ namespace PrivateLMS.Controllers
                 var book = await _context.Books
                     .Include(b => b.BookCategories)
                         .ThenInclude(bc => bc.Category)
+                    .Include(b => b.Publisher)
                     .Include(b => b.LoanRecords)
                     .FirstOrDefaultAsync(m => m.BookId == id);
 
@@ -80,8 +77,11 @@ namespace PrivateLMS.Controllers
                     Language = book.Language,
                     PublishedDate = book.PublishedDate,
                     IsAvailable = book.IsAvailable,
+                    CoverImagePath = book.CoverImagePath,
+                    PublisherId = book.PublisherId,
+                    AvailablePublishers = _context.Publishers.ToList(),
                     AvailableCategories = book.BookCategories.Select(bc => bc.Category).ToList(),
-                    LoanRecords = book.LoanRecords.ToList()
+                    LoanRecords = book.LoanRecords?.ToList() ?? new List<LoanRecord>()
                 };
 
                 return View(viewModel);
@@ -93,16 +93,31 @@ namespace PrivateLMS.Controllers
             }
         }
 
+        // GET: Books/Loan/5
+        public IActionResult Loan(int? id)
+        {
+            if (id == null)
+            {
+                TempData["ErrorMessage"] = "Book ID was not provided for loan.";
+                return View("NotFound");
+            }
+
+            // Redirect to LoanController.Create with the book ID
+            return RedirectToAction("Create", "Loan", new { bookId = id });
+        }
+
         // GET: Books/Create
         public IActionResult Create()
         {
             var viewModel = new BookViewModel
             {
+                AvailablePublishers = _context.Publishers.ToList(),
                 AvailableCategories = _context.Categories.ToList()
             };
             return View(viewModel);
         }
 
+        // POST: Books/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(BookViewModel viewModel)
@@ -111,6 +126,20 @@ namespace PrivateLMS.Controllers
             {
                 try
                 {
+                    string? coverImagePath = null;
+                    if (viewModel.CoverImage != null)
+                    {
+                        var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images/book-covers");
+                        Directory.CreateDirectory(uploadsFolder);
+                        var fileName = Guid.NewGuid().ToString() + Path.GetExtension(viewModel.CoverImage.FileName);
+                        var filePath = Path.Combine(uploadsFolder, fileName);
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await viewModel.CoverImage.CopyToAsync(stream);
+                        }
+                        coverImagePath = $"/images/book-covers/{fileName}";
+                    }
+
                     var book = new Book
                     {
                         Title = viewModel.Title,
@@ -119,6 +148,8 @@ namespace PrivateLMS.Controllers
                         Language = viewModel.Language,
                         PublishedDate = viewModel.PublishedDate,
                         IsAvailable = viewModel.IsAvailable,
+                        CoverImagePath = coverImagePath,
+                        PublisherId = viewModel.PublisherId,
                         BookCategories = viewModel.SelectedCategoryIds
                             .Select(categoryId => new BookCategory { CategoryId = categoryId })
                             .ToList()
@@ -126,18 +157,25 @@ namespace PrivateLMS.Controllers
 
                     _context.Books.Add(book);
                     await _context.SaveChangesAsync();
+
+                    foreach (var bc in book.BookCategories)
+                    {
+                        bc.BookId = book.BookId;
+                    }
+                    await _context.SaveChangesAsync();
+
                     TempData["SuccessMessage"] = $"Successfully added the book: {book.Title}.";
                     return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
                 {
                     TempData["ErrorMessage"] = $"An error occurred while adding the book: {ex.Message}";
-                    return View(viewModel);
                 }
             }
 
+            viewModel.AvailablePublishers = _context.Publishers.ToList();
             viewModel.AvailableCategories = _context.Categories.ToList();
-            TempData["ErrorMessage"] = "Please fix the errors and try again.";
+            TempData["ErrorMessage"] = TempData["ErrorMessage"] ?? "Please fix the errors and try again.";
             return View(viewModel);
         }
 
@@ -171,8 +209,11 @@ namespace PrivateLMS.Controllers
                     Language = book.Language,
                     PublishedDate = book.PublishedDate,
                     IsAvailable = book.IsAvailable,
-                    AvailableCategories = _context.Categories.ToList(),
-                    SelectedCategoryIds = book.BookCategories.Select(bc => bc.CategoryId).ToList()
+                    CoverImagePath = book.CoverImagePath,
+                    PublisherId = book.PublisherId,
+                    SelectedCategoryIds = book.BookCategories.Select(bc => bc.CategoryId).ToList(),
+                    AvailablePublishers = _context.Publishers.ToList(),
+                    AvailableCategories = _context.Categories.ToList()
                 };
 
                 return View(viewModel);
@@ -209,16 +250,36 @@ namespace PrivateLMS.Controllers
                         return View("NotFound");
                     }
 
-                    // Update book properties
+                    if (viewModel.CoverImage != null)
+                    {
+                        var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images/book-covers");
+                        Directory.CreateDirectory(uploadsFolder);
+                        var fileName = Guid.NewGuid().ToString() + Path.GetExtension(viewModel.CoverImage.FileName);
+                        var filePath = Path.Combine(uploadsFolder, fileName);
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await viewModel.CoverImage.CopyToAsync(stream);
+                        }
+                        if (!string.IsNullOrEmpty(book.CoverImagePath))
+                        {
+                            var oldFilePath = Path.Combine(_webHostEnvironment.WebRootPath, book.CoverImagePath.TrimStart('/'));
+                            if (System.IO.File.Exists(oldFilePath))
+                            {
+                                System.IO.File.Delete(oldFilePath);
+                            }
+                        }
+                        book.CoverImagePath = $"/images/book-covers/{fileName}";
+                    }
+
                     book.Title = viewModel.Title;
                     book.Author = viewModel.Author;
                     book.ISBN = viewModel.ISBN;
                     book.Language = viewModel.Language;
                     book.PublishedDate = viewModel.PublishedDate;
                     book.IsAvailable = viewModel.IsAvailable;
+                    book.PublisherId = viewModel.PublisherId;
 
-                    // Update categories
-                    book.BookCategories.Clear(); // Remove existing categories
+                    book.BookCategories.Clear();
                     book.BookCategories = viewModel.SelectedCategoryIds
                         .Select(categoryId => new BookCategory { BookId = book.BookId, CategoryId = categoryId })
                         .ToList();
@@ -231,14 +292,15 @@ namespace PrivateLMS.Controllers
                 catch (Exception ex)
                 {
                     TempData["ErrorMessage"] = $"An error occurred while updating the book: {ex.Message}";
-                    return View(viewModel);
                 }
             }
 
+            viewModel.AvailablePublishers = _context.Publishers.ToList();
             viewModel.AvailableCategories = _context.Categories.ToList();
-            TempData["ErrorMessage"] = "Please fix the errors and try again.";
+            TempData["ErrorMessage"] = TempData["ErrorMessage"] ?? "Please fix the errors and try again.";
             return View(viewModel);
         }
+
 
         // GET: Books/Delete/5
         public async Task<IActionResult> Delete(int? id)
@@ -254,6 +316,7 @@ namespace PrivateLMS.Controllers
                 var book = await _context.Books
                     .Include(b => b.BookCategories)
                         .ThenInclude(bc => bc.Category)
+                    .Include(b => b.Publisher)
                     .FirstOrDefaultAsync(m => m.BookId == id);
 
                 if (book == null)
@@ -271,6 +334,8 @@ namespace PrivateLMS.Controllers
                     Language = book.Language,
                     PublishedDate = book.PublishedDate,
                     IsAvailable = book.IsAvailable,
+                    CoverImagePath = book.CoverImagePath,
+                    PublisherId = book.PublisherId,
                     AvailableCategories = book.BookCategories.Select(bc => bc.Category).ToList()
                 };
 

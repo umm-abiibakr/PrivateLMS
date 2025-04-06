@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
 
 namespace PrivateLMS.Models
 {
@@ -13,5 +14,9 @@ namespace PrivateLMS.Models
         [Required(ErrorMessage = "Please enter Publisher Location")]
         [StringLength(100, ErrorMessage = "Location cannot exceed 100 characters.")]
         public string Location { get; set; }
+
+        public string? LogoImagePath { get; set; }
+        [Display(Name = "Publisher Logo")]
+        public IFormFile? LogoImage { get; set; } 
     }
 }

@@ -5,7 +5,6 @@ namespace PrivateLMS.ViewModels
 {
     public class LoanViewModel
     {
-
         [Required]
         public int BookId { get; set; }
 

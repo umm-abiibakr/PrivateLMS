@@ -15,8 +15,33 @@ namespace PrivateLMS.Controllers
             _context = context;
         }
 
-        // Displays the loan form for a specific book.
-        // GET: loan/Create/5
+        // GET: Loan
+        public async Task<IActionResult> Index()
+        {
+            try
+            {
+                var loans = await _context.LoanRecords
+                    .Include(lr => lr.Book)
+                    .Select(lr => new LoanViewModel
+                    {
+                        BookId = lr.BookId,
+                        BookTitle = lr.Book.Title,
+                        LoanerName = lr.LoanerName,
+                        LoanerEmail = lr.LoanerEmail,
+                        Phone = lr.Phone
+                    })
+                    .ToListAsync();
+
+                return View(loans);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"An error occurred while loading the loan records: {ex.Message}";
+                return View("Error");
+            }
+        }
+
+        // GET: Loan/Create/5
         public async Task<IActionResult> Create(int? bookId)
         {
             if (bookId == null || bookId == 0)
@@ -50,19 +75,20 @@ namespace PrivateLMS.Controllers
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = "An error occurred while loading the loan form.";
+                TempData["ErrorMessage"] = $"An error occurred while loading the loan form: {ex.Message}";
                 return View("Error");
             }
         }
 
-        // Processes the loaning action, creates a loanRecord, updates the book's availability
-        // POST: loan/Create
+        // POST: Loan/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(LoanViewModel model)
         {
             if (!ModelState.IsValid)
             {
+                var book = await _context.Books.FindAsync(model.BookId);
+                model.BookTitle = book?.Title; // Preserve BookTitle on validation failure
                 return View(model);
             }
 
@@ -90,9 +116,7 @@ namespace PrivateLMS.Controllers
                     LoanDate = DateTime.UtcNow
                 };
 
-                // Update the book's availability
                 book.IsAvailable = false;
-
                 _context.LoanRecords.Add(loanRecord);
                 await _context.SaveChangesAsync();
 
@@ -101,13 +125,12 @@ namespace PrivateLMS.Controllers
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = "An error occurred while processing the loaning action.";
+                TempData["ErrorMessage"] = $"An error occurred while processing the loan: {ex.Message}";
                 return View("Error");
             }
         }
 
-        // Displays the return confirmation for a specific loan record
-        // GET: loan/Return/5
+        // GET: Loan/Return/5
         public async Task<IActionResult> Return(int? loanRecordId)
         {
             if (loanRecordId == null || loanRecordId == 0)
@@ -119,8 +142,8 @@ namespace PrivateLMS.Controllers
             try
             {
                 var loanRecord = await _context.LoanRecords
-                    .Include(br => br.Book)
-                    .FirstOrDefaultAsync(br => br.LoanRecordId == loanRecordId);
+                    .Include(lr => lr.Book)
+                    .FirstOrDefaultAsync(lr => lr.LoanRecordId == loanRecordId);
 
                 if (loanRecord == null)
                 {
@@ -131,7 +154,7 @@ namespace PrivateLMS.Controllers
                 if (loanRecord.ReturnDate != null)
                 {
                     TempData["ErrorMessage"] = $"The loan record for '{loanRecord.Book.Title}' has already been returned.";
-                    return View("AbreadyReturned");
+                    return View("AlreadyReturned"); // Fixed typo
                 }
 
                 var returnViewModel = new ReturnViewModel
@@ -146,13 +169,12 @@ namespace PrivateLMS.Controllers
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = "An error occurred while loading the return confirmation.";
+                TempData["ErrorMessage"] = $"An error occurred while loading the return confirmation: {ex.Message}";
                 return View("Error");
             }
         }
 
-        // Processes the return action, updates the loanRecord with the return date, updates the book's availability
-        // POST: loan/Return/5
+        // POST: Loan/Return/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Return(ReturnViewModel model)
@@ -165,8 +187,8 @@ namespace PrivateLMS.Controllers
             try
             {
                 var loanRecord = await _context.LoanRecords
-                    .Include(br => br.Book)
-                    .FirstOrDefaultAsync(br => br.LoanRecordId == model.LoanRecordId);
+                    .Include(lr => lr.Book)
+                    .FirstOrDefaultAsync(lr => lr.LoanRecordId == model.LoanRecordId);
 
                 if (loanRecord == null)
                 {
@@ -177,13 +199,10 @@ namespace PrivateLMS.Controllers
                 if (loanRecord.ReturnDate != null)
                 {
                     TempData["ErrorMessage"] = $"The loan record for '{loanRecord.Book.Title}' has already been returned.";
-                    return View("AbreadyReturned");
+                    return View("AlreadyReturned"); // Fixed typo
                 }
 
-                // Update the loan record
                 loanRecord.ReturnDate = DateTime.UtcNow;
-
-                // Update the book's availability
                 loanRecord.Book.IsAvailable = true;
                 await _context.SaveChangesAsync();
 
@@ -192,10 +211,9 @@ namespace PrivateLMS.Controllers
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = "An error occurred while processing the return action.";
+                TempData["ErrorMessage"] = $"An error occurred while processing the return: {ex.Message}";
                 return View("Error");
             }
         }
     }
 }
-

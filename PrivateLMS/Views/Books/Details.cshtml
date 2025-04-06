@@ -1,79 +1,92 @@
 @model PrivateLMS.Models.BookViewModel
-@{
-    ViewData["Title"] = "Book Details";
-}
 
-<div class="container mt-5">
-    <div class="row">
-        <!-- Book Image -->
-        <div class="col-md-3 text-center">
-            <img src="https://covers.openlibrary.org/b/ISBN/@Model.ISBN-M.jpg" alt="@Model.Title" class="img-fluid rounded shadow">
-        </div>
+<style>
+    .details-container {
+        max-width: 600px;
+        margin: 0 auto;
+        text-align: center;
+    }
 
-        <!-- Book Information -->
-        <div class="col-md-9">
-            <div class="card h-100">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="card-title">@Model.Title</h3>
-                </div>
-                <div class="card-body">
-                    <dl class="row">
-                        <dt class="col-sm-4">Author:</dt>
-                        <dd class="col-sm-8">@Model.Author</dd>
+        .details-container img {
+            display: block;
+            margin: 0 auto;
+        }
 
-                        <dt class="col-sm-4">ISBN:</dt>
-                        <dd class="col-sm-8">@Model.ISBN</dd>
+        .details-container dl {
+            margin: 0 auto;
+        }
 
-                        <dt class="col-sm-4">Language:</dt>
-                        <dd class="col-sm-8">@Model.Language</dd>
+        .details-container dt, .details-container dd {
+            display: inline-block;
+            width: 48%;
+            margin: 5px 0;
+        }
 
-                        <dt class="col-sm-4">Published Date:</dt>
-                        <dd class="col-sm-8">@Model.PublishedDate.ToString("yyyy-MM-dd")</dd>
+        .details-container dt {
+            font-weight: bold;
+            text-align: right;
+        }
 
-                        <dt class="col-sm-4">Availability:</dt>
-                        <dd class="col-sm-8">
-                            @if (Model.IsAvailable)
-                            {
-                                <span class="badge bg-success">Available</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-danger">Checked Out</span>
-                            }
-                        </dd>
+        .details-container dd {
+            text-align: left;
+        }
 
-                        <!-- Categories -->
-                        <dt class="col-sm-4">Categories:</dt>
-                        <dd class="col-sm-8">
-                            @if (Model.AvailableCategories != null && Model.AvailableCategories.Count > 0)
-                            {
-                                <ul class="list-inline">
-                                    @foreach (var category in Model.AvailableCategories)
-                                    {
-                                        <li class="list-inline-item">
-                                            <span class="badge bg-info">@category.CategoryName</span>
-                                        </li>
-                                    }
-                                </ul>
-                            }
-                            else
-                            {
-                                <span class="text-muted">No categories</span>
-                            }
-                        </dd>
-                    </dl>
-                </div>
-                <div class="card-footer d-flex justify-content-between">
-                    <a asp-action="Edit" asp-route-id="@Model.BookId" class="btn btn-warning">
-                        <i class="bi bi-pencil-square"></i> Edit
-                    </a>
-                    <a asp-action="Index" class="btn btn-secondary">
-                        <i class="bi bi-arrow-left-circle"></i> Back to List
-                    </a>
-                </div>
-            </div>
-        </div>
+        .details-container .btn {
+            margin: 5px;
+        }
+</style>
+
+<div class="details-container">
+    <h2>Book Details</h2>
+
+    @if (!string.IsNullOrEmpty(Model.CoverImagePath))
+    {
+        <img src="@Model.CoverImagePath" alt="@Model.Title Cover" style="max-width: 300px; margin-bottom: 20px;" />
+    }
+    else
+    {
+        <p>No Cover Image</p>
+    }
+
+    <dl>
+        <dt>Title</dt>
+        <dd>@Model.Title</dd>
+        <dt>Author</dt>
+        <dd>@Model.Author</dd>
+        <dt>ISBN</dt>
+        <dd>@Model.ISBN</dd>
+        <dt>Language</dt>
+        <dd>@Model.Language</dd>
+        <dt>Published Date</dt>
+        <dd>@Model.PublishedDate.ToShortDateString()</dd>
+        <dt>Available</dt>
+        <dd>@(Model.IsAvailable ? "Yes" : "No")</dd>
+        <dt>Publisher</dt>
+        <dd>@(Model.AvailablePublishers.FirstOrDefault(p => p.PublisherId == Model.PublisherId)?.PublisherName ?? "None")</dd>
+        <dt>Categories</dt>
+        <dd>
+            @if (Model.AvailableCategories.Any())
+            {
+                <ul class="list-unstyled">
+                    @foreach (var category in Model.AvailableCategories)
+                    {
+                        <li>@category.CategoryName</li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <span>No Categories</span>
+            }
+        </dd>
+    </dl>
+
+    <div>
+        <a asp-action="Edit" asp-route-id="@Model.BookId" class="btn btn-warning">Edit</a>
+        @if (Model.IsAvailable)
+        {
+            <a asp-action="Loan" asp-route-id="@Model.BookId" class="btn btn-primary">Loan</a>
+        }
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
     </div>
 </div>
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">

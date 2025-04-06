@@ -7,7 +7,7 @@
 
 <form asp-action="Delete" method="post">
     <input type="hidden" asp-for="CategoryId" />
-    @Html.AntiForgeryToken() 
+    @Html.AntiForgeryToken()
     <button type="submit" class="btn btn-danger">Delete</button>
     <a asp-action="Index" class="btn btn-secondary">Cancel</a>
 </form>

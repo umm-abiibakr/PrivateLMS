@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using PrivateLMS.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace PrivateLMS.Models
@@ -7,10 +6,10 @@ namespace PrivateLMS.Models
     public class LoanRecord
     {
         [Key]
-        public int LoanRecordId { get; set; } //PK
+        public int LoanRecordId { get; set; }
 
         [Required]
-        public int BookId { get; set; } //FK
+        public int BookId { get; set; }
 
         [Required(ErrorMessage = "Please enter Loaner Name")]
         public string LoanerName { get; set; }
@@ -30,7 +29,6 @@ namespace PrivateLMS.Models
         [DataType(DataType.DateTime)]
         public DateTime? ReturnDate { get; set; }
 
-        // Navigation Properties
         [BindNever]
         public Book Book { get; set; }
     }

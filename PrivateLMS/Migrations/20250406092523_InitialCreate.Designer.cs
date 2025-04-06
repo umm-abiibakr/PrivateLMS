@@ -12,8 +12,8 @@ using PrivateLMS.Data;
 namespace PrivateLMS.Migrations
 {
     [DbContext(typeof(LibraryDbContext))]
-    [Migration("20250405054431_PublisherFix")]
-    partial class PublisherFix
+    [Migration("20250406092523_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -37,6 +37,9 @@ namespace PrivateLMS.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("CoverImagePath")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ISBN")
                         .IsRequired()
@@ -232,6 +235,9 @@ namespace PrivateLMS.Migrations
 
                     b.Property<string>("Location")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LogoImagePath")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PublisherName")
