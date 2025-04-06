@@ -1,41 +1,32 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using PrivateLMS.Data;
+using PrivateLMS.Services;
 using PrivateLMS.Models;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
+using PrivateLMS.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace PrivateLMS.Controllers
 {
     public class BooksController : Controller
     {
         private readonly LibraryDbContext _context;
+        private readonly IBookService _bookService;
         private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public BooksController(LibraryDbContext context, IWebHostEnvironment webHostEnvironment)
+        public BooksController(LibraryDbContext context, IBookService bookService, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
+            _bookService = bookService;
             _webHostEnvironment = webHostEnvironment;
         }
 
-        // GET: Books
         public async Task<IActionResult> Index()
         {
             try
             {
-                var books = await _context.Books
-                    .AsNoTracking()
-                    .ToListAsync();
-
-                var bookViewModels = books.Select(book => new BookViewModel
-                {
-                    BookId = book.BookId,
-                    Title = book.Title,
-                    CoverImagePath = book.CoverImagePath,
-                    IsAvailable = book.IsAvailable
-                }).ToList();
-
-                return View(bookViewModels);
+                var books = await _bookService.GetAllBooksAsync();
+                return View(books);
             }
             catch (Exception ex)
             {
@@ -44,7 +35,6 @@ namespace PrivateLMS.Controllers
             }
         }
 
-        // GET: Books/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -55,36 +45,14 @@ namespace PrivateLMS.Controllers
 
             try
             {
-                var book = await _context.Books
-                    .Include(b => b.BookCategories)
-                        .ThenInclude(bc => bc.Category)
-                    .Include(b => b.Publisher)
-                    .Include(b => b.LoanRecords)
-                    .FirstOrDefaultAsync(m => m.BookId == id);
-
+                var book = await _bookService.GetBookDetailsAsync(id.Value);
                 if (book == null)
                 {
                     TempData["ErrorMessage"] = $"No book found with ID {id}.";
                     return View("NotFound");
                 }
 
-                var viewModel = new BookViewModel
-                {
-                    BookId = book.BookId,
-                    Title = book.Title,
-                    Author = book.Author,
-                    ISBN = book.ISBN,
-                    Language = book.Language,
-                    PublishedDate = book.PublishedDate,
-                    IsAvailable = book.IsAvailable,
-                    CoverImagePath = book.CoverImagePath,
-                    PublisherId = book.PublisherId,
-                    AvailablePublishers = _context.Publishers.ToList(),
-                    AvailableCategories = book.BookCategories.Select(bc => bc.Category).ToList(),
-                    LoanRecords = book.LoanRecords?.ToList() ?? new List<LoanRecord>()
-                };
-
-                return View(viewModel);
+                return View(book);
             }
             catch (Exception ex)
             {
@@ -93,7 +61,6 @@ namespace PrivateLMS.Controllers
             }
         }
 
-        // GET: Books/Loan/5
         public IActionResult Loan(int? id)
         {
             if (id == null)
@@ -102,7 +69,6 @@ namespace PrivateLMS.Controllers
                 return View("NotFound");
             }
 
-            // Redirect to LoanController.Create with the book ID
             return RedirectToAction("Create", "Loan", new { bookId = id });
         }
 

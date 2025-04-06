@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using PrivateLMS.Data;
+using PrivateLMS.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,12 @@ builder.Services.AddSession(options =>
 builder.Services.AddDbContext<LibraryDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")),
     ServiceLifetime.Scoped); // Explicitly set the lifetime
+
+// Register services
+builder.Services.AddScoped<ILoanService, LoanService>();
+builder.Services.AddScoped<IBookService, BookService>(); 
+builder.Services.AddScoped<IPublisherService, PublisherService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 var app = builder.Build();
 

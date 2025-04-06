@@ -1,37 +1,23 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using PrivateLMS.Data;
-using PrivateLMS.Models;
+using PrivateLMS.Services;
 using PrivateLMS.ViewModels;
 
 namespace PrivateLMS.Controllers
 {
     public class LoanController : Controller
     {
-        private readonly LibraryDbContext _context;
+        private readonly ILoanService _loanService;
 
-        public LoanController(LibraryDbContext context)
+        public LoanController(ILoanService loanService)
         {
-            _context = context;
+            _loanService = loanService;
         }
 
-        // GET: Loan
         public async Task<IActionResult> Index()
         {
             try
             {
-                var loans = await _context.LoanRecords
-                    .Include(lr => lr.Book)
-                    .Select(lr => new LoanViewModel
-                    {
-                        BookId = lr.BookId,
-                        BookTitle = lr.Book.Title,
-                        LoanerName = lr.LoanerName,
-                        LoanerEmail = lr.LoanerEmail,
-                        Phone = lr.Phone
-                    })
-                    .ToListAsync();
-
+                var loans = await _loanService.GetAllLoansAsync();
                 return View(loans);
             }
             catch (Exception ex)
@@ -41,7 +27,6 @@ namespace PrivateLMS.Controllers
             }
         }
 
-        // GET: Loan/Create/5
         public async Task<IActionResult> Create(int? bookId)
         {
             if (bookId == null || bookId == 0)
@@ -52,24 +37,12 @@ namespace PrivateLMS.Controllers
 
             try
             {
-                var book = await _context.Books.FindAsync(bookId);
-                if (book == null)
+                var loanViewModel = await _loanService.GetLoanFormAsync(bookId.Value);
+                if (loanViewModel == null)
                 {
-                    TempData["ErrorMessage"] = $"No book found with ID {bookId} to loan.";
-                    return View("NotFound");
-                }
-
-                if (!book.IsAvailable)
-                {
-                    TempData["ErrorMessage"] = $"The book '{book.Title}' is currently not available for loaning.";
+                    TempData["ErrorMessage"] = "The book is not available or does not exist.";
                     return View("NotAvailable");
                 }
-
-                var loanViewModel = new LoanViewModel
-                {
-                    BookId = book.BookId,
-                    BookTitle = book.Title
-                };
 
                 return View(loanViewModel);
             }
@@ -80,47 +53,30 @@ namespace PrivateLMS.Controllers
             }
         }
 
-        // POST: Loan/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(LoanViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                var book = await _context.Books.FindAsync(model.BookId);
-                model.BookTitle = book?.Title; // Preserve BookTitle on validation failure
+                var loanViewModel = await _loanService.GetLoanFormAsync(model.BookId);
+                if (loanViewModel != null)
+                {
+                    model.BookTitle = loanViewModel.BookTitle;
+                }
                 return View(model);
             }
 
             try
             {
-                var book = await _context.Books.FindAsync(model.BookId);
-                if (book == null)
+                var success = await _loanService.CreateLoanAsync(model);
+                if (!success)
                 {
-                    TempData["ErrorMessage"] = $"No book found with ID {model.BookId} to loan.";
-                    return View("NotFound");
-                }
-
-                if (!book.IsAvailable)
-                {
-                    TempData["ErrorMessage"] = $"The book '{book.Title}' is already loaned.";
+                    TempData["ErrorMessage"] = "The book is not available or does not exist.";
                     return View("NotAvailable");
                 }
 
-                var loanRecord = new LoanRecord
-                {
-                    BookId = book.BookId,
-                    LoanerName = model.LoanerName,
-                    LoanerEmail = model.LoanerEmail,
-                    Phone = model.Phone,
-                    LoanDate = DateTime.UtcNow
-                };
-
-                book.IsAvailable = false;
-                _context.LoanRecords.Add(loanRecord);
-                await _context.SaveChangesAsync();
-
-                TempData["SuccessMessage"] = $"Successfully loaned the book: {book.Title}.";
+                TempData["SuccessMessage"] = $"Successfully loaned the book: {model.BookTitle}.";
                 return RedirectToAction("Index", "Books");
             }
             catch (Exception ex)
@@ -130,7 +86,6 @@ namespace PrivateLMS.Controllers
             }
         }
 
-        // GET: Loan/Return/5
         public async Task<IActionResult> Return(int? loanRecordId)
         {
             if (loanRecordId == null || loanRecordId == 0)
@@ -141,29 +96,12 @@ namespace PrivateLMS.Controllers
 
             try
             {
-                var loanRecord = await _context.LoanRecords
-                    .Include(lr => lr.Book)
-                    .FirstOrDefaultAsync(lr => lr.LoanRecordId == loanRecordId);
-
-                if (loanRecord == null)
+                var returnViewModel = await _loanService.GetReturnFormAsync(loanRecordId.Value);
+                if (returnViewModel == null)
                 {
-                    TempData["ErrorMessage"] = $"No loan record found with ID {loanRecordId} to return.";
-                    return View("NotFound");
+                    TempData["ErrorMessage"] = "The loan record does not exist or has already been returned.";
+                    return View("AlreadyReturned");
                 }
-
-                if (loanRecord.ReturnDate != null)
-                {
-                    TempData["ErrorMessage"] = $"The loan record for '{loanRecord.Book.Title}' has already been returned.";
-                    return View("AlreadyReturned"); // Fixed typo
-                }
-
-                var returnViewModel = new ReturnViewModel
-                {
-                    LoanRecordId = loanRecord.LoanRecordId,
-                    BookTitle = loanRecord.Book.Title,
-                    LoanerName = loanRecord.LoanerName,
-                    LoanDate = loanRecord.LoanDate
-                };
 
                 return View(returnViewModel);
             }
@@ -174,7 +112,6 @@ namespace PrivateLMS.Controllers
             }
         }
 
-        // POST: Loan/Return/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Return(ReturnViewModel model)
@@ -186,27 +123,14 @@ namespace PrivateLMS.Controllers
 
             try
             {
-                var loanRecord = await _context.LoanRecords
-                    .Include(lr => lr.Book)
-                    .FirstOrDefaultAsync(lr => lr.LoanRecordId == model.LoanRecordId);
-
-                if (loanRecord == null)
+                var success = await _loanService.ReturnLoanAsync(model.LoanRecordId);
+                if (!success)
                 {
-                    TempData["ErrorMessage"] = $"No loan record found with ID {model.LoanRecordId} to return.";
-                    return View("NotFound");
+                    TempData["ErrorMessage"] = "The loan record does not exist or has already been returned.";
+                    return View("AlreadyReturned");
                 }
 
-                if (loanRecord.ReturnDate != null)
-                {
-                    TempData["ErrorMessage"] = $"The loan record for '{loanRecord.Book.Title}' has already been returned.";
-                    return View("AlreadyReturned"); // Fixed typo
-                }
-
-                loanRecord.ReturnDate = DateTime.UtcNow;
-                loanRecord.Book.IsAvailable = true;
-                await _context.SaveChangesAsync();
-
-                TempData["SuccessMessage"] = $"Successfully returned the book: {loanRecord.Book.Title}.";
+                TempData["SuccessMessage"] = "Successfully returned the book.";
                 return RedirectToAction("Index", "Books");
             }
             catch (Exception ex)
