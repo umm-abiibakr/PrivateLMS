@@ -1,26 +1,30 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace PrivateLMS.ViewModels
 {
     public class LoanViewModel
     {
-        [Required]
         public int BookId { get; set; }
 
-        [BindNever]
+        [Display(Name = "Book Title")]
         public string? BookTitle { get; set; }
 
-        [Required(ErrorMessage = "Your name is required.")]
-        [StringLength(100, ErrorMessage = "Name cannot exceed 100 characters.")]
-        public string LoanerName { get; set; }
+        [Required(ErrorMessage = "Please enter Loaner Name")]
+        public string? LoanerName { get; set; }
 
-        [Required(ErrorMessage = "Your email is required.")]
-        [EmailAddress(ErrorMessage = "Invalid email address.")]
-        public string LoanerEmail { get; set; }
+        [Required(ErrorMessage = "Please enter Loaner Email Address")]
+        [EmailAddress(ErrorMessage = "Please enter a valid Email Address")]
+        public string? LoanerEmail { get; set; }
 
-        [Required(ErrorMessage = "Your Phone Number is required.")]
-        [Phone(ErrorMessage = "Invalid Phone Number")]
-        public string Phone { get; set; }
+        [Required(ErrorMessage = "Please enter Loaner Phone Number")]
+        [Phone(ErrorMessage = "Please enter a valid phone number")]
+        public string? Phone { get; set; }
+
+        [Display(Name = "Return Date")]
+        public DateTime? ReturnDate { get; set; }
+
+        [Display(Name = "Loan Date")]
+        public DateTime LoanDate { get; set; } 
     }
 }
