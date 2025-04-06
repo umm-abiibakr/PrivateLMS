@@ -25,32 +25,37 @@ namespace PrivateLMS.Services
                 .Select(lr => new LoanViewModel
                 {
                     BookId = lr.BookId,
-                    BookTitle = lr.Book.Title,
-                    LoanerName = lr.LoanerName,
-                    LoanerEmail = lr.LoanerEmail,
-                    Phone = lr.Phone
+                    BookTitle = lr.Book != null ? lr.Book.Title ?? "Unknown" : "Unknown",
+                    LoanerName = lr.LoanerName ?? string.Empty,
+                    LoanerEmail = lr.LoanerEmail ?? string.Empty,
+                    Phone = lr.Phone ?? string.Empty,
+                    ReturnDate = lr.ReturnDate
                 })
                 .ToListAsync();
         }
 
         public async Task<LoanViewModel> GetLoanFormAsync(int bookId)
         {
-            var book = await _context.Books.FindAsync(bookId);
+            var book = await _context.Books
+                .FirstOrDefaultAsync(b => b.BookId == bookId);
+
             if (book == null || !book.IsAvailable)
             {
-                return null; // Let controller handle null case
+                return null;
             }
 
             return new LoanViewModel
             {
                 BookId = book.BookId,
-                BookTitle = book.Title
+                BookTitle = book.Title ?? string.Empty
             };
         }
 
         public async Task<bool> CreateLoanAsync(LoanViewModel model)
         {
-            var book = await _context.Books.FindAsync(model.BookId);
+            var book = await _context.Books
+                .FirstOrDefaultAsync(b => b.BookId == model.BookId);
+
             if (book == null || !book.IsAvailable)
             {
                 return false;
@@ -59,14 +64,15 @@ namespace PrivateLMS.Services
             var loanRecord = new LoanRecord
             {
                 BookId = book.BookId,
-                LoanerName = model.LoanerName,
-                LoanerEmail = model.LoanerEmail,
-                Phone = model.Phone,
+                LoanerName = model.LoanerName ?? string.Empty,
+                LoanerEmail = model.LoanerEmail ?? string.Empty,
+                Phone = model.Phone ?? string.Empty,
                 LoanDate = DateTime.UtcNow
             };
 
             book.IsAvailable = false;
             _context.LoanRecords.Add(loanRecord);
+            _context.Update(book);
             await _context.SaveChangesAsync();
             return true;
         }
@@ -79,14 +85,14 @@ namespace PrivateLMS.Services
 
             if (loanRecord == null || loanRecord.ReturnDate != null)
             {
-                return null; // Let controller handle null case
+                return null;
             }
 
             return new ReturnViewModel
             {
                 LoanRecordId = loanRecord.LoanRecordId,
-                BookTitle = loanRecord.Book.Title,
-                LoanerName = loanRecord.LoanerName,
+                BookTitle = loanRecord.Book != null ? loanRecord.Book.Title ?? string.Empty : string.Empty,
+                LoanerName = loanRecord.LoanerName ?? string.Empty,
                 LoanDate = loanRecord.LoanDate
             };
         }
@@ -103,9 +109,36 @@ namespace PrivateLMS.Services
             }
 
             loanRecord.ReturnDate = DateTime.UtcNow;
-            loanRecord.Book.IsAvailable = true;
+            if (loanRecord.Book != null)
+            {
+                loanRecord.Book.IsAvailable = true;
+            }
+            _context.Update(loanRecord);
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<List<LoanViewModel>> GetUserLoansAsync(string username)
+        {
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                return new List<LoanViewModel>();
+            }
+
+            return await _context.LoanRecords
+                .Include(lr => lr.Book)
+                .Where(lr => lr.LoanerName == username) // Assuming LoanerName matches session Username
+                .Select(lr => new LoanViewModel
+                {
+                    BookId = lr.BookId,
+                    BookTitle = lr.Book != null ? lr.Book.Title ?? "Unknown" : "Unknown",
+                    LoanerName = lr.LoanerName ?? string.Empty,
+                    LoanerEmail = lr.LoanerEmail ?? string.Empty,
+                    Phone = lr.Phone ?? string.Empty,
+                    ReturnDate = lr.ReturnDate,
+                    LoanDate = lr.LoanDate 
+                })
+                .ToListAsync();
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using PrivateLMS.Models;
-using PrivateLMS.ViewModels;
+﻿using PrivateLMS.ViewModels;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -12,5 +11,6 @@ namespace PrivateLMS.Services
         Task<bool> CreateLoanAsync(LoanViewModel model);
         Task<ReturnViewModel> GetReturnFormAsync(int loanRecordId);
         Task<bool> ReturnLoanAsync(int loanRecordId);
+        Task<List<LoanViewModel>> GetUserLoansAsync(string username); 
     }
 }

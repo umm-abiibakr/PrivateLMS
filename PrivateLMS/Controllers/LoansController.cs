@@ -1,18 +1,24 @@
 using Microsoft.AspNetCore.Mvc;
 using PrivateLMS.Services;
 using PrivateLMS.ViewModels;
+using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http; // For IHttpContextAccessor
 
 namespace PrivateLMS.Controllers
 {
-    public class LoanController : Controller
+    public class LoansController : Controller
     {
         private readonly ILoanService _loanService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public LoanController(ILoanService loanService)
+        public LoansController(ILoanService loanService, IHttpContextAccessor httpContextAccessor)
         {
             _loanService = loanService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
+        // GET: Loan
         public async Task<IActionResult> Index()
         {
             try
@@ -23,13 +29,36 @@ namespace PrivateLMS.Controllers
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = $"An error occurred while loading the loan records: {ex.Message}";
-                return View("Error");
+                return RedirectToAction("Error", "Home");
             }
         }
 
+        // GET: Loan/MyLoans
+        public async Task<IActionResult> MyLoans()
+        {
+            try
+            {
+                var username = _httpContextAccessor.HttpContext?.Session.GetString("Username");
+                if (string.IsNullOrEmpty(username))
+                {
+                    TempData["ErrorMessage"] = "You must be logged in to view your loans.";
+                    return RedirectToAction("Index", "Login");
+                }
+
+                var loans = await _loanService.GetUserLoansAsync(username);
+                return View(loans);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"An error occurred while loading your loans: {ex.Message}";
+                return RedirectToAction("Error", "Home");
+            }
+        }
+
+        // GET: Loan/Create/5
         public async Task<IActionResult> Create(int? bookId)
         {
-            if (bookId == null || bookId == 0)
+            if (bookId == null)
             {
                 TempData["ErrorMessage"] = "Book ID was not provided for loaning.";
                 return View("NotFound");
@@ -43,16 +72,16 @@ namespace PrivateLMS.Controllers
                     TempData["ErrorMessage"] = "The book is not available or does not exist.";
                     return View("NotAvailable");
                 }
-
                 return View(loanViewModel);
             }
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = $"An error occurred while loading the loan form: {ex.Message}";
-                return View("Error");
+                return RedirectToAction("Error", "Home");
             }
         }
 
+        // POST: Loan/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(LoanViewModel model)
@@ -69,6 +98,12 @@ namespace PrivateLMS.Controllers
 
             try
             {
+                var username = _httpContextAccessor.HttpContext?.Session.GetString("Username");
+                if (!string.IsNullOrEmpty(username))
+                {
+                    model.LoanerName = username; // Auto-set LoanerName from session
+                }
+
                 var success = await _loanService.CreateLoanAsync(model);
                 if (!success)
                 {
@@ -82,13 +117,14 @@ namespace PrivateLMS.Controllers
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = $"An error occurred while processing the loan: {ex.Message}";
-                return View("Error");
+                return RedirectToAction("Error", "Home");
             }
         }
 
+        // GET: Loan/Return/5
         public async Task<IActionResult> Return(int? loanRecordId)
         {
-            if (loanRecordId == null || loanRecordId == 0)
+            if (loanRecordId == null)
             {
                 TempData["ErrorMessage"] = "Loan Record ID was not provided for returning.";
                 return View("NotFound");
@@ -102,16 +138,16 @@ namespace PrivateLMS.Controllers
                     TempData["ErrorMessage"] = "The loan record does not exist or has already been returned.";
                     return View("AlreadyReturned");
                 }
-
                 return View(returnViewModel);
             }
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = $"An error occurred while loading the return confirmation: {ex.Message}";
-                return View("Error");
+                return RedirectToAction("Error", "Home");
             }
         }
 
+        // POST: Loan/Return/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Return(ReturnViewModel model)
@@ -136,7 +172,7 @@ namespace PrivateLMS.Controllers
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = $"An error occurred while processing the return: {ex.Message}";
-                return View("Error");
+                return RedirectToAction("Error", "Home");
             }
         }
     }

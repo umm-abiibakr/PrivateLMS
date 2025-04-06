@@ -1,0 +1,22 @@
+﻿@model int
+
+<div class="loan-cart">
+    <a asp-controller="Loan" asp-action="Index" class="text-decoration-none text-dark">
+        <span class="badge bg-primary position-relative">
+            <i class="bi bi-cart"></i> Loans
+            @if (Model > 0)
+            {
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    @Model
+                    <span class="visually-hidden">loaned books</span>
+                </span>
+            }
+        </span>
+    </a>
+</div>
+
+<style>
+    .loan-cart {
+        margin-left: 10px;
+    }
+</style>
