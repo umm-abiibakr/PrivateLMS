@@ -1,36 +1,34 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using PrivateLMS.Data;
+using PrivateLMS.Services;
 using PrivateLMS.Models;
+using System;
+using System.Threading.Tasks;
 
 namespace PrivateLMS.Controllers
 {
     public class CategoriesController : Controller
     {
-        private readonly LibraryDbContext _context;
+        private readonly ICategoryService _categoryService;
 
-        public CategoriesController(LibraryDbContext context)
+        public CategoriesController(ICategoryService categoryService)
         {
-            _context = context;
+            _categoryService = categoryService;
         }
 
-        // GET: Categories
         public async Task<IActionResult> Index()
         {
-            var categories = await _context.Categories
-                .Include(c => c.BookCategories)
-                .Select(c => new CategoryViewModel
-                {
-                    CategoryId = c.CategoryId,
-                    CategoryName = c.CategoryName,
-                    BookCount = c.BookCategories.Count
-                })
-                .ToListAsync();
-
-            return View(categories);
+            try
+            {
+                var categories = await _categoryService.GetAllCategoriesAsync();
+                return View(categories);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"An error occurred while loading categories: {ex.Message}";
+                return View("Error");
+            }
         }
 
-        // GET: Categories/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -39,57 +37,56 @@ namespace PrivateLMS.Controllers
                 return View("NotFound");
             }
 
-            var category = await _context.Categories
-                .Include(c => c.BookCategories)
-                .ThenInclude(bc => bc.Book)
-                .FirstOrDefaultAsync(c => c.CategoryId == id);
-
-            if (category == null)
+            try
             {
-                TempData["ErrorMessage"] = "Category not found.";
-                return View("NotFound");
+                var category = await _categoryService.GetCategoryDetailsAsync(id.Value);
+                if (category == null)
+                {
+                    TempData["ErrorMessage"] = "Category not found.";
+                    return View("NotFound");
+                }
+                return View(category);
             }
-
-            var viewModel = new CategoryViewModel
+            catch (Exception ex)
             {
-                CategoryId = category.CategoryId,
-                CategoryName = category.CategoryName,
-                BookCount = category.BookCategories.Count,
-                // Optional: List of book titles for display
-                Books = category.BookCategories.Select(bc => bc.Book.Title).ToList()
-            };
-
-            return View(viewModel);
+                TempData["ErrorMessage"] = $"An error occurred while loading category details: {ex.Message}";
+                return View("Error");
+            }
         }
 
-        // GET: Categories/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Categories/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CategoryViewModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var category = new Category
-                {
-                    CategoryName = model.CategoryName
-                };
+                return View(model);
+            }
 
-                _context.Categories.Add(category);
-                await _context.SaveChangesAsync();
+            try
+            {
+                var success = await _categoryService.CreateCategoryAsync(model);
+                if (!success)
+                {
+                    TempData["ErrorMessage"] = "Failed to create category.";
+                    return View(model);
+                }
+
                 TempData["SuccessMessage"] = "Category added successfully.";
                 return RedirectToAction(nameof(Index));
             }
-
-            return View(model);
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"An error occurred while creating the category: {ex.Message}";
+                return View(model);
+            }
         }
 
-        // GET: Categories/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -98,23 +95,23 @@ namespace PrivateLMS.Controllers
                 return View("NotFound");
             }
 
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null)
+            try
             {
-                TempData["ErrorMessage"] = "Category not found.";
-                return View("NotFound");
+                var category = await _categoryService.GetCategoryDetailsAsync(id.Value);
+                if (category == null)
+                {
+                    TempData["ErrorMessage"] = "Category not found.";
+                    return View("NotFound");
+                }
+                return View(category);
             }
-
-            var viewModel = new CategoryViewModel
+            catch (Exception ex)
             {
-                CategoryId = category.CategoryId,
-                CategoryName = category.CategoryName
-            };
-
-            return View(viewModel);
+                TempData["ErrorMessage"] = $"An error occurred while loading category for edit: {ex.Message}";
+                return View("Error");
+            }
         }
 
-        // POST: Categories/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, CategoryViewModel model)
@@ -125,25 +122,30 @@ namespace PrivateLMS.Controllers
                 return View("NotFound");
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var category = await _context.Categories.FindAsync(id);
-                if (category == null)
+                return View(model);
+            }
+
+            try
+            {
+                var success = await _categoryService.UpdateCategoryAsync(id, model);
+                if (!success)
                 {
                     TempData["ErrorMessage"] = "Category not found.";
                     return View("NotFound");
                 }
 
-                category.CategoryName = model.CategoryName;
-                await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Category updated successfully.";
                 return RedirectToAction(nameof(Index));
             }
-
-            return View(model);
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"An error occurred while updating the category: {ex.Message}";
+                return View(model);
+            }
         }
 
-        // GET: Categories/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -152,40 +154,49 @@ namespace PrivateLMS.Controllers
                 return View("NotFound");
             }
 
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null)
+            try
             {
-                TempData["ErrorMessage"] = "Category not found.";
-                return View("NotFound");
+                var category = await _categoryService.GetCategoryDetailsAsync(id.Value);
+                if (category == null)
+                {
+                    TempData["ErrorMessage"] = "Category not found.";
+                    return View("NotFound");
+                }
+                return View(category);
             }
-
-            return View(category);
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"An error occurred while loading category for deletion: {ex.Message}";
+                return View("Error");
+            }
         }
 
-        // POST: Categories/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var category = await _context.Categories
-                .Include(c => c.BookCategories)
-                .FirstOrDefaultAsync(c => c.CategoryId == id);
-            if (category == null)
+            try
             {
-                TempData["ErrorMessage"] = "Category not found.";
-                return View("NotFound");
-            }
+                var success = await _categoryService.DeleteCategoryAsync(id);
+                if (!success)
+                {
+                    TempData["ErrorMessage"] = "Category not found or cannot be deleted due to associated books.";
+                    return View("NotFound");
+                }
 
-            if (category.BookCategories.Any())
-            {
-                TempData["ErrorMessage"] = "Cannot delete category because it is associated with books.";
+                TempData["SuccessMessage"] = "Category deleted successfully.";
                 return RedirectToAction(nameof(Index));
             }
-
-            _context.Categories.Remove(category);
-            await _context.SaveChangesAsync();
-            TempData["SuccessMessage"] = "Category deleted successfully.";
-            return RedirectToAction(nameof(Index));
+            catch (InvalidOperationException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"An error occurred while deleting the category: {ex.Message}";
+                return View("Error");
+            }
         }
     }
 }
