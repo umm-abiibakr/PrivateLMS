@@ -29,11 +29,16 @@ namespace PrivateLMS.Models
         [Display(Name = "Published Date")]
         public DateTime PublishedDate { get; set; }
 
+        public string Description { get; set; }
+
+        [Range(0, int.MaxValue, ErrorMessage = "Available copies must be a non-negative number.")]
+        public int AvailableCopies { get; set; }
+
         [BindNever]
         [Display(Name = "Available")]
         public bool IsAvailable { get; set; } = true;
 
-        public string? CoverImagePath { get; set; } // Added for book cover image
+        public string? CoverImagePath { get; set; } 
 
         // Navigation Properties
         [BindNever]

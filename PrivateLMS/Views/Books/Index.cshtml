@@ -1,62 +1,72 @@
 @model IEnumerable<PrivateLMS.Models.BookViewModel>
+@{
+    ViewData["Title"] = "Books";
+}
 
 <h2 class="text-center mb-4">Books</h2>
 
-<div class="row mb-3">
-    <div class="col-md-6">
-        <form asp-action="Index" method="get" class="d-flex">
-            <input type="text" name="searchTerm" class="form-control me-2" placeholder="Search by title or author" value="@ViewBag.SearchTerm" />
-            <button type="submit" class="btn btn-outline-primary">Search</button>
-        </form>
-    </div>
-    <div class="col-md-6 text-end">
-        <a asp-action="Create" class="btn btn-primary">Add Book</a>
-    </div>
+<div class="mb-3">
+    <form asp-action="Index" method="get" class="d-flex">
+        <input type="text" name="searchTerm" class="form-control me-2" placeholder="Search by title or author" value="@ViewBag.SearchTerm" />
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
 </div>
 
-@if (!Model.Any())
-{
-    <p class="text-center">No books found matching your search.</p>
-}
-else
-{
-    <div class="row row-cols-1 row-cols-md-3 g-4">
-        @foreach (var book in Model)
-        {
-            <div class="col">
-                <div class="card h-100 text-center">
-                    @if (!string.IsNullOrEmpty(book.CoverImagePath))
-                    {
-                        <img src="@book.CoverImagePath" class="card-img-top mx-auto d-block" alt="@book.Title Cover" style="max-height: 200px; max-width: 100%; object-fit: cover;" />
-                    }
-                    else
-                    {
-                        <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
-                            <span>No Cover</span>
-                        </div>
-                    }
-                    <div class="card-body">
-                        <h5 class="card-title">@book.Title</h5>
-                        <p class="card-text">
-                            @if (book.IsAvailable)
-                            {
-                                <span class="badge bg-success">Available</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-danger">Not Available</span>
-                            }
-                        </p>
-                        <div>
-                            <a asp-action="Details" asp-route-id="@book.BookId" class="btn btn-info btn-sm">View Details</a>
-                            @if (book.IsAvailable)
-                            {
-                                <a asp-action="Loan" asp-route-id="@book.BookId" class="btn btn-primary btn-sm">Loan</a>
-                            }
-                        </div>
+<div class="text-end mb-3">
+    @if (User.IsInRole("Admin"))
+    {
+        <a asp-action="Create" class="btn btn-primary">Add Book</a>
+    }
+</div>
+
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    @foreach (var book in Model)
+    {
+        <div class="col">
+            <div class="card h-100 text-center">
+                @if (!string.IsNullOrEmpty(book.CoverImagePath))
+                {
+                    <img src="@book.CoverImagePath" class="card-img-top mx-auto d-block" alt="@book.Title Cover" style="max-height: 200px; max-width: 100%; object-fit: cover;" />
+                }
+                else
+                {
+                    <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <span>No Cover</span>
+                    </div>
+                }
+                <div class="card-body">
+                    <h5 class="card-title">@book.Title</h5>
+                    <p class="card-text">
+                        @if (!string.IsNullOrEmpty(book.Description))
+                        {
+                            <small class="text-muted">@(book.Description.Length > 50 ? book.Description.Substring(0, 50) + "..." : book.Description)</small>
+                        }
+                        <br />
+                        <span>Copies: @book.AvailableCopies</span>
+                        <br />
+                        @if (book.IsAvailable)
+                        {
+                            <span class="badge bg-success">Available</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Not Available</span>
+                        }
+                    </p>
+                    <div>
+                        <a asp-action="Details" asp-route-id="@book.BookId" class="btn btn-info btn-sm">View Details</a>
+                        @if (book.IsAvailable && book.AvailableCopies > 0)
+                        {
+                            <a asp-action="Loan" asp-route-id="@book.BookId" class="btn btn-primary btn-sm">Loan</a>
+                        }
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-action="Edit" asp-route-id="@book.BookId" class="btn btn-warning btn-sm">Edit</a>
+                            <a asp-action="Delete" asp-route-id="@book.BookId" class="btn btn-danger btn-sm">Delete</a>
+                        }
                     </div>
                 </div>
             </div>
-        }
-    </div>
-}
+        </div>
+    }
+</div>

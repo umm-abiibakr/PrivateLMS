@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace PrivateLMS.Models
@@ -22,14 +22,15 @@ namespace PrivateLMS.Models
         [Phone(ErrorMessage = "Please enter a valid phone number")]
         public string Phone { get; set; }
 
-        [BindNever]
         [DataType(DataType.DateTime)]
         public DateTime LoanDate { get; set; } = DateTime.UtcNow;
 
         [DataType(DataType.DateTime)]
+        public DateTime? DueDate { get; set; } 
+
+        [DataType(DataType.DateTime)]
         public DateTime? ReturnDate { get; set; }
 
-        [BindNever]
         public Book Book { get; set; }
     }
 }

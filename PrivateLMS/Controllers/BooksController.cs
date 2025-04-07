@@ -270,7 +270,7 @@ namespace PrivateLMS.Controllers
                 return View("NotFound");
             }
 
-            return RedirectToAction("Create", "Loan", new { bookId = id });
+            return RedirectToAction("Create", "Loans", new { bookId = id });
         }
     }
 }

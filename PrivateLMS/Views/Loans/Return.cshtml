@@ -1,4 +1,7 @@
 @model PrivateLMS.ViewModels.ReturnViewModel
+@{
+    ViewData["Title"] = "Return Book";
+}
 
 <h2>Return Book: @Model.BookTitle</h2>
 
@@ -10,6 +13,8 @@
         <dd class="col-sm-10">@Model.LoanerName</dd>
         <dt class="col-sm-2">Loan Date</dt>
         <dd class="col-sm-10">@Model.LoanDate?.ToString("yyyy-MM-dd HH:mm")</dd>
+        <dt class="col-sm-2">Due Date</dt>
+        <dd class="col-sm-10">@Model.DueDate?.ToString("yyyy-MM-dd")</dd>
     </dl>
 </div>
 

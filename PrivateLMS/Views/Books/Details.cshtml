@@ -53,12 +53,16 @@
         <dd>@Model.Title</dd>
         <dt>Author</dt>
         <dd>@Model.Author</dd>
+        <dt>Description</dt>
+        <dd>@(Model.Description ?? "No description available")</dd>
         <dt>ISBN</dt>
         <dd>@Model.ISBN</dd>
         <dt>Language</dt>
         <dd>@Model.Language</dd>
         <dt>Published Date</dt>
         <dd>@Model.PublishedDate.ToShortDateString()</dd>
+        <dt>Available Copies</dt>
+        <dd>@Model.AvailableCopies</dd>
         <dt>Available</dt>
         <dd>@(Model.IsAvailable ? "Yes" : "No")</dd>
         <dt>Publisher</dt>

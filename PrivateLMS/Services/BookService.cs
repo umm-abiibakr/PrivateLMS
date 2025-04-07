@@ -26,7 +26,9 @@ namespace PrivateLMS.Services
                     BookId = b.BookId,
                     Title = b.Title ?? string.Empty,
                     CoverImagePath = b.CoverImagePath,
-                    IsAvailable = b.IsAvailable
+                    IsAvailable = b.IsAvailable,
+                    AvailableCopies = b.AvailableCopies, // Added
+                    Description = b.Description // Added
                 })
                 .ToListAsync();
         }
@@ -34,16 +36,12 @@ namespace PrivateLMS.Services
         public async Task<BookViewModel> GetBookDetailsAsync(int bookId)
         {
             var book = await _context.Books
-                .Include(b => b.BookCategories)
-                    .ThenInclude(bc => bc.Category)
+                .Include(b => b.BookCategories).ThenInclude(bc => bc.Category)
                 .Include(b => b.Publisher)
                 .Include(b => b.LoanRecords)
                 .FirstOrDefaultAsync(b => b.BookId == bookId);
 
-            if (book == null)
-            {
-                return null;
-            }
+            if (book == null) return null;
 
             return new BookViewModel
             {
@@ -56,9 +54,12 @@ namespace PrivateLMS.Services
                 IsAvailable = book.IsAvailable,
                 CoverImagePath = book.CoverImagePath,
                 PublisherId = book.PublisherId,
-                AvailablePublishers = await GetAllPublishersAsync(),
+                AvailablePublishers = (await GetAllPublishersAsync()) ?? new List<Publisher>(),
                 AvailableCategories = book.BookCategories?.Select(bc => bc.Category).ToList() ?? new List<Category>(),
-                LoanRecords = book.LoanRecords?.ToList() ?? new List<LoanRecord>()
+                LoanRecords = book.LoanRecords?.ToList() ?? new List<LoanRecord>(),
+                SelectedCategoryIds = book.BookCategories?.Select(bc => bc.CategoryId).ToList() ?? new List<int>(),
+                Description = book.Description, // Added
+                AvailableCopies = book.AvailableCopies // Added
             };
         }
 
@@ -74,9 +75,9 @@ namespace PrivateLMS.Services
                 IsAvailable = model.IsAvailable,
                 CoverImagePath = coverImagePath,
                 PublisherId = model.PublisherId,
-                BookCategories = model.SelectedCategoryIds
-                    ?.Select(categoryId => new BookCategory { CategoryId = categoryId })
-                    .ToList() ?? new List<BookCategory>()
+                Description = model.Description, // Added
+                AvailableCopies = model.AvailableCopies, // Added
+                BookCategories = model.SelectedCategoryIds?.Select(categoryId => new BookCategory { CategoryId = categoryId }).ToList() ?? new List<BookCategory>()
             };
 
             _context.Books.Add(book);
@@ -96,10 +97,7 @@ namespace PrivateLMS.Services
                 .Include(b => b.BookCategories)
                 .FirstOrDefaultAsync(b => b.BookId == id);
 
-            if (book == null)
-            {
-                return false;
-            }
+            if (book == null) return false;
 
             book.Title = model.Title ?? string.Empty;
             book.Author = model.Author ?? string.Empty;
@@ -108,6 +106,8 @@ namespace PrivateLMS.Services
             book.PublishedDate = model.PublishedDate;
             book.IsAvailable = model.IsAvailable;
             book.PublisherId = model.PublisherId;
+            book.Description = model.Description; // Added
+            book.AvailableCopies = model.AvailableCopies; // Added
             if (!string.IsNullOrEmpty(coverImagePath))
             {
                 book.CoverImagePath = coverImagePath;

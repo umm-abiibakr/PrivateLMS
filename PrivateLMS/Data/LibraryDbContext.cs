@@ -11,13 +11,60 @@ namespace PrivateLMS.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Seed Book data with PublisherId
             modelBuilder.Entity<Book>().HasData(
-                new Book { BookId = 1, Title = "The Three Fundamental Principles", Author = "Muhammad Ibn Abdil-Wahhab", ISBN = "978-0201616224", Language = "Arabic", PublishedDate = new DateTime(2021, 10, 30), IsAvailable = true, PublisherId = 1 },
-                new Book { BookId = 2, Title = "Arbaun An-Nawawi", Author = "Imaam An-Nawawi", ISBN = "978-0132350884", Language = "Hausa", PublishedDate = new DateTime(2023, 8, 1), IsAvailable = true, PublisherId = 2 },
-                new Book { BookId = 3, Title = "Tafseer At-Tabari", Author = "Imaam At-Tabari", ISBN = "978-0451616235", Language = "Arabic", PublishedDate = new DateTime(2022, 11, 22), IsAvailable = true, PublisherId = 3 },
-                new Book { BookId = 4, Title = "Tafseer Ibn Kathir", Author = "Ibn Kathir", ISBN = "978-4562350123", Language = "English", PublishedDate = new DateTime(2020, 8, 15), IsAvailable = true, PublisherId = 4 }
-            );
+        new Book
+        {
+            BookId = 1,
+            Title = "The Three Fundamental Principles",
+            Author = "Muhammad Ibn Abdil-Wahhab",
+            ISBN = "978-0201616224",
+            Language = "Arabic",
+            PublishedDate = new DateTime(2021, 10, 30),
+            Description = "A foundational text on Islamic principles.",
+            AvailableCopies = 5,
+            IsAvailable = true,
+            PublisherId = 1
+        },
+        new Book
+        {
+            BookId = 2,
+            Title = "Arbaun An-Nawawi",
+            Author = "Imaam An-Nawawi",
+            ISBN = "978-0132350884",
+            Language = "Hausa",
+            PublishedDate = new DateTime(2023, 8, 1),
+            Description = "A collection of forty hadiths.",
+            AvailableCopies = 3,
+            IsAvailable = true,
+            PublisherId = 2
+        },
+        new Book
+        {
+            BookId = 3,
+            Title = "Tafseer At-Tabari",
+            Author = "Imaam At-Tabari",
+            ISBN = "978-0451616235",
+            Language = "Arabic",
+            PublishedDate = new DateTime(2022, 11, 22),
+            Description = "Comprehensive exegesis of the Quran.",
+            AvailableCopies = 2,
+            IsAvailable = true,
+            PublisherId = 3
+        },
+        new Book
+        {
+            BookId = 4,
+            Title = "Tafseer Ibn Kathir",
+            Author = "Ibn Kathir",
+            ISBN = "978-4562350123",
+            Language = "English",
+            PublishedDate = new DateTime(2020, 8, 15),
+            Description = "A widely respected Quranic commentary.",
+            AvailableCopies = 4,
+            IsAvailable = true,
+            PublisherId = 4
+        }
+    );
 
             // Seed User data 
             modelBuilder.Entity<User>().HasData(

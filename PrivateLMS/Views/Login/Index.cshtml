@@ -26,5 +26,10 @@
         </div>
 
         <button type="submit" class="btn btn-primary">Login</button>
+        <a asp-controller="Registration" asp-action="Step1" class="btn btn-link">Register</a>
     </form>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

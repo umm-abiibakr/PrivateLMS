@@ -1,4 +1,7 @@
 ﻿@model IEnumerable<PrivateLMS.ViewModels.LoanViewModel>
+@{
+    ViewData["Title"] = "My Loans";
+}
 
 <h2 class="text-center mb-4">My Loans</h2>
 
@@ -13,6 +16,7 @@ else
             <tr>
                 <th>Book Title</th>
                 <th>Loan Date</th>
+                <th>Due Date</th>
                 <th>Return Date</th>
                 <th>Actions</th>
             </tr>
@@ -23,6 +27,7 @@ else
                 <tr>
                     <td>@loan.BookTitle</td>
                     <td>@loan.LoanDate.ToShortDateString()</td>
+                    <td>@(loan.DueDate?.ToShortDateString() ?? "N/A")</td>
                     <td>
                         @if (loan.ReturnDate.HasValue)
                         {
@@ -36,7 +41,7 @@ else
                     <td>
                         @if (!loan.ReturnDate.HasValue)
                         {
-                            <a asp-action="Return" asp-route-loanRecordId="@loan.BookId" class="btn btn-primary btn-sm">Return</a>
+                            <a asp-action="Return" asp-route-loanRecordId="@loan.LoanRecordId" class="btn btn-primary btn-sm">Return</a>
                         }
                     </td>
                 </tr>
