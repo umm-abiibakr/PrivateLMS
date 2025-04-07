@@ -1,4 +1,4 @@
-﻿@model PrivateLMS.Models.User
+﻿@model PrivateLMS.ViewModels.Step1ViewModel
 @{
     ViewData["Title"] = "Step 1: Personal Information";
 }
@@ -6,6 +6,7 @@
 <div class="container mt-5">
     <h2>Step 1: Personal Information</h2>
     <form asp-action="Step1" method="post">
+        <div asp-validation-summary="All" class="text-danger"></div>
 
         <div class="mb-3">
             <label asp-for="FirstName" class="form-label">First Name</label>

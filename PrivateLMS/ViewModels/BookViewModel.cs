@@ -28,20 +28,27 @@ namespace PrivateLMS.Models
         [Display(Name = "Published Date")]
         public DateTime PublishedDate { get; set; }
 
+        [StringLength(500, ErrorMessage = "Description cannot exceed 500 characters.")]
+        public string Description { get; set; }
+
+        [Range(0, int.MaxValue, ErrorMessage = "Available copies must be a non-negative number.")]
+        [Display(Name = "Available Copies")]
+        public int AvailableCopies { get; set; }
+
         [Display(Name = "Available")]
         public bool IsAvailable { get; set; } = true;
 
         public string? CoverImagePath { get; set; }
         [Display(Name = "Book Cover")]
-        public IFormFile? CoverImage { get; set; } // For file upload
+        public IFormFile? CoverImage { get; set; }
 
         [Required(ErrorMessage = "Please select a Publisher")]
         [Display(Name = "Publisher")]
         public int? PublisherId { get; set; }
 
-        public List<int> SelectedCategoryIds { get; set; } = new List<int>(); // For category multi-select
+        [Required(ErrorMessage = "Please select at least one category")]
+        public List<int> SelectedCategoryIds { get; set; } = new List<int>();
 
-        // For dropdowns and display
         public List<Publisher> AvailablePublishers { get; set; } = new List<Publisher>();
         public List<Category> AvailableCategories { get; set; } = new List<Category>();
         public List<LoanRecord> LoanRecords { get; set; } = new List<LoanRecord>();
