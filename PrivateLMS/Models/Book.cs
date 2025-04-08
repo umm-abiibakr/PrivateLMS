@@ -16,9 +16,8 @@ namespace PrivateLMS.Models
         [StringLength(100, ErrorMessage = "Language name cannot exceed 100 characters.")]
         public string Language { get; set; }
 
-        [Required(ErrorMessage = "The Author field is required.")]
-        [StringLength(100, ErrorMessage = "Author name cannot exceed 100 characters.")]
-        public string Author { get; set; }
+        [Required(ErrorMessage = "Please select an Author")]
+        public int AuthorId { get; set; } // Replaced string Author with AuthorId
 
         [Required(ErrorMessage = "The ISBN field is required.")]
         [RegularExpression(@"^(97(8|9))?\d{9}(\d|X)$", ErrorMessage = "ISBN must be a valid 10 or 13 digit number.")]
@@ -46,5 +45,6 @@ namespace PrivateLMS.Models
         public ICollection<BookCategory>? BookCategories { get; set; }
         public int? PublisherId { get; set; }
         public Publisher? Publisher { get; set; }
+        public Author Author { get; set; } 
     }
 }

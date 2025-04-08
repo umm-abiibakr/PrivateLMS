@@ -16,7 +16,7 @@ namespace PrivateLMS.Data
         {
             BookId = 1,
             Title = "The Three Fundamental Principles",
-            Author = "Muhammad Ibn Abdil-Wahhab",
+            AuthorId = 1,
             ISBN = "978-0201616224",
             Language = "Arabic",
             PublishedDate = new DateTime(2021, 10, 30),
@@ -29,7 +29,7 @@ namespace PrivateLMS.Data
         {
             BookId = 2,
             Title = "Arbaun An-Nawawi",
-            Author = "Imaam An-Nawawi",
+            AuthorId = 2,
             ISBN = "978-0132350884",
             Language = "Hausa",
             PublishedDate = new DateTime(2023, 8, 1),
@@ -42,7 +42,7 @@ namespace PrivateLMS.Data
         {
             BookId = 3,
             Title = "Tafseer At-Tabari",
-            Author = "Imaam At-Tabari",
+            AuthorId = 3,
             ISBN = "978-0451616235",
             Language = "Arabic",
             PublishedDate = new DateTime(2022, 11, 22),
@@ -55,7 +55,7 @@ namespace PrivateLMS.Data
         {
             BookId = 4,
             Title = "Tafseer Ibn Kathir",
-            Author = "Ibn Kathir",
+            AuthorId = 4,
             ISBN = "978-4562350123",
             Language = "English",
             PublishedDate = new DateTime(2020, 8, 15),
@@ -63,8 +63,16 @@ namespace PrivateLMS.Data
             AvailableCopies = 4,
             IsAvailable = true,
             PublisherId = 4
-        }
-    );
+            }
+           );
+
+            // Seed Authors
+            modelBuilder.Entity<Author>().HasData(
+                new Author { AuthorId = 1, Name = "Muhammad Ibn Abdil-Wahhab" },
+                new Author { AuthorId = 2, Name = "Imaam An-Nawawi" },
+                new Author { AuthorId = 3, Name = "Imaam At-Tabari" },
+                new Author { AuthorId = 4, Name = "Ibn Kathir" }
+            );
 
             // Seed User data 
             modelBuilder.Entity<User>().HasData(
@@ -108,14 +116,20 @@ namespace PrivateLMS.Data
                 .WithMany(c => c.BookCategories)
                 .HasForeignKey(bc => bc.CategoryId);
 
-            // Book to Publisher (one-to-many)
             modelBuilder.Entity<Book>()
                 .HasOne(b => b.Publisher)
                 .WithMany()
                 .HasForeignKey(b => b.PublisherId)
                 .OnDelete(DeleteBehavior.SetNull); // If Publisher is deleted, set PublisherId to null
+
+            modelBuilder.Entity<Book>()
+            .HasOne(b => b.Author)
+            .WithMany(a => a.Books)
+            .HasForeignKey(b => b.AuthorId)
+            .OnDelete(DeleteBehavior.Restrict);
         }
 
+        public DbSet<Author> Authors { get; set; }
         public DbSet<Book> Books { get; set; }
         public DbSet<LoanRecord> LoanRecords { get; set; }
         public DbSet<Publisher> Publishers { get; set; }

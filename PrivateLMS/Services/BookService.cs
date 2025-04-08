@@ -11,10 +11,12 @@ namespace PrivateLMS.Services
     public class BookService : IBookService
     {
         private readonly LibraryDbContext _context;
+        private readonly IAuthorService _authorService; // Added dependency
 
-        public BookService(LibraryDbContext context)
+        public BookService(LibraryDbContext context, IAuthorService authorService)
         {
             _context = context;
+            _authorService = authorService;
         }
 
         public async Task<List<BookViewModel>> GetAllBooksAsync()
@@ -27,8 +29,8 @@ namespace PrivateLMS.Services
                     Title = b.Title ?? string.Empty,
                     CoverImagePath = b.CoverImagePath,
                     IsAvailable = b.IsAvailable,
-                    AvailableCopies = b.AvailableCopies, // Added
-                    Description = b.Description // Added
+                    AvailableCopies = b.AvailableCopies,
+                    Description = b.Description
                 })
                 .ToListAsync();
         }
@@ -38,6 +40,7 @@ namespace PrivateLMS.Services
             var book = await _context.Books
                 .Include(b => b.BookCategories).ThenInclude(bc => bc.Category)
                 .Include(b => b.Publisher)
+                .Include(b => b.Author)
                 .Include(b => b.LoanRecords)
                 .FirstOrDefaultAsync(b => b.BookId == bookId);
 
@@ -47,19 +50,20 @@ namespace PrivateLMS.Services
             {
                 BookId = book.BookId,
                 Title = book.Title ?? string.Empty,
-                Author = book.Author ?? string.Empty,
+                AuthorId = book.AuthorId,
                 ISBN = book.ISBN ?? string.Empty,
                 Language = book.Language ?? string.Empty,
                 PublishedDate = book.PublishedDate,
                 IsAvailable = book.IsAvailable,
                 CoverImagePath = book.CoverImagePath,
                 PublisherId = book.PublisherId,
-                AvailablePublishers = (await GetAllPublishersAsync()) ?? new List<Publisher>(),
+                Description = book.Description,
+                AvailableCopies = book.AvailableCopies,
+                AvailableAuthors = await _authorService.GetAllAuthorsAsync(), // Use IAuthorService
+                AvailablePublishers = await GetAllPublishersAsync(),
                 AvailableCategories = book.BookCategories?.Select(bc => bc.Category).ToList() ?? new List<Category>(),
                 LoanRecords = book.LoanRecords?.ToList() ?? new List<LoanRecord>(),
-                SelectedCategoryIds = book.BookCategories?.Select(bc => bc.CategoryId).ToList() ?? new List<int>(),
-                Description = book.Description, // Added
-                AvailableCopies = book.AvailableCopies // Added
+                SelectedCategoryIds = book.BookCategories?.Select(bc => bc.CategoryId).ToList() ?? new List<int>()
             };
         }
 
@@ -68,15 +72,15 @@ namespace PrivateLMS.Services
             var book = new Book
             {
                 Title = model.Title ?? string.Empty,
-                Author = model.Author ?? string.Empty,
+                AuthorId = model.AuthorId,
                 ISBN = model.ISBN ?? string.Empty,
                 Language = model.Language ?? string.Empty,
                 PublishedDate = model.PublishedDate,
                 IsAvailable = model.IsAvailable,
                 CoverImagePath = coverImagePath,
                 PublisherId = model.PublisherId,
-                Description = model.Description, // Added
-                AvailableCopies = model.AvailableCopies, // Added
+                Description = model.Description,
+                AvailableCopies = model.AvailableCopies,
                 BookCategories = model.SelectedCategoryIds?.Select(categoryId => new BookCategory { CategoryId = categoryId }).ToList() ?? new List<BookCategory>()
             };
 
@@ -100,14 +104,14 @@ namespace PrivateLMS.Services
             if (book == null) return false;
 
             book.Title = model.Title ?? string.Empty;
-            book.Author = model.Author ?? string.Empty;
+            book.AuthorId = model.AuthorId;
             book.ISBN = model.ISBN ?? string.Empty;
             book.Language = model.Language ?? string.Empty;
             book.PublishedDate = model.PublishedDate;
             book.IsAvailable = model.IsAvailable;
             book.PublisherId = model.PublisherId;
-            book.Description = model.Description; // Added
-            book.AvailableCopies = model.AvailableCopies; // Added
+            book.Description = model.Description;
+            book.AvailableCopies = model.AvailableCopies;
             if (!string.IsNullOrEmpty(coverImagePath))
             {
                 book.CoverImagePath = coverImagePath;
@@ -144,10 +148,7 @@ namespace PrivateLMS.Services
                 .Include(b => b.BookCategories)
                 .FirstOrDefaultAsync(b => b.BookId == id);
 
-            if (book == null)
-            {
-                return false;
-            }
+            if (book == null) return false;
 
             _context.Books.Remove(book);
             await _context.SaveChangesAsync();
@@ -166,14 +167,19 @@ namespace PrivateLMS.Services
                 searchTerm = searchTerm.Trim();
                 return await _context.Books
                     .AsNoTracking()
+                    .Include(b => b.Author)
                     .Where(b => (b.Title != null && EF.Functions.Like(b.Title, $"%{searchTerm}%")) ||
-                                (b.Author != null && EF.Functions.Like(b.Author, $"%{searchTerm}%")))
+                                (b.Author != null && EF.Functions.Like(b.Author.Name, $"%{searchTerm}%")))
                     .Select(b => new BookViewModel
                     {
                         BookId = b.BookId,
                         Title = b.Title ?? string.Empty,
                         CoverImagePath = b.CoverImagePath ?? string.Empty,
-                        IsAvailable = b.IsAvailable
+                        IsAvailable = b.IsAvailable,
+                        AvailableCopies = b.AvailableCopies,
+                        Description = b.Description,
+                        AuthorId = b.AuthorId,
+                        AvailableAuthors = new List<Author> { b.Author } // Single author for search result
                     })
                     .ToListAsync();
             }

@@ -12,7 +12,7 @@ using PrivateLMS.Data;
 namespace PrivateLMS.Migrations
 {
     [DbContext(typeof(LibraryDbContext))]
-    [Migration("20250406092523_InitialCreate")]
+    [Migration("20250407234744_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -25,6 +25,55 @@ namespace PrivateLMS.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("PrivateLMS.Models.Author", b =>
+                {
+                    b.Property<int>("AuthorId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AuthorId"));
+
+                    b.Property<string>("Biography")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("BirthDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeathDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("AuthorId");
+
+                    b.ToTable("Authors");
+
+                    b.HasData(
+                        new
+                        {
+                            AuthorId = 1,
+                            Name = "Muhammad Ibn Abdil-Wahhab"
+                        },
+                        new
+                        {
+                            AuthorId = 2,
+                            Name = "Imaam An-Nawawi"
+                        },
+                        new
+                        {
+                            AuthorId = 3,
+                            Name = "Imaam At-Tabari"
+                        },
+                        new
+                        {
+                            AuthorId = 4,
+                            Name = "Ibn Kathir"
+                        });
+                });
+
             modelBuilder.Entity("PrivateLMS.Models.Book", b =>
                 {
                     b.Property<int>("BookId")
@@ -33,12 +82,17 @@ namespace PrivateLMS.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BookId"));
 
-                    b.Property<string>("Author")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                    b.Property<int>("AuthorId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AvailableCopies")
+                        .HasColumnType("int");
 
                     b.Property<string>("CoverImagePath")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ISBN")
@@ -66,6 +120,8 @@ namespace PrivateLMS.Migrations
 
                     b.HasKey("BookId");
 
+                    b.HasIndex("AuthorId");
+
                     b.HasIndex("PublisherId");
 
                     b.ToTable("Books");
@@ -74,7 +130,9 @@ namespace PrivateLMS.Migrations
                         new
                         {
                             BookId = 1,
-                            Author = "Muhammad Ibn Abdil-Wahhab",
+                            AuthorId = 1,
+                            AvailableCopies = 5,
+                            Description = "A foundational text on Islamic principles.",
                             ISBN = "978-0201616224",
                             IsAvailable = true,
                             Language = "Arabic",
@@ -85,7 +143,9 @@ namespace PrivateLMS.Migrations
                         new
                         {
                             BookId = 2,
-                            Author = "Imaam An-Nawawi",
+                            AuthorId = 2,
+                            AvailableCopies = 3,
+                            Description = "A collection of forty hadiths.",
                             ISBN = "978-0132350884",
                             IsAvailable = true,
                             Language = "Hausa",
@@ -96,7 +156,9 @@ namespace PrivateLMS.Migrations
                         new
                         {
                             BookId = 3,
-                            Author = "Imaam At-Tabari",
+                            AuthorId = 3,
+                            AvailableCopies = 2,
+                            Description = "Comprehensive exegesis of the Quran.",
                             ISBN = "978-0451616235",
                             IsAvailable = true,
                             Language = "Arabic",
@@ -107,7 +169,9 @@ namespace PrivateLMS.Migrations
                         new
                         {
                             BookId = 4,
-                            Author = "Ibn Kathir",
+                            AuthorId = 4,
+                            AvailableCopies = 4,
+                            Description = "A widely respected Quranic commentary.",
                             ISBN = "978-4562350123",
                             IsAvailable = true,
                             Language = "English",
@@ -199,6 +263,9 @@ namespace PrivateLMS.Migrations
 
                     b.Property<int>("BookId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime?>("DueDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("LoanDate")
                         .HasColumnType("datetime2");
@@ -376,10 +443,18 @@ namespace PrivateLMS.Migrations
 
             modelBuilder.Entity("PrivateLMS.Models.Book", b =>
                 {
+                    b.HasOne("PrivateLMS.Models.Author", "Author")
+                        .WithMany("Books")
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("PrivateLMS.Models.Publisher", "Publisher")
                         .WithMany()
                         .HasForeignKey("PublisherId")
                         .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Author");
 
                     b.Navigation("Publisher");
                 });
@@ -412,6 +487,11 @@ namespace PrivateLMS.Migrations
                         .IsRequired();
 
                     b.Navigation("Book");
+                });
+
+            modelBuilder.Entity("PrivateLMS.Models.Author", b =>
+                {
+                    b.Navigation("Books");
                 });
 
             modelBuilder.Entity("PrivateLMS.Models.Book", b =>
