@@ -1,17 +1,24 @@
 @model PrivateLMS.Models.BookViewModel
+@{
+    ViewData["Title"] = "Create Book";
+}
 
 <h2>Create Book</h2>
 
 <form asp-action="Create" method="post" enctype="multipart/form-data">
+    <div asp-validation-summary="All" class="text-danger"></div>
+
     <div class="mb-3">
         <label asp-for="Title" class="form-label"></label>
         <input asp-for="Title" class="form-control" />
         <span asp-validation-for="Title" class="text-danger"></span>
     </div>
     <div class="mb-3">
-        <label asp-for="Author" class="form-label"></label>
-        <input asp-for="Author" class="form-control" />
-        <span asp-validation-for="Author" class="text-danger"></span>
+        <label asp-for="AuthorId" class="form-label">Author</label>
+        <select asp-for="AuthorId" class="form-control" asp-items="@(new SelectList(Model.AvailableAuthors, "AuthorId", "Name"))">
+            <option value="">Select an Author</option>
+        </select>
+        <span asp-validation-for="AuthorId" class="text-danger"></span>
     </div>
     <div class="mb-3">
         <label asp-for="ISBN" class="form-label"></label>
@@ -29,8 +36,18 @@
         <span asp-validation-for="PublishedDate" class="text-danger"></span>
     </div>
     <div class="mb-3">
-        <label asp-for="IsAvailable" class="form-label"></label>
-        <input asp-for="IsAvailable" type="checkbox" class="form-check-input" />
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="AvailableCopies" class="form-label"></label>
+        <input asp-for="AvailableCopies" class="form-control" type="number" min="0" />
+        <span asp-validation-for="AvailableCopies" class="text-danger"></span>
+    </div>
+    <div class="mb-3 form-check">
+        <input asp-for="IsAvailable" class="form-check-input" />
+        <label asp-for="IsAvailable" class="form-check-label"></label>
         <span asp-validation-for="IsAvailable" class="text-danger"></span>
     </div>
     <div class="mb-3">
@@ -38,19 +55,6 @@
         <input asp-for="CoverImage" type="file" class="form-control" accept="image/*" />
         <span asp-validation-for="CoverImage" class="text-danger"></span>
     </div>
-
-    <div class="mb-3">
-        <label asp-for="Description" class="form-label">Description</label>
-        <textarea asp-for="Description" class="form-control" rows="3"></textarea>
-        <span asp-validation-for="Description" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="AvailableCopies" class="form-label">Available Copies</label>
-        <input asp-for="AvailableCopies" class="form-control" type="number" min="0" />
-        <span asp-validation-for="AvailableCopies" class="text-danger"></span>
-    </div>
-
     <div class="mb-3">
         <label asp-for="PublisherId" class="form-label">Publisher</label>
         <select asp-for="PublisherId" class="form-control" asp-items="@(new SelectList(Model.AvailablePublishers, "PublisherId", "PublisherName"))">
@@ -58,7 +62,6 @@
         </select>
         <span asp-validation-for="PublisherId" class="text-danger"></span>
     </div>
-
     <div class="mb-3">
         <label class="form-label">Categories</label>
         <select asp-for="SelectedCategoryIds" class="form-control" multiple asp-items="@(new SelectList(Model.AvailableCategories, "CategoryId", "CategoryName"))"></select>
@@ -67,6 +70,10 @@
     <button type="submit" class="btn btn-success">Save</button>
     <a asp-action="Index" class="btn btn-secondary">Back</a>
 </form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
 <script>
     tinymce.init({
       selector: 'textarea',

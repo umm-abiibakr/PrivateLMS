@@ -14,6 +14,22 @@ namespace PrivateLMS.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Authors",
+                columns: table => new
+                {
+                    AuthorId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Biography = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BirthDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeathDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Authors", x => x.AuthorId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Categories",
                 columns: table => new
                 {
@@ -77,9 +93,11 @@ namespace PrivateLMS.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Title = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Language = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Author = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    AuthorId = table.Column<int>(type: "int", nullable: false),
                     ISBN = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PublishedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AvailableCopies = table.Column<int>(type: "int", nullable: false),
                     IsAvailable = table.Column<bool>(type: "bit", nullable: false),
                     CoverImagePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PublisherId = table.Column<int>(type: "int", nullable: true)
@@ -87,6 +105,12 @@ namespace PrivateLMS.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Books", x => x.BookId);
+                    table.ForeignKey(
+                        name: "FK_Books_Authors_AuthorId",
+                        column: x => x.AuthorId,
+                        principalTable: "Authors",
+                        principalColumn: "AuthorId",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Books_Publishers_PublisherId",
                         column: x => x.PublisherId,
@@ -130,6 +154,7 @@ namespace PrivateLMS.Migrations
                     LoanerEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LoanDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DueDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     ReturnDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
@@ -141,6 +166,17 @@ namespace PrivateLMS.Migrations
                         principalTable: "Books",
                         principalColumn: "BookId",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "Authors",
+                columns: new[] { "AuthorId", "Biography", "BirthDate", "DeathDate", "Name" },
+                values: new object[,]
+                {
+                    { 1, null, null, null, "Muhammad Ibn Abdil-Wahhab" },
+                    { 2, null, null, null, "Imaam An-Nawawi" },
+                    { 3, null, null, null, "Imaam At-Tabari" },
+                    { 4, null, null, null, "Ibn Kathir" }
                 });
 
             migrationBuilder.InsertData(
@@ -171,13 +207,13 @@ namespace PrivateLMS.Migrations
 
             migrationBuilder.InsertData(
                 table: "Books",
-                columns: new[] { "BookId", "Author", "CoverImagePath", "ISBN", "IsAvailable", "Language", "PublishedDate", "PublisherId", "Title" },
+                columns: new[] { "BookId", "AuthorId", "AvailableCopies", "CoverImagePath", "Description", "ISBN", "IsAvailable", "Language", "PublishedDate", "PublisherId", "Title" },
                 values: new object[,]
                 {
-                    { 1, "Muhammad Ibn Abdil-Wahhab", null, "978-0201616224", true, "Arabic", new DateTime(2021, 10, 30, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, "The Three Fundamental Principles" },
-                    { 2, "Imaam An-Nawawi", null, "978-0132350884", true, "Hausa", new DateTime(2023, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, "Arbaun An-Nawawi" },
-                    { 3, "Imaam At-Tabari", null, "978-0451616235", true, "Arabic", new DateTime(2022, 11, 22, 0, 0, 0, 0, DateTimeKind.Unspecified), 3, "Tafseer At-Tabari" },
-                    { 4, "Ibn Kathir", null, "978-4562350123", true, "English", new DateTime(2020, 8, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), 4, "Tafseer Ibn Kathir" }
+                    { 1, 1, 5, null, "A foundational text on Islamic principles.", "978-0201616224", true, "Arabic", new DateTime(2021, 10, 30, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, "The Three Fundamental Principles" },
+                    { 2, 2, 3, null, "A collection of forty hadiths.", "978-0132350884", true, "Hausa", new DateTime(2023, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, "Arbaun An-Nawawi" },
+                    { 3, 3, 2, null, "Comprehensive exegesis of the Quran.", "978-0451616235", true, "Arabic", new DateTime(2022, 11, 22, 0, 0, 0, 0, DateTimeKind.Unspecified), 3, "Tafseer At-Tabari" },
+                    { 4, 4, 4, null, "A widely respected Quranic commentary.", "978-4562350123", true, "English", new DateTime(2020, 8, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), 4, "Tafseer Ibn Kathir" }
                 });
 
             migrationBuilder.InsertData(
@@ -195,6 +231,11 @@ namespace PrivateLMS.Migrations
                 name: "IX_BookCategory_CategoryId",
                 table: "BookCategory",
                 column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Books_AuthorId",
+                table: "Books",
+                column: "AuthorId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Books_PublisherId",
@@ -224,6 +265,9 @@ namespace PrivateLMS.Migrations
 
             migrationBuilder.DropTable(
                 name: "Books");
+
+            migrationBuilder.DropTable(
+                name: "Authors");
 
             migrationBuilder.DropTable(
                 name: "Publishers");

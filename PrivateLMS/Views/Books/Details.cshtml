@@ -1,4 +1,7 @@
 @model PrivateLMS.Models.BookViewModel
+@{
+    ViewData["Title"] = "Book Details";
+}
 
 <style>
     .details-container {
@@ -52,7 +55,7 @@
         <dt>Title</dt>
         <dd>@Model.Title</dd>
         <dt>Author</dt>
-        <dd>@Model.Author</dd>
+        <dd>@(Model.AvailableAuthors.FirstOrDefault(a => a.AuthorId == Model.AuthorId)?.Name ?? "Unknown")</dd>
         <dt>Description</dt>
         <dd>@(Model.Description ?? "No description available")</dd>
         <dt>ISBN</dt>
@@ -87,7 +90,7 @@
 
     <div>
         <a asp-action="Edit" asp-route-id="@Model.BookId" class="btn btn-warning">Edit</a>
-        @if (Model.IsAvailable)
+        @if (Model.IsAvailable && Model.AvailableCopies > 0)
         {
             <a asp-action="Loan" asp-route-id="@Model.BookId" class="btn btn-primary">Loan</a>
         }

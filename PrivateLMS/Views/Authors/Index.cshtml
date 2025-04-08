@@ -1,0 +1,36 @@
+@model IEnumerable<PrivateLMS.ViewModels.AuthorViewModel>
+@{
+    ViewData["Title"] = "Authors";
+}
+
+<h2 class="text-center mb-4">Authors</h2>
+
+<div class="text-end mb-3">
+    <a asp-action="Create" class="btn btn-primary">Add Author</a>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Books</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var author in Model)
+        {
+            <tr>
+                <td>@author.Name</td>
+                <td>@author.BookCount</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@author.AuthorId" class="btn btn-info btn-sm">Details</a>
+                    <a asp-action="Edit" asp-route-id="@author.AuthorId" class="btn btn-warning btn-sm">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@author.AuthorId" class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Back to Books</a>

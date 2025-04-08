@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PrivateLMS.Models;
 using PrivateLMS.Services;
@@ -11,11 +12,13 @@ namespace PrivateLMS.Controllers
     public class BooksController : Controller
     {
         private readonly IBookService _bookService;
+        private readonly IAuthorService _authorService; // Added
         private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public BooksController(IBookService bookService, IWebHostEnvironment webHostEnvironment)
+        public BooksController(IBookService bookService, IAuthorService authorService, IWebHostEnvironment webHostEnvironment)
         {
             _bookService = bookService;
+            _authorService = authorService;
             _webHostEnvironment = webHostEnvironment;
         }
 
@@ -62,12 +65,14 @@ namespace PrivateLMS.Controllers
         }
 
         // GET: Books/Create
+        [Authorize(Roles = "Admin")] // Re-added as per your preference
         public async Task<IActionResult> Create()
         {
             try
             {
                 var viewModel = new BookViewModel
                 {
+                    AvailableAuthors = await _authorService.GetAllAuthorsAsync(), // Use IAuthorService
                     AvailablePublishers = await _bookService.GetAllPublishersAsync(),
                     AvailableCategories = await _bookService.GetAllCategoriesAsync()
                 };
@@ -83,6 +88,7 @@ namespace PrivateLMS.Controllers
         // POST: Books/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create(BookViewModel viewModel)
         {
             if (ModelState.IsValid)
@@ -107,6 +113,7 @@ namespace PrivateLMS.Controllers
                     if (!success)
                     {
                         TempData["ErrorMessage"] = "Failed to create the book.";
+                        viewModel.AvailableAuthors = await _authorService.GetAllAuthorsAsync();
                         viewModel.AvailablePublishers = await _bookService.GetAllPublishersAsync();
                         viewModel.AvailableCategories = await _bookService.GetAllCategoriesAsync();
                         return View(viewModel);
@@ -121,6 +128,7 @@ namespace PrivateLMS.Controllers
                 }
             }
 
+            viewModel.AvailableAuthors = await _authorService.GetAllAuthorsAsync();
             viewModel.AvailablePublishers = await _bookService.GetAllPublishersAsync();
             viewModel.AvailableCategories = await _bookService.GetAllCategoriesAsync();
             TempData["ErrorMessage"] = TempData["ErrorMessage"] ?? "Please fix the errors and try again.";
@@ -128,6 +136,7 @@ namespace PrivateLMS.Controllers
         }
 
         // GET: Books/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -144,6 +153,7 @@ namespace PrivateLMS.Controllers
                     TempData["ErrorMessage"] = $"No book found with ID {id}.";
                     return View("NotFound");
                 }
+                book.SelectedCategoryIds = book.AvailableCategories.Select(c => c.CategoryId).ToList();
                 return View(book);
             }
             catch (Exception ex)
@@ -156,6 +166,7 @@ namespace PrivateLMS.Controllers
         // POST: Books/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, BookViewModel viewModel)
         {
             if (id != viewModel.BookId)
@@ -198,6 +209,7 @@ namespace PrivateLMS.Controllers
                 }
             }
 
+            viewModel.AvailableAuthors = await _authorService.GetAllAuthorsAsync();
             viewModel.AvailablePublishers = await _bookService.GetAllPublishersAsync();
             viewModel.AvailableCategories = await _bookService.GetAllCategoriesAsync();
             TempData["ErrorMessage"] = TempData["ErrorMessage"] ?? "Please fix the errors and try again.";
@@ -205,6 +217,7 @@ namespace PrivateLMS.Controllers
         }
 
         // GET: Books/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -233,6 +246,7 @@ namespace PrivateLMS.Controllers
         // POST: Books/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             try
