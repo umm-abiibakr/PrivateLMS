@@ -1,0 +1,31 @@
+﻿@model PrivateLMS.ViewModels.FineViewModel
+@{
+    ViewData["Title"] = "Pay Fine";
+}
+
+<h2>Pay Fine for @Model.BookTitle</h2>
+
+<p>Please confirm payment of the fine below:</p>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">Book Title</dt>
+        <dd class="col-sm-10">@Model.BookTitle</dd>
+        <dt class="col-sm-2">Loaner Name</dt>
+        <dd class="col-sm-10">@Model.LoanerName</dd>
+        <dt class="col-sm-2">Loan Date</dt>
+        <dd class="col-sm-10">@Model.LoanDate.ToShortDateString()</dd>
+        <dt class="col-sm-2">Due Date</dt>
+        <dd class="col-sm-10">@(Model.DueDate?.ToShortDateString() ?? "N/A")</dd>
+        <dt class="col-sm-2">Return Date</dt>
+        <dd class="col-sm-10">@(Model.ReturnDate?.ToShortDateString() ?? "Not Returned")</dd>
+        <dt class="col-sm-2">Fine Amount</dt>
+        <dd class="col-sm-10">@Model.FineAmount.ToString("C", new System.Globalization.CultureInfo("en-NG"))</dd>
+    </dl>
+</div>
+
+<form asp-action="Pay" method="post">
+    <input type="hidden" asp-for="LoanRecordId" />
+    <button type="submit" class="btn btn-success">Confirm Payment</button>
+    <a asp-action="MyFines" class="btn btn-secondary">Cancel</a>
+</form>

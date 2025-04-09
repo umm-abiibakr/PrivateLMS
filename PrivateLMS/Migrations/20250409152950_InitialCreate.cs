@@ -120,7 +120,7 @@ namespace PrivateLMS.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "BookCategory",
+                name: "BookCategories",
                 columns: table => new
                 {
                     BookId = table.Column<int>(type: "int", nullable: false),
@@ -128,15 +128,15 @@ namespace PrivateLMS.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BookCategory", x => new { x.BookId, x.CategoryId });
+                    table.PrimaryKey("PK_BookCategories", x => new { x.BookId, x.CategoryId });
                     table.ForeignKey(
-                        name: "FK_BookCategory_Books_BookId",
+                        name: "FK_BookCategories_Books_BookId",
                         column: x => x.BookId,
                         principalTable: "Books",
                         principalColumn: "BookId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_BookCategory_Categories_CategoryId",
+                        name: "FK_BookCategories_Categories_CategoryId",
                         column: x => x.CategoryId,
                         principalTable: "Categories",
                         principalColumn: "CategoryId",
@@ -150,12 +150,14 @@ namespace PrivateLMS.Migrations
                     LoanRecordId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     BookId = table.Column<int>(type: "int", nullable: false),
-                    LoanerName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LoanerEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
                     LoanDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DueDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ReturnDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    ReturnDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    FineAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    IsFinePaid = table.Column<bool>(type: "bit", nullable: false),
+                    IsRenewed = table.Column<bool>(type: "bit", nullable: false),
+                    BookId1 = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -166,6 +168,17 @@ namespace PrivateLMS.Migrations
                         principalTable: "Books",
                         principalColumn: "BookId",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_LoanRecords_Books_BookId1",
+                        column: x => x.BookId1,
+                        principalTable: "Books",
+                        principalColumn: "BookId");
+                    table.ForeignKey(
+                        name: "FK_LoanRecords_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.InsertData(
@@ -203,7 +216,11 @@ namespace PrivateLMS.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "UserId", "Address", "City", "ConfirmPassword", "Country", "DateOfBirth", "Email", "FirstName", "Gender", "LastName", "Password", "PhoneNumber", "PostalCode", "Role", "State", "TermsAccepted", "Username" },
-                values: new object[] { 1, "123 Admin St.", "Admin City", "password", "Admin Country", new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin@privatelms.com", "Admin", "Male", "User", "password", "1234567890", "12345", "Admin", "Admin State", true, "admin" });
+                values: new object[,]
+                {
+                    { 1, "123 Admin St.", "Admin City", "password", "Admin Country", new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin@privatelms.com", "Admin", "Male", "User", "password", "1234567890", "12345", "Admin", "Admin State", true, "admin" },
+                    { 2, "456 User Rd.", "User City", "userpass", "User Country", new DateTime(1995, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), "john.doe@example.com", "John", "Male", "Doe", "userpass", "0987654321", "54321", "User", "User State", true, "user1" }
+                });
 
             migrationBuilder.InsertData(
                 table: "Books",
@@ -217,7 +234,7 @@ namespace PrivateLMS.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "BookCategory",
+                table: "BookCategories",
                 columns: new[] { "BookId", "CategoryId" },
                 values: new object[,]
                 {
@@ -227,9 +244,18 @@ namespace PrivateLMS.Migrations
                     { 4, 3 }
                 });
 
+            migrationBuilder.InsertData(
+                table: "LoanRecords",
+                columns: new[] { "LoanRecordId", "BookId", "BookId1", "DueDate", "FineAmount", "IsFinePaid", "IsRenewed", "LoanDate", "ReturnDate", "UserId" },
+                values: new object[,]
+                {
+                    { 1, 1, null, new DateTime(2025, 4, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), 3000m, false, false, new DateTime(2025, 3, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 4, 7, 0, 0, 0, 0, DateTimeKind.Unspecified), 2 },
+                    { 2, 2, null, new DateTime(2025, 4, 20, 0, 0, 0, 0, DateTimeKind.Unspecified), 0m, false, false, new DateTime(2025, 3, 30, 0, 0, 0, 0, DateTimeKind.Unspecified), null, 2 }
+                });
+
             migrationBuilder.CreateIndex(
-                name: "IX_BookCategory_CategoryId",
-                table: "BookCategory",
+                name: "IX_BookCategories_CategoryId",
+                table: "BookCategories",
                 column: "CategoryId");
 
             migrationBuilder.CreateIndex(
@@ -246,25 +272,35 @@ namespace PrivateLMS.Migrations
                 name: "IX_LoanRecords_BookId",
                 table: "LoanRecords",
                 column: "BookId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LoanRecords_BookId1",
+                table: "LoanRecords",
+                column: "BookId1");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LoanRecords_UserId",
+                table: "LoanRecords",
+                column: "UserId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "BookCategory");
+                name: "BookCategories");
 
             migrationBuilder.DropTable(
                 name: "LoanRecords");
-
-            migrationBuilder.DropTable(
-                name: "Users");
 
             migrationBuilder.DropTable(
                 name: "Categories");
 
             migrationBuilder.DropTable(
                 name: "Books");
+
+            migrationBuilder.DropTable(
+                name: "Users");
 
             migrationBuilder.DropTable(
                 name: "Authors");
