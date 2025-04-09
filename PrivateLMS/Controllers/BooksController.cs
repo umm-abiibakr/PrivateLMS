@@ -12,7 +12,7 @@ namespace PrivateLMS.Controllers
     public class BooksController : Controller
     {
         private readonly IBookService _bookService;
-        private readonly IAuthorService _authorService; // Added
+        private readonly IAuthorService _authorService; 
         private readonly IWebHostEnvironment _webHostEnvironment;
 
         public BooksController(IBookService bookService, IAuthorService authorService, IWebHostEnvironment webHostEnvironment)
@@ -65,7 +65,7 @@ namespace PrivateLMS.Controllers
         }
 
         // GET: Books/Create
-        [Authorize(Roles = "Admin")] // Re-added as per your preference
+        //[Authorize(Roles = "Admin")] 
         public async Task<IActionResult> Create()
         {
             try
@@ -88,7 +88,7 @@ namespace PrivateLMS.Controllers
         // POST: Books/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create(BookViewModel viewModel)
         {
             if (ModelState.IsValid)
@@ -136,7 +136,7 @@ namespace PrivateLMS.Controllers
         }
 
         // GET: Books/Edit/5
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -166,7 +166,7 @@ namespace PrivateLMS.Controllers
         // POST: Books/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, BookViewModel viewModel)
         {
             if (id != viewModel.BookId)
@@ -217,7 +217,7 @@ namespace PrivateLMS.Controllers
         }
 
         // GET: Books/Delete/5
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -246,7 +246,7 @@ namespace PrivateLMS.Controllers
         // POST: Books/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             try

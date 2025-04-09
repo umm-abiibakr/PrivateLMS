@@ -14,10 +14,12 @@ else
     <table class="table table-striped">
         <thead>
             <tr>
+                <th>Loan ID</th> <!-- Added -->
                 <th>Book Title</th>
                 <th>Loan Date</th>
                 <th>Due Date</th>
                 <th>Return Date</th>
+                <th>Renewed</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -25,9 +27,16 @@ else
             @foreach (var loan in Model)
             {
                 <tr>
+                    <td>@loan.LoanRecordId</td> <!-- Added -->
                     <td>@loan.BookTitle</td>
                     <td>@loan.LoanDate.ToShortDateString()</td>
-                    <td>@(loan.DueDate?.ToShortDateString() ?? "N/A")</td>
+                    <td>
+                        @(loan.DueDate?.ToShortDateString() ?? "N/A")
+                        @if (loan.DueDate.HasValue && loan.DueDate < DateTime.Now && !loan.ReturnDate.HasValue)
+                        {
+                            <span class="badge bg-danger ms-2">Overdue</span>
+                        }
+                    </td>
                     <td>
                         @if (loan.ReturnDate.HasValue)
                         {
@@ -38,11 +47,17 @@ else
                             <span class="badge bg-warning">Not Returned</span>
                         }
                     </td>
+                    <td>@(loan.IsRenewed ? "Yes" : "No")</td>
                     <td>
                         @if (!loan.ReturnDate.HasValue)
                         {
                             <a asp-action="Return" asp-route-loanRecordId="@loan.LoanRecordId" class="btn btn-primary btn-sm">Return</a>
+                            @if (!loan.IsRenewed)
+                            {
+                                <a asp-action="Renew" asp-route-id="@loan.LoanRecordId" class="btn btn-success btn-sm">Renew</a>
+                            }
                         }
+                        <a asp-controller="Fines" asp-action="MyFines" class="btn btn-info btn-sm">View Fines</a>
                     </td>
                 </tr>
             }

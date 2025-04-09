@@ -34,8 +34,8 @@ namespace PrivateLMS.Controllers
                 if (user != null)
                 {
                     HttpContext.Session.SetString("Username", model.Username);
-                    HttpContext.Session.SetString("Role", user.Role); // Optional: Store role for authorization
-                    return RedirectToAction("Index", "Dashboard");
+                    HttpContext.Session.SetString("Role", user.Role); 
+                    return RedirectToAction("Index", "Books");
                 }
 
                 ModelState.AddModelError(string.Empty, "Invalid username or password.");
@@ -47,7 +47,7 @@ namespace PrivateLMS.Controllers
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Books");
         }
     }
 }

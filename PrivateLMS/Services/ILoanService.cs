@@ -11,6 +11,7 @@ namespace PrivateLMS.Services
         Task<bool> CreateLoanAsync(LoanViewModel model);
         Task<ReturnViewModel> GetReturnFormAsync(int loanRecordId);
         Task<bool> ReturnLoanAsync(int loanRecordId);
-        Task<List<LoanViewModel>> GetUserLoansAsync(string username); 
+        Task<List<LoanViewModel>> GetUserLoansAsync(string username);
+        Task<bool> RenewLoanAsync(int loanRecordId);
     }
 }

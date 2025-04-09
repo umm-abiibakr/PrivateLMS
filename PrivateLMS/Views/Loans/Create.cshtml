@@ -8,26 +8,20 @@
 <form asp-action="Create" method="post">
     <div asp-validation-summary="All" class="text-danger"></div>
     <input type="hidden" asp-for="BookId" />
+    <input type="hidden" asp-for="UserId" />
     <div class="mb-3">
         <label asp-for="LoanerName" class="form-label">Loaner Name</label>
         <input asp-for="LoanerName" class="form-control" readonly />
-        <span asp-validation-for="LoanerName" class="text-danger"></span>
-    </div>
-    <div class="mb-3">
-        <label asp-for="LoanerEmail" class="form-label">Loaner Email</label>
-        <input asp-for="LoanerEmail" class="form-control" />
-        <span asp-validation-for="LoanerEmail" class="text-danger"></span>
-    </div>
-    <div class="mb-3">
-        <label asp-for="Phone" class="form-label">Loaner Phone</label>
-        <input asp-for="Phone" class="form-control" />
-        <span asp-validation-for="Phone" class="text-danger"></span>
     </div>
     <div class="mb-3">
         <label asp-for="DueDate" class="form-label">Due Date</label>
         <input asp-for="DueDate" class="form-control" type="date" readonly />
         <span asp-validation-for="DueDate" class="text-danger"></span>
     </div>
-    <button type="submit" class="btn btn-success">Loan Book</button>
+    <button type="submit" class="btn btn-success">Confirm Loan</button>
     <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Cancel</a>
 </form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
