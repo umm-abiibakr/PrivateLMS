@@ -1,4 +1,4 @@
-@model PrivateLMS.Models.BookViewModel
+@model PrivateLMS.ViewModels.BookViewModel
 @{
     ViewData["Title"] = "Book Details";
 }
@@ -55,7 +55,24 @@
         <dt>Title</dt>
         <dd>@Model.Title</dd>
         <dt>Author</dt>
-        <dd>@(Model.AvailableAuthors.FirstOrDefault(a => a.AuthorId == Model.AuthorId)?.Name ?? "Unknown")</dd>
+        <dd>
+            @if (User.Identity.IsAuthenticated)
+            {
+                var author = Model.AvailableAuthors.FirstOrDefault(a => a.AuthorId == Model.AuthorId);
+                if (author != null)
+                {
+                    <a asp-controller="Authors" asp-action="Details" asp-route-id="@Model.AuthorId">@author.Name</a>
+                }
+                else
+                {
+                    <span>Unknown</span>
+                }
+            }
+            else
+            {
+                @(Model.AvailableAuthors.FirstOrDefault(a => a.AuthorId == Model.AuthorId)?.Name ?? "Unknown")
+            }
+        </dd>
         <dt>Description</dt>
         <dd>@(Model.Description ?? "No description available")</dd>
         <dt>ISBN</dt>
@@ -69,7 +86,24 @@
         <dt>Available</dt>
         <dd>@(Model.IsAvailable ? "Yes" : "No")</dd>
         <dt>Publisher</dt>
-        <dd>@(Model.AvailablePublishers.FirstOrDefault(p => p.PublisherId == Model.PublisherId)?.PublisherName ?? "None")</dd>
+        <dd>
+            @if (User.Identity.IsAuthenticated && Model.PublisherId.HasValue)
+            {
+                var publisher = Model.AvailablePublishers.FirstOrDefault(p => p.PublisherId == Model.PublisherId);
+                if (publisher != null)
+                {
+                    <a asp-controller="Publishers" asp-action="Details" asp-route-id="@Model.PublisherId">@publisher.PublisherName</a>
+                }
+                else
+                {
+                    <span>None</span>
+                }
+            }
+            else
+            {
+                @(Model.AvailablePublishers.FirstOrDefault(p => p.PublisherId == Model.PublisherId)?.PublisherName ?? "None")
+            }
+        </dd>
         <dt>Categories</dt>
         <dd>
             @if (Model.AvailableCategories.Any())
@@ -89,8 +123,11 @@
     </dl>
 
     <div>
-        <a asp-action="Edit" asp-route-id="@Model.BookId" class="btn btn-warning">Edit</a>
-        @if (Model.IsAvailable && Model.AvailableCopies > 0)
+        @if (User.IsInRole("Admin"))
+        {
+            <a asp-action="Edit" asp-route-id="@Model.BookId" class="btn btn-warning">Edit</a>
+        }
+        @if (Model.IsAvailable && Model.AvailableCopies > 0 && User.Identity.IsAuthenticated)
         {
             <a asp-action="Loan" asp-route-id="@Model.BookId" class="btn btn-primary">Loan</a>
         }

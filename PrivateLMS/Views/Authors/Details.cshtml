@@ -15,12 +15,15 @@
         <dd class="col-sm-10">@(Model.BirthDate?.ToShortDateString() ?? "Unknown")</dd>
         <dt class="col-sm-2">Death Date</dt>
         <dd class="col-sm-10">@(Model.DeathDate?.ToShortDateString() ?? "N/A")</dd>
-        <dt class="col-sm-2">Books</dt>
+        <dt class="col-sm-2">Number of Books</dt>
         <dd class="col-sm-10">@Model.BookCount</dd>
     </dl>
 </div>
 
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.AuthorId" class="btn btn-warning">Edit</a>
-    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    @if (User.IsInRole("Admin"))
+    {
+        <a asp-action="Edit" asp-route-id="@Model.AuthorId" class="btn btn-warning">Edit</a>
+    }
+    <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Back to Books</a>
 </div>

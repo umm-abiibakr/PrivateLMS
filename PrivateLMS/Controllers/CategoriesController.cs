@@ -1,11 +1,15 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PrivateLMS.Services;
-using PrivateLMS.Models;
+using PrivateLMS.ViewModels;
+using PrivateLMS.Services;
+using PrivateLMS.ViewModels;
 using System;
 using System.Threading.Tasks;
 
 namespace PrivateLMS.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class CategoriesController : Controller
     {
         private readonly ICategoryService _categoryService;
@@ -25,38 +29,38 @@ namespace PrivateLMS.Controllers
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = $"An error occurred while loading categories: {ex.Message}";
-                return View("Error");
+                return RedirectToAction("Error", "Home");
             }
         }
 
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
+            if (!id.HasValue)
             {
                 TempData["ErrorMessage"] = "Category ID was not provided.";
-                return View("NotFound");
+                return PartialView("_NotFound");
             }
 
             try
             {
                 var category = await _categoryService.GetCategoryDetailsAsync(id.Value);
-                if (category == null)
+                if (category is null)
                 {
                     TempData["ErrorMessage"] = "Category not found.";
-                    return View("NotFound");
+                    return PartialView("_NotFound");
                 }
                 return View(category);
             }
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = $"An error occurred while loading category details: {ex.Message}";
-                return View("Error");
+                return RedirectToAction("Error", "Home");
             }
         }
 
         public IActionResult Create()
         {
-            return View();
+            return View(new CategoryViewModel());
         }
 
         [HttpPost]
@@ -89,26 +93,26 @@ namespace PrivateLMS.Controllers
 
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
+            if (!id.HasValue)
             {
                 TempData["ErrorMessage"] = "Category ID was not provided.";
-                return View("NotFound");
+                return PartialView("_NotFound");
             }
 
             try
             {
                 var category = await _categoryService.GetCategoryDetailsAsync(id.Value);
-                if (category == null)
+                if (category is null)
                 {
                     TempData["ErrorMessage"] = "Category not found.";
-                    return View("NotFound");
+                    return PartialView("_NotFound");
                 }
                 return View(category);
             }
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = $"An error occurred while loading category for edit: {ex.Message}";
-                return View("Error");
+                return RedirectToAction("Error", "Home");
             }
         }
 
@@ -119,7 +123,7 @@ namespace PrivateLMS.Controllers
             if (id != model.CategoryId)
             {
                 TempData["ErrorMessage"] = "Category ID mismatch.";
-                return View("NotFound");
+                return PartialView("_NotFound");
             }
 
             if (!ModelState.IsValid)
@@ -133,7 +137,7 @@ namespace PrivateLMS.Controllers
                 if (!success)
                 {
                     TempData["ErrorMessage"] = "Category not found.";
-                    return View("NotFound");
+                    return PartialView("_NotFound");
                 }
 
                 TempData["SuccessMessage"] = "Category updated successfully.";
@@ -148,26 +152,26 @@ namespace PrivateLMS.Controllers
 
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
+            if (!id.HasValue)
             {
                 TempData["ErrorMessage"] = "Category ID was not provided.";
-                return View("NotFound");
+                return PartialView("_NotFound");
             }
 
             try
             {
                 var category = await _categoryService.GetCategoryDetailsAsync(id.Value);
-                if (category == null)
+                if (category is null)
                 {
                     TempData["ErrorMessage"] = "Category not found.";
-                    return View("NotFound");
+                    return PartialView("_NotFound");
                 }
                 return View(category);
             }
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = $"An error occurred while loading category for deletion: {ex.Message}";
-                return View("Error");
+                return RedirectToAction("Error", "Home");
             }
         }
 
@@ -181,7 +185,7 @@ namespace PrivateLMS.Controllers
                 if (!success)
                 {
                     TempData["ErrorMessage"] = "Category not found or cannot be deleted due to associated books.";
-                    return View("NotFound");
+                    return PartialView("_NotFound");
                 }
 
                 TempData["SuccessMessage"] = "Category deleted successfully.";
@@ -195,7 +199,7 @@ namespace PrivateLMS.Controllers
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = $"An error occurred while deleting the category: {ex.Message}";
-                return View("Error");
+                return RedirectToAction("Error", "Home");
             }
         }
     }

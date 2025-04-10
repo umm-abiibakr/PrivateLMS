@@ -17,7 +17,7 @@ namespace PrivateLMS.Models
         public string Language { get; set; }
 
         [Required(ErrorMessage = "Please select an Author")]
-        public int AuthorId { get; set; } // Replaced string Author with AuthorId
+        public int AuthorId { get; set; }
 
         [Required(ErrorMessage = "The ISBN field is required.")]
         [RegularExpression(@"^(97(8|9))?\d{9}(\d|X)$", ErrorMessage = "ISBN must be a valid 10 or 13 digit number.")]
@@ -28,7 +28,7 @@ namespace PrivateLMS.Models
         [Display(Name = "Published Date")]
         public DateTime PublishedDate { get; set; }
 
-        public string Description { get; set; }
+        public string? Description { get; set; } 
 
         [Range(0, int.MaxValue, ErrorMessage = "Available copies must be a non-negative number.")]
         public int AvailableCopies { get; set; }
@@ -42,9 +42,13 @@ namespace PrivateLMS.Models
         // Navigation Properties
         [BindNever]
         public ICollection<LoanRecord>? LoanRecords { get; set; }
+
         public ICollection<BookCategory>? BookCategories { get; set; }
-        public int? PublisherId { get; set; }
+
+        public int? PublisherId { get; set; } 
+
         public Publisher? Publisher { get; set; }
-        public Author Author { get; set; } 
+
+        public Author Author { get; set; }
     }
 }

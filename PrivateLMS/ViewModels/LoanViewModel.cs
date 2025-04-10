@@ -12,10 +12,10 @@ namespace PrivateLMS.ViewModels
         [Display(Name = "Book Title")]
         public string? BookTitle { get; set; }
 
-        public int UserId { get; set; } 
+        public int UserId { get; set; }
 
         [Display(Name = "Loaner Name")]
-        public string? LoanerName { get; set; } 
+        public string? LoanerName { get; set; }
 
         [Display(Name = "Loan Date")]
         public DateTime LoanDate { get; set; }
@@ -26,6 +26,14 @@ namespace PrivateLMS.ViewModels
         [Display(Name = "Return Date")]
         public DateTime? ReturnDate { get; set; }
 
+        [Display(Name = "Renewed")]
         public bool IsRenewed { get; set; }
+
+        [DataType(DataType.Currency)]
+        [Display(Name = "Fine Amount")]
+        public decimal FineAmount { get; set; }
+
+        [Display(Name = "Fine Paid")]
+        public bool IsFinePaid { get; set; }
     }
 }

@@ -1,29 +1,37 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using PrivateLMS.Models;
 using PrivateLMS.Services;
+using PrivateLMS.ViewModels;
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
 
 namespace PrivateLMS.Controllers
 {
+    [Authorize]
     public class BooksController : Controller
     {
         private readonly IBookService _bookService;
-        private readonly IAuthorService _authorService; 
+        private readonly IAuthorService _authorService;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public BooksController(IBookService bookService, IAuthorService authorService, IWebHostEnvironment webHostEnvironment)
+        public BooksController(
+            IBookService bookService,
+            IAuthorService authorService,
+            IWebHostEnvironment webHostEnvironment,
+            UserManager<ApplicationUser> userManager)
         {
             _bookService = bookService;
             _authorService = authorService;
             _webHostEnvironment = webHostEnvironment;
+            _userManager = userManager;
         }
 
-        // GET: Books
-        public async Task<IActionResult> Index(string searchTerm = "")
+        [AllowAnonymous]
+        public async Task<IActionResult> Index(string? searchTerm = "")
         {
             try
             {
@@ -38,22 +46,22 @@ namespace PrivateLMS.Controllers
             }
         }
 
-        // GET: Books/Details/5
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
+            if (!id.HasValue)
             {
                 TempData["ErrorMessage"] = "Book ID was not provided.";
-                return View("NotFound");
+                return PartialView("_NotFound");
             }
 
             try
             {
                 var book = await _bookService.GetBookDetailsAsync(id.Value);
-                if (book == null)
+                if (book is null)
                 {
                     TempData["ErrorMessage"] = $"No book found with ID {id}.";
-                    return View("NotFound");
+                    return PartialView("_NotFound");
                 }
                 return View(book);
             }
@@ -64,17 +72,16 @@ namespace PrivateLMS.Controllers
             }
         }
 
-        // GET: Books/Create
-        //[Authorize(Roles = "Admin")] 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create()
         {
             try
             {
                 var viewModel = new BookViewModel
                 {
-                    AvailableAuthors = await _authorService.GetAllAuthorsAsync(), // Use IAuthorService
-                    AvailablePublishers = await _bookService.GetAllPublishersAsync(),
-                    AvailableCategories = await _bookService.GetAllCategoriesAsync()
+                    AvailableAuthors = await _authorService.GetAllAuthorsAsync() ?? new List<Author>(),
+                    AvailablePublishers = await _bookService.GetAllPublishersAsync() ?? new List<Publisher>(),
+                    AvailableCategories = await _bookService.GetAllCategoriesAsync() ?? new List<Category>()
                 };
                 return View(viewModel);
             }
@@ -85,10 +92,9 @@ namespace PrivateLMS.Controllers
             }
         }
 
-        // POST: Books/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create(BookViewModel viewModel)
         {
             if (ModelState.IsValid)
@@ -96,7 +102,7 @@ namespace PrivateLMS.Controllers
                 try
                 {
                     string? coverImagePath = null;
-                    if (viewModel.CoverImage != null)
+                    if (viewModel.CoverImage is not null)
                     {
                         var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images/book-covers");
                         Directory.CreateDirectory(uploadsFolder);
@@ -113,9 +119,7 @@ namespace PrivateLMS.Controllers
                     if (!success)
                     {
                         TempData["ErrorMessage"] = "Failed to create the book.";
-                        viewModel.AvailableAuthors = await _authorService.GetAllAuthorsAsync();
-                        viewModel.AvailablePublishers = await _bookService.GetAllPublishersAsync();
-                        viewModel.AvailableCategories = await _bookService.GetAllCategoriesAsync();
+                        await PopulateBookViewModelLists(viewModel);
                         return View(viewModel);
                     }
 
@@ -128,32 +132,29 @@ namespace PrivateLMS.Controllers
                 }
             }
 
-            viewModel.AvailableAuthors = await _authorService.GetAllAuthorsAsync();
-            viewModel.AvailablePublishers = await _bookService.GetAllPublishersAsync();
-            viewModel.AvailableCategories = await _bookService.GetAllCategoriesAsync();
+            await PopulateBookViewModelLists(viewModel);
             TempData["ErrorMessage"] = TempData["ErrorMessage"] ?? "Please fix the errors and try again.";
             return View(viewModel);
         }
 
-        // GET: Books/Edit/5
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
+            if (!id.HasValue)
             {
                 TempData["ErrorMessage"] = "Book ID was not provided.";
-                return View("NotFound");
+                return PartialView("_NotFound");
             }
 
             try
             {
                 var book = await _bookService.GetBookDetailsAsync(id.Value);
-                if (book == null)
+                if (book is null)
                 {
                     TempData["ErrorMessage"] = $"No book found with ID {id}.";
-                    return View("NotFound");
+                    return PartialView("_NotFound");
                 }
-                book.SelectedCategoryIds = book.AvailableCategories.Select(c => c.CategoryId).ToList();
+                book.SelectedCategoryIds = book.AvailableCategories?.Select(c => c.CategoryId).ToList() ?? new List<int>();
                 return View(book);
             }
             catch (Exception ex)
@@ -163,16 +164,15 @@ namespace PrivateLMS.Controllers
             }
         }
 
-        // POST: Books/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, BookViewModel viewModel)
         {
             if (id != viewModel.BookId)
             {
                 TempData["ErrorMessage"] = "Book ID mismatch.";
-                return View("NotFound");
+                return PartialView("_NotFound");
             }
 
             if (ModelState.IsValid)
@@ -180,7 +180,7 @@ namespace PrivateLMS.Controllers
                 try
                 {
                     string? coverImagePath = null;
-                    if (viewModel.CoverImage != null)
+                    if (viewModel.CoverImage is not null)
                     {
                         var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images/book-covers");
                         Directory.CreateDirectory(uploadsFolder);
@@ -197,7 +197,7 @@ namespace PrivateLMS.Controllers
                     if (!success)
                     {
                         TempData["ErrorMessage"] = $"No book found with ID {id}.";
-                        return View("NotFound");
+                        return PartialView("_NotFound");
                     }
 
                     TempData["SuccessMessage"] = $"Successfully updated the book: {viewModel.Title}.";
@@ -209,30 +209,27 @@ namespace PrivateLMS.Controllers
                 }
             }
 
-            viewModel.AvailableAuthors = await _authorService.GetAllAuthorsAsync();
-            viewModel.AvailablePublishers = await _bookService.GetAllPublishersAsync();
-            viewModel.AvailableCategories = await _bookService.GetAllCategoriesAsync();
+            await PopulateBookViewModelLists(viewModel);
             TempData["ErrorMessage"] = TempData["ErrorMessage"] ?? "Please fix the errors and try again.";
             return View(viewModel);
         }
 
-        // GET: Books/Delete/5
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
+            if (!id.HasValue)
             {
                 TempData["ErrorMessage"] = "Book ID was not provided for deletion.";
-                return View("NotFound");
+                return PartialView("_NotFound");
             }
 
             try
             {
                 var book = await _bookService.GetBookDetailsAsync(id.Value);
-                if (book == null)
+                if (book is null)
                 {
                     TempData["ErrorMessage"] = $"No book found with ID {id} for deletion.";
-                    return View("NotFound");
+                    return PartialView("_NotFound");
                 }
                 return View(book);
             }
@@ -243,26 +240,25 @@ namespace PrivateLMS.Controllers
             }
         }
 
-        // POST: Books/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             try
             {
                 var book = await _bookService.GetBookByIdAsync(id);
-                if (book == null)
+                if (book is null)
                 {
                     TempData["ErrorMessage"] = $"No book found with ID {id}.";
-                    return View("NotFound");
+                    return PartialView("_NotFound");
                 }
 
                 var success = await _bookService.DeleteBookAsync(id);
                 if (!success)
                 {
                     TempData["ErrorMessage"] = $"Failed to delete book with ID {id}.";
-                    return View("NotFound");
+                    return PartialView("_NotFound");
                 }
 
                 TempData["SuccessMessage"] = "Book deleted successfully.";
@@ -275,16 +271,29 @@ namespace PrivateLMS.Controllers
             }
         }
 
-        // GET: Books/Loan/5
-        public IActionResult Loan(int? id)
+        public async Task<IActionResult> Loan(int? id)
         {
-            if (id == null)
+            if (!id.HasValue)
             {
                 TempData["ErrorMessage"] = "Book ID was not provided for loan.";
-                return View("NotFound");
+                return PartialView("_NotFound");
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user is null)
+            {
+                TempData["ErrorMessage"] = "You must be logged in to loan a book.";
+                return RedirectToAction("Index", "Login");
             }
 
             return RedirectToAction("Create", "Loans", new { bookId = id });
+        }
+
+        private async Task PopulateBookViewModelLists(BookViewModel viewModel)
+        {
+            viewModel.AvailableAuthors = await _authorService.GetAllAuthorsAsync() ?? new List<Author>();
+            viewModel.AvailablePublishers = await _bookService.GetAllPublishersAsync() ?? new List<Publisher>();
+            viewModel.AvailableCategories = await _bookService.GetAllCategoriesAsync() ?? new List<Category>();
         }
     }
 }

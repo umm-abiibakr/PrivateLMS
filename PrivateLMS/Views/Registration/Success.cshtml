@@ -2,9 +2,11 @@
     ViewData["Title"] = "Registration Successful";
 }
 
-<div class="container mt-5">
+<div class="container mt-5 text-center">
     <h2>Registration Successful!</h2>
     <p>Your account has been created successfully.</p>
-    <a asp-controller="Login" asp-action="Index" class="btn btn-primary">Login</a>
-    <a asp-controller="Books" asp-action="Index" class="btn btn-primary">Go to Home</a>
+    <div>
+        <a asp-controller="Login" asp-action="Index" class="btn btn-primary me-2">Login</a>
+        <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Go to Books</a>
+    </div>
 </div>

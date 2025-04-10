@@ -25,6 +25,7 @@ namespace PrivateLMS.Services
             return await _context.LoanRecords
                 .Include(lr => lr.Book)
                 .Include(lr => lr.User)
+                .AsNoTracking()
                 .Select(lr => new LoanViewModel
                 {
                     LoanRecordId = lr.LoanRecordId,
@@ -35,14 +36,17 @@ namespace PrivateLMS.Services
                     LoanDate = lr.LoanDate,
                     DueDate = lr.DueDate,
                     ReturnDate = lr.ReturnDate,
-                    IsRenewed = lr.IsRenewed
+                    IsRenewed = lr.IsRenewed,
+                    FineAmount = lr.FineAmount,
+                    IsFinePaid = lr.IsFinePaid
                 })
                 .ToListAsync();
         }
 
-        public async Task<LoanViewModel> GetLoanFormAsync(int bookId)
+        public async Task<LoanViewModel?> GetLoanFormAsync(int bookId)
         {
             var book = await _context.Books
+                .AsNoTracking()
                 .FirstOrDefaultAsync(b => b.BookId == bookId);
 
             if (book == null || !book.IsAvailable || book.AvailableCopies <= 0)
@@ -91,11 +95,12 @@ namespace PrivateLMS.Services
             return true;
         }
 
-        public async Task<ReturnViewModel> GetReturnFormAsync(int loanRecordId)
+        public async Task<ReturnViewModel?> GetReturnFormAsync(int loanRecordId)
         {
             var loanRecord = await _context.LoanRecords
                 .Include(lr => lr.Book)
                 .Include(lr => lr.User)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(lr => lr.LoanRecordId == loanRecordId);
 
             if (loanRecord == null || loanRecord.ReturnDate != null)
@@ -146,7 +151,8 @@ namespace PrivateLMS.Services
             return await _context.LoanRecords
                 .Include(lr => lr.Book)
                 .Include(lr => lr.User)
-                .Where(lr => lr.User != null && lr.User.Username == username)
+                .Where(lr => lr.User != null && lr.User.UserName == username)
+                .AsNoTracking()
                 .Select(lr => new LoanViewModel
                 {
                     LoanRecordId = lr.LoanRecordId,
@@ -157,7 +163,9 @@ namespace PrivateLMS.Services
                     LoanDate = lr.LoanDate,
                     DueDate = lr.DueDate,
                     ReturnDate = lr.ReturnDate,
-                    IsRenewed = lr.IsRenewed
+                    IsRenewed = lr.IsRenewed,
+                    FineAmount = lr.FineAmount,
+                    IsFinePaid = lr.IsFinePaid
                 })
                 .ToListAsync();
         }

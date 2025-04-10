@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 
 namespace PrivateLMS.Controllers
 {
-    //[Authorize(Roles = "Admin")]
     public class AuthorsController : Controller
     {
         private readonly IAuthorService _authorService;
@@ -19,7 +18,7 @@ namespace PrivateLMS.Controllers
             _authorService = authorService;
         }
 
-        // GET: Authors
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
             try
@@ -43,13 +42,13 @@ namespace PrivateLMS.Controllers
             }
         }
 
-        // GET: Authors/Details/5
+        [Authorize]
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
+            if (!id.HasValue)
             {
                 TempData["ErrorMessage"] = "Author ID was not provided.";
-                return View("NotFound");
+                return PartialView("_NotFound");
             }
 
             try
@@ -58,7 +57,7 @@ namespace PrivateLMS.Controllers
                 if (author == null)
                 {
                     TempData["ErrorMessage"] = $"No author found with ID {id}.";
-                    return View("NotFound");
+                    return PartialView("_NotFound");
                 }
                 var viewModel = new AuthorViewModel
                 {
@@ -78,15 +77,15 @@ namespace PrivateLMS.Controllers
             }
         }
 
-        // GET: Authors/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View(new AuthorViewModel());
         }
 
-        // POST: Authors/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create(AuthorViewModel viewModel)
         {
             if (ModelState.IsValid)
@@ -118,13 +117,13 @@ namespace PrivateLMS.Controllers
             return View(viewModel);
         }
 
-        // GET: Authors/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
+            if (!id.HasValue)
             {
                 TempData["ErrorMessage"] = "Author ID was not provided.";
-                return View("NotFound");
+                return PartialView("_NotFound");
             }
 
             try
@@ -133,7 +132,7 @@ namespace PrivateLMS.Controllers
                 if (author == null)
                 {
                     TempData["ErrorMessage"] = $"No author found with ID {id}.";
-                    return View("NotFound");
+                    return PartialView("_NotFound");
                 }
                 var viewModel = new AuthorViewModel
                 {
@@ -153,15 +152,15 @@ namespace PrivateLMS.Controllers
             }
         }
 
-        // POST: Authors/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, AuthorViewModel viewModel)
         {
             if (id != viewModel.AuthorId)
             {
                 TempData["ErrorMessage"] = "Author ID mismatch.";
-                return View("NotFound");
+                return PartialView("_NotFound");
             }
 
             if (ModelState.IsValid)
@@ -180,7 +179,7 @@ namespace PrivateLMS.Controllers
                     if (!success)
                     {
                         TempData["ErrorMessage"] = $"No author found with ID {id}.";
-                        return View("NotFound");
+                        return PartialView("_NotFound");
                     }
 
                     TempData["SuccessMessage"] = $"Successfully updated the author: {author.Name}.";
@@ -194,13 +193,13 @@ namespace PrivateLMS.Controllers
             return View(viewModel);
         }
 
-        // GET: Authors/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
+            if (!id.HasValue)
             {
                 TempData["ErrorMessage"] = "Author ID was not provided for deletion.";
-                return View("NotFound");
+                return PartialView("_NotFound");
             }
 
             try
@@ -209,7 +208,7 @@ namespace PrivateLMS.Controllers
                 if (author == null)
                 {
                     TempData["ErrorMessage"] = $"No author found with ID {id} for deletion.";
-                    return View("NotFound");
+                    return PartialView("_NotFound");
                 }
                 var viewModel = new AuthorViewModel
                 {
@@ -229,9 +228,9 @@ namespace PrivateLMS.Controllers
             }
         }
 
-        // POST: Authors/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             try
@@ -240,7 +239,7 @@ namespace PrivateLMS.Controllers
                 if (!success)
                 {
                     TempData["ErrorMessage"] = $"Failed to delete author with ID {id}. It may have associated books.";
-                    return View("NotFound");
+                    return PartialView("_NotFound");
                 }
 
                 TempData["SuccessMessage"] = "Author deleted successfully.";

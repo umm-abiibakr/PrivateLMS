@@ -1,4 +1,4 @@
-@model PrivateLMS.Models.BookViewModel
+@model PrivateLMS.ViewModels.BookViewModel
 @{
     ViewData["Title"] = "Create Book";
 }
@@ -6,10 +6,10 @@
 <h2>Create Book</h2>
 
 <form asp-action="Create" method="post" enctype="multipart/form-data">
-    <div asp-validation-summary="All" class="text-danger"></div>
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
     <div class="mb-3">
-        <label asp-for="Title" class="form-label"></label>
+        <label asp-for="Title" class="form-label">Title</label>
         <input asp-for="Title" class="form-control" />
         <span asp-validation-for="Title" class="text-danger"></span>
     </div>
@@ -21,76 +21,73 @@
         <span asp-validation-for="AuthorId" class="text-danger"></span>
     </div>
     <div class="mb-3">
-        <label asp-for="ISBN" class="form-label"></label>
+        <label asp-for="ISBN" class="form-label">ISBN</label>
         <input asp-for="ISBN" class="form-control" />
         <span asp-validation-for="ISBN" class="text-danger"></span>
     </div>
     <div class="mb-3">
-        <label asp-for="Language" class="form-label"></label>
+        <label asp-for="Language" class="form-label">Language</label>
         <input asp-for="Language" class="form-control" />
         <span asp-validation-for="Language" class="text-danger"></span>
     </div>
     <div class="mb-3">
-        <label asp-for="PublishedDate" class="form-label"></label>
+        <label asp-for="PublishedDate" class="form-label">Published Date</label>
         <input asp-for="PublishedDate" type="date" class="form-control" />
         <span asp-validation-for="PublishedDate" class="text-danger"></span>
     </div>
     <div class="mb-3">
-        <label asp-for="Description" class="form-label"></label>
+        <label asp-for="Description" class="form-label">Description</label>
         <textarea asp-for="Description" class="form-control" rows="3"></textarea>
         <span asp-validation-for="Description" class="text-danger"></span>
     </div>
     <div class="mb-3">
-        <label asp-for="AvailableCopies" class="form-label"></label>
+        <label asp-for="AvailableCopies" class="form-label">Available Copies</label>
         <input asp-for="AvailableCopies" class="form-control" type="number" min="0" />
         <span asp-validation-for="AvailableCopies" class="text-danger"></span>
     </div>
     <div class="mb-3 form-check">
         <input asp-for="IsAvailable" class="form-check-input" />
-        <label asp-for="IsAvailable" class="form-check-label"></label>
+        <label asp-for="IsAvailable" class="form-check-label">Available</label>
         <span asp-validation-for="IsAvailable" class="text-danger"></span>
     </div>
     <div class="mb-3">
-        <label asp-for="CoverImage" class="form-label"></label>
+        <label asp-for="CoverImage" class="form-label">Book Cover</label>
         <input asp-for="CoverImage" type="file" class="form-control" accept="image/*" />
         <span asp-validation-for="CoverImage" class="text-danger"></span>
     </div>
     <div class="mb-3">
         <label asp-for="PublisherId" class="form-label">Publisher</label>
         <select asp-for="PublisherId" class="form-control" asp-items="@(new SelectList(Model.AvailablePublishers, "PublisherId", "PublisherName"))">
-            <option value="">Select a Publisher</option>
+            <option value="">Select a Publisher (optional)</option>
         </select>
         <span asp-validation-for="PublisherId" class="text-danger"></span>
     </div>
     <div class="mb-3">
-        <label class="form-label">Categories</label>
+        <label asp-for="SelectedCategoryIds" class="form-label">Categories</label>
         <select asp-for="SelectedCategoryIds" class="form-control" multiple asp-items="@(new SelectList(Model.AvailableCategories, "CategoryId", "CategoryName"))"></select>
         <span asp-validation-for="SelectedCategoryIds" class="text-danger"></span>
     </div>
     <button type="submit" class="btn btn-success">Save</button>
-    <a asp-action="Index" class="btn btn-secondary">Back</a>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
 </form>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        tinymce.init({
+            selector: 'textarea',
+            plugins: [
+                'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'image', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'wordcount',
+                'checklist', 'mediaembed', 'casechange', 'formatpainter', 'pageembed', 'a11ychecker', 'tinymcespellchecker', 'permanentpen', 'powerpaste', 'advtable', 'advcode', 'editimage', 'advtemplate', 'ai', 'mentions', 'tinycomments', 'tableofcontents', 'footnotes', 'mergetags', 'autocorrect', 'typography', 'inlinecss', 'markdown', 'importword', 'exportword', 'exportpdf'
+            ],
+            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+            tinycomments_mode: 'embedded',
+            tinycomments_author: 'Author name',
+            mergetags_list: [
+                { value: 'First.Name', title: 'First Name' },
+                { value: 'Email', title: 'Email' }
+            ],
+            ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant'))
+        });
+    </script>
 }
-<script>
-    tinymce.init({
-      selector: 'textarea',
-      plugins: [
-        // Core editing features
-        'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'image', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'wordcount',
-        // Your account includes a free trial of TinyMCE premium features
-        // Try the most popular premium features until Apr 21, 2025:
-        'checklist', 'mediaembed', 'casechange', 'formatpainter', 'pageembed', 'a11ychecker', 'tinymcespellchecker', 'permanentpen', 'powerpaste', 'advtable', 'advcode', 'editimage', 'advtemplate', 'ai', 'mentions', 'tinycomments', 'tableofcontents', 'footnotes', 'mergetags', 'autocorrect', 'typography', 'inlinecss', 'markdown','importword', 'exportword', 'exportpdf'
-      ],
-      toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
-      tinycomments_mode: 'embedded',
-      tinycomments_author: 'Author name',
-      mergetags_list: [
-        { value: 'First.Name', title: 'First Name' },
-        { value: 'Email', title: 'Email' },
-      ],
-      ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant')),
-    });
-</script>

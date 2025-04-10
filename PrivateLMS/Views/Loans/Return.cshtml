@@ -12,14 +12,14 @@
         <dt class="col-sm-2">Loaner Name</dt>
         <dd class="col-sm-10">@Model.LoanerName</dd>
         <dt class="col-sm-2">Loan Date</dt>
-        <dd class="col-sm-10">@Model.LoanDate?.ToString("yyyy-MM-dd HH:mm")</dd>
+        <dd class="col-sm-10">@(Model.LoanDate?.ToShortDateString() ?? "N/A")</dd>
         <dt class="col-sm-2">Due Date</dt>
-        <dd class="col-sm-10">@Model.DueDate?.ToString("yyyy-MM-dd")</dd>
+        <dd class="col-sm-10">@(Model.DueDate?.ToShortDateString() ?? "N/A")</dd>
     </dl>
 </div>
 
 <form asp-action="Return" method="post">
     <input type="hidden" asp-for="LoanRecordId" />
     <button type="submit" class="btn btn-primary">Confirm Return</button>
-    <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Cancel</a>
+    <a asp-action="MyLoans" class="btn btn-secondary">Back to My Loans</a>
 </form>

@@ -9,7 +9,7 @@ namespace PrivateLMS.ViewModels
 
         [Required(ErrorMessage = "The Author Name is required.")]
         [StringLength(100, ErrorMessage = "Author name cannot exceed 100 characters.")]
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         [StringLength(1000, ErrorMessage = "Biography cannot exceed 1000 characters.")]
         public string? Biography { get; set; }
@@ -20,7 +20,7 @@ namespace PrivateLMS.ViewModels
         [DataType(DataType.Date)]
         public DateTime? DeathDate { get; set; }
 
+        [Display(Name = "Number of Books")]
         public int BookCount { get; set; }
-
     }
 }

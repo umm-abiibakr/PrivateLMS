@@ -1,6 +1,25 @@
 ﻿@{
     ViewData["Title"] = "Privacy Policy";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<div class="container mt-5">
+    <h2>Privacy Policy</h2>
+    <p>
+        At Warathatul Ambiya Library, we are committed to protecting your privacy. This policy outlines how we collect, use, and safeguard your personal information.
+    </p>
+    <h3>Information We Collect</h3>
+    <p>
+        We collect information such as your name, email, and loan history to provide library services. This data is stored securely and only used for library management purposes.
+    </p>
+    <h3>How We Use Your Information</h3>
+    <p>
+        Your information is used to manage book loans, fines, and user accounts. We do not share your data with third parties except as required by law.
+    </p>
+    <h3>Contact Us</h3>
+    <p>
+        If you have questions about our privacy practices, please contact us at support@warathatulambiya.com.
+    </p>
+    <div class="text-end mt-4">
+        <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Back to Books</a>
+    </div>
+</div>

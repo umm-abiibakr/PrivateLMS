@@ -1,4 +1,7 @@
-@model PrivateLMS.Models.PublisherViewModel
+@model PrivateLMS.ViewModels.PublisherViewModel
+@{
+    ViewData["Title"] = "Publisher Details";
+}
 
 <h2>Publisher Details</h2>
 
@@ -23,6 +26,9 @@
 </div>
 
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.PublisherId" class="btn btn-warning">Edit</a>
-    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    @if (User.IsInRole("Admin"))
+    {
+        <a asp-action="Edit" asp-route-id="@Model.PublisherId" class="btn btn-warning">Edit</a>
+    }
+    <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Back to Books</a>
 </div>

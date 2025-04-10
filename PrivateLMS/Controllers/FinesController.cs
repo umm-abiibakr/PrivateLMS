@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PrivateLMS.Data;
+using PrivateLMS.Models;
 using PrivateLMS.Services;
 using PrivateLMS.ViewModels;
 using System;
@@ -9,21 +11,23 @@ using System.Threading.Tasks;
 
 namespace PrivateLMS.Controllers
 {
-    //[Authorize]
+    [Authorize]
     public class FinesController : Controller
     {
         private readonly LibraryDbContext _context;
         private readonly IFineService _fineService;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public FinesController(LibraryDbContext context, IFineService fineService, IHttpContextAccessor httpContextAccessor)
+        public FinesController(
+            LibraryDbContext context,
+            IFineService fineService,
+            UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _fineService = fineService;
-            _httpContextAccessor = httpContextAccessor;
+            _userManager = userManager;
         }
 
-        // GET: Fines (Admin view of all fines)
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
@@ -39,19 +43,18 @@ namespace PrivateLMS.Controllers
             }
         }
 
-        // GET: Fines/MyFines (User view of their fines)
         public async Task<IActionResult> MyFines()
         {
             try
             {
-                var username = _httpContextAccessor.HttpContext?.Session.GetString("Username");
-                if (string.IsNullOrEmpty(username))
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
                 {
                     TempData["ErrorMessage"] = "You must be logged in to view your fines.";
                     return RedirectToAction("Index", "Login");
                 }
 
-                var fines = await _fineService.GetUserFinesAsync(username);
+                var fines = await _fineService.GetUserFinesAsync(user.UserName);
                 return View(fines);
             }
             catch (Exception ex)
@@ -61,19 +64,18 @@ namespace PrivateLMS.Controllers
             }
         }
 
-        // GET: Fines/Pay/5
         public async Task<IActionResult> Pay(int? id)
         {
-            if (id == null)
+            if (!id.HasValue)
             {
                 TempData["ErrorMessage"] = "Fine ID was not provided.";
-                return View("NotFound");
+                return PartialView("_NotFound");
             }
 
             try
             {
-                var username = _httpContextAccessor.HttpContext?.Session.GetString("Username");
-                if (string.IsNullOrEmpty(username))
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
                 {
                     TempData["ErrorMessage"] = "You must be logged in to pay a fine.";
                     return RedirectToAction("Index", "Login");
@@ -82,12 +84,12 @@ namespace PrivateLMS.Controllers
                 var loan = await _context.LoanRecords
                     .Include(lr => lr.Book)
                     .Include(lr => lr.User)
-                    .FirstOrDefaultAsync(lr => lr.LoanRecordId == id.Value && lr.User.Username == username);
+                    .FirstOrDefaultAsync(lr => lr.LoanRecordId == id.Value && lr.User.UserName == user.UserName);
 
                 if (loan == null)
                 {
                     TempData["ErrorMessage"] = "No fine found for this loan, or you do not have permission to pay it.";
-                    return View("NotFound");
+                    return PartialView("_NotFound");
                 }
 
                 if (loan.IsFinePaid)
@@ -100,7 +102,7 @@ namespace PrivateLMS.Controllers
                 {
                     LoanRecordId = loan.LoanRecordId,
                     BookTitle = loan.Book?.Title ?? "Unknown",
-                    LoanerName = loan.User != null ? $"{loan.User.FirstName} {loan.User.LastName}" : "Unknown",
+                    LoanerName = $"{loan.User.FirstName} {loan.User.LastName}",
                     LoanDate = loan.LoanDate,
                     DueDate = loan.DueDate,
                     ReturnDate = loan.ReturnDate,
@@ -116,15 +118,14 @@ namespace PrivateLMS.Controllers
             }
         }
 
-        // POST: Fines/Pay/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Pay(int id)
         {
             try
             {
-                var username = _httpContextAccessor.HttpContext?.Session.GetString("Username");
-                if (string.IsNullOrEmpty(username))
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
                 {
                     TempData["ErrorMessage"] = "You must be logged in to pay a fine.";
                     return RedirectToAction("Index", "Login");
@@ -132,7 +133,7 @@ namespace PrivateLMS.Controllers
 
                 var loan = await _context.LoanRecords
                     .Include(lr => lr.User)
-                    .FirstOrDefaultAsync(lr => lr.LoanRecordId == id && lr.User.Username == username);
+                    .FirstOrDefaultAsync(lr => lr.LoanRecordId == id && lr.User.UserName == user.UserName);
 
                 if (loan == null)
                 {

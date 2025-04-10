@@ -1,0 +1,12 @@
+﻿<div class="text-center">
+    <h2>Not Found</h2>
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+    else
+    {
+        <p>The requested item could not be found.</p>
+    }
+    <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Back to Books</a>
+</div>

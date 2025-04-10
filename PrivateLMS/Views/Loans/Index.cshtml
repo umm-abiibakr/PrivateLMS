@@ -14,7 +14,7 @@ else
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>Loan ID</th> <!-- Added -->
+                <th>Loan ID</th>
                 <th>Book Title</th>
                 <th>User ID</th>
                 <th>Loaner Name</th>
@@ -22,6 +22,7 @@ else
                 <th>Due Date</th>
                 <th>Return Date</th>
                 <th>Renewed</th>
+                <th>Fine Amount</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -29,7 +30,7 @@ else
             @foreach (var loan in Model)
             {
                 <tr>
-                    <td>@loan.LoanRecordId</td> <!-- Added -->
+                    <td>@loan.LoanRecordId</td>
                     <td>@loan.BookTitle</td>
                     <td>@loan.UserId</td>
                     <td>@loan.LoanerName</td>
@@ -43,6 +44,16 @@ else
                     </td>
                     <td>@(loan.ReturnDate?.ToShortDateString() ?? "Not Returned")</td>
                     <td>@(loan.IsRenewed ? "Yes" : "No")</td>
+                    <td>
+                        @if (loan.FineAmount > 0)
+                        {
+                            @loan.FineAmount.ToString("C", new System.Globalization.CultureInfo("en-NG"))
+                        }
+                        else
+                        {
+                            <span>-</span>
+                        }
+                    </td>
                     <td>
                         @if (!loan.ReturnDate.HasValue)
                         {

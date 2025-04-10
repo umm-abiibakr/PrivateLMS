@@ -20,13 +20,15 @@ namespace PrivateLMS.Services
         {
             return await _context.Authors
                 .Include(a => a.Books)
+                .AsNoTracking()
                 .ToListAsync() ?? new List<Author>();
         }
 
-        public async Task<Author> GetAuthorByIdAsync(int authorId)
+        public async Task<Author?> GetAuthorByIdAsync(int authorId)
         {
             return await _context.Authors
                 .Include(a => a.Books)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(a => a.AuthorId == authorId);
         }
 

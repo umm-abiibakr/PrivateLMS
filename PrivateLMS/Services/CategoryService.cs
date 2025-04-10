@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PrivateLMS.Data;
 using PrivateLMS.Models;
+using PrivateLMS.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,7 @@ namespace PrivateLMS.Services
         {
             return await _context.Categories
                 .Include(c => c.BookCategories)
+                .AsNoTracking()
                 .Select(c => new CategoryViewModel
                 {
                     CategoryId = c.CategoryId,
@@ -30,10 +32,11 @@ namespace PrivateLMS.Services
                 .ToListAsync();
         }
 
-        public async Task<CategoryViewModel> GetCategoryDetailsAsync(int categoryId)
+        public async Task<CategoryViewModel?> GetCategoryDetailsAsync(int categoryId)
         {
             var category = await _context.Categories
                 .Include(c => c.BookCategories)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(c => c.CategoryId == categoryId);
 
             if (category == null)

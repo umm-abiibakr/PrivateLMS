@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PrivateLMS.Data;
 using PrivateLMS.Models;
+using PrivateLMS.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace PrivateLMS.Services
     public class BookService : IBookService
     {
         private readonly LibraryDbContext _context;
-        private readonly IAuthorService _authorService; // Added dependency
+        private readonly IAuthorService _authorService;
 
         public BookService(LibraryDbContext context, IAuthorService authorService)
         {
@@ -35,13 +36,14 @@ namespace PrivateLMS.Services
                 .ToListAsync();
         }
 
-        public async Task<BookViewModel> GetBookDetailsAsync(int bookId)
+        public async Task<BookViewModel?> GetBookDetailsAsync(int bookId)
         {
             var book = await _context.Books
                 .Include(b => b.BookCategories).ThenInclude(bc => bc.Category)
                 .Include(b => b.Publisher)
                 .Include(b => b.Author)
                 .Include(b => b.LoanRecords)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(b => b.BookId == bookId);
 
             if (book == null) return null;
@@ -59,7 +61,7 @@ namespace PrivateLMS.Services
                 PublisherId = book.PublisherId,
                 Description = book.Description,
                 AvailableCopies = book.AvailableCopies,
-                AvailableAuthors = await _authorService.GetAllAuthorsAsync(), // Use IAuthorService
+                AvailableAuthors = await _authorService.GetAllAuthorsAsync(),
                 AvailablePublishers = await GetAllPublishersAsync(),
                 AvailableCategories = book.BookCategories?.Select(bc => bc.Category).ToList() ?? new List<Category>(),
                 LoanRecords = book.LoanRecords?.ToList() ?? new List<LoanRecord>(),
@@ -67,7 +69,7 @@ namespace PrivateLMS.Services
             };
         }
 
-        public async Task<bool> CreateBookAsync(BookViewModel model, string coverImagePath)
+        public async Task<bool> CreateBookAsync(BookViewModel model, string? coverImagePath)
         {
             var book = new Book
             {
@@ -95,7 +97,7 @@ namespace PrivateLMS.Services
             return true;
         }
 
-        public async Task<bool> UpdateBookAsync(int id, BookViewModel model, string coverImagePath)
+        public async Task<bool> UpdateBookAsync(int id, BookViewModel model, string? coverImagePath)
         {
             var book = await _context.Books
                 .Include(b => b.BookCategories)
@@ -127,19 +129,25 @@ namespace PrivateLMS.Services
             return true;
         }
 
-        public async Task<Book> GetBookByIdAsync(int bookId)
+        public async Task<Book?> GetBookByIdAsync(int bookId)
         {
-            return await _context.Books.FindAsync(bookId);
+            return await _context.Books
+                .AsNoTracking()
+                .FirstOrDefaultAsync(b => b.BookId == bookId);
         }
 
         public async Task<List<Publisher>> GetAllPublishersAsync()
         {
-            return await _context.Publishers.ToListAsync() ?? new List<Publisher>();
+            return await _context.Publishers
+                .AsNoTracking()
+                .ToListAsync() ?? new List<Publisher>();
         }
 
         public async Task<List<Category>> GetAllCategoriesAsync()
         {
-            return await _context.Categories.ToListAsync() ?? new List<Category>();
+            return await _context.Categories
+                .AsNoTracking()
+                .ToListAsync() ?? new List<Category>();
         }
 
         public async Task<bool> DeleteBookAsync(int id)
