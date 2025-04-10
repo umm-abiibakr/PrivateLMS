@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PrivateLMS.Data;
+using PrivateLMS.Models;
 using PrivateLMS.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -25,10 +26,11 @@ namespace PrivateLMS.Services
                 .Include(lr => lr.Book)
                 .Include(lr => lr.User)
                 .Where(lr => lr.FineAmount > 0)
+                .AsNoTracking()
                 .Select(lr => new FineViewModel
                 {
                     LoanRecordId = lr.LoanRecordId,
-                    BookTitle = lr.Book.Title ?? "Unknown",
+                    BookTitle = lr.Book != null ? lr.Book.Title ?? "Unknown" : "Unknown",
                     LoanerName = lr.User != null ? $"{lr.User.FirstName} {lr.User.LastName}" : "Unknown",
                     LoanDate = lr.LoanDate,
                     DueDate = lr.DueDate,
@@ -49,11 +51,12 @@ namespace PrivateLMS.Services
             return await _context.LoanRecords
                 .Include(lr => lr.Book)
                 .Include(lr => lr.User)
-                .Where(lr => lr.User != null && lr.User.Username == username && lr.FineAmount > 0)
+                .Where(lr => lr.User != null && lr.User.UserName == username && lr.FineAmount > 0)
+                .AsNoTracking()
                 .Select(lr => new FineViewModel
                 {
                     LoanRecordId = lr.LoanRecordId,
-                    BookTitle = lr.Book.Title ?? "Unknown",
+                    BookTitle = lr.Book != null ? lr.Book.Title ?? "Unknown" : "Unknown",
                     LoanerName = lr.User != null ? $"{lr.User.FirstName} {lr.User.LastName}" : "Unknown",
                     LoanDate = lr.LoanDate,
                     DueDate = lr.DueDate,
@@ -67,6 +70,7 @@ namespace PrivateLMS.Services
         public async Task<decimal> CalculateFineAsync(int loanRecordId)
         {
             var loan = await _context.LoanRecords
+                .AsNoTracking()
                 .FirstOrDefaultAsync(lr => lr.LoanRecordId == loanRecordId);
 
             if (loan == null || !loan.DueDate.HasValue || loan.ReturnDate == null || loan.ReturnDate <= loan.DueDate)

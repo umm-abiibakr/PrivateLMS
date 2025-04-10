@@ -14,12 +14,13 @@ else
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>Loan ID</th> <!-- Added -->
+                <th>Loan ID</th>
                 <th>Book Title</th>
                 <th>Loan Date</th>
                 <th>Due Date</th>
                 <th>Return Date</th>
                 <th>Renewed</th>
+                <th>Fine Amount</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -27,7 +28,7 @@ else
             @foreach (var loan in Model)
             {
                 <tr>
-                    <td>@loan.LoanRecordId</td> <!-- Added -->
+                    <td>@loan.LoanRecordId</td>
                     <td>@loan.BookTitle</td>
                     <td>@loan.LoanDate.ToShortDateString()</td>
                     <td>
@@ -37,27 +38,27 @@ else
                             <span class="badge bg-danger ms-2">Overdue</span>
                         }
                     </td>
+                    <td>@(loan.ReturnDate?.ToShortDateString() ?? "Not Returned")</td>
+                    <td>@(loan.IsRenewed ? "Yes" : "No")</td>
                     <td>
-                        @if (loan.ReturnDate.HasValue)
+                        @if (loan.FineAmount > 0)
                         {
-                            @loan.ReturnDate.Value.ToShortDateString()
+                            @loan.FineAmount.ToString("C", new System.Globalization.CultureInfo("en-NG"))
                         }
                         else
                         {
-                            <span class="badge bg-warning">Not Returned</span>
+                            <span>-</span>
                         }
                     </td>
-                    <td>@(loan.IsRenewed ? "Yes" : "No")</td>
                     <td>
                         @if (!loan.ReturnDate.HasValue)
                         {
                             <a asp-action="Return" asp-route-loanRecordId="@loan.LoanRecordId" class="btn btn-primary btn-sm">Return</a>
                             @if (!loan.IsRenewed)
                             {
-                                <a asp-action="Renew" asp-route-id="@loan.LoanRecordId" class="btn btn-success btn-sm">Renew</a>
+                                <a asp-action="Renew" asp-route-id="@loan.LoanRecordId" class="btn btn-info btn-sm">Renew</a>
                             }
                         }
-                        <a asp-controller="Fines" asp-action="MyFines" class="btn btn-info btn-sm">View Fines</a>
                     </td>
                 </tr>
             }
@@ -66,5 +67,6 @@ else
 }
 
 <div class="text-end">
+    <a asp-controller="Fines" asp-action="MyFines" class="btn btn-primary me-2">View My Fines</a>
     <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Back to Books</a>
 </div>

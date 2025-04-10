@@ -6,7 +6,7 @@
 <h2>Loan Book: @Model.BookTitle</h2>
 
 <form asp-action="Create" method="post">
-    <div asp-validation-summary="All" class="text-danger"></div>
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <input type="hidden" asp-for="BookId" />
     <input type="hidden" asp-for="UserId" />
     <div class="mb-3">
@@ -19,7 +19,7 @@
         <span asp-validation-for="DueDate" class="text-danger"></span>
     </div>
     <button type="submit" class="btn btn-success">Confirm Loan</button>
-    <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Cancel</a>
+    <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Back to Books</a>
 </form>
 
 @section Scripts {

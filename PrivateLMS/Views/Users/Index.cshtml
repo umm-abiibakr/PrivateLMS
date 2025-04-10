@@ -1,5 +1,41 @@
-﻿@model List<string>
+﻿@model IEnumerable<PrivateLMS.ViewModels.UserViewModel>
+@{
+    ViewData["Title"] = "Users";
+}
 
 <h2 class="text-center mb-4">Users</h2>
-<p class="text-center">User management coming soon!</p>
-<a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Back to Home</a>
+
+@if (!Model.Any())
+{
+    <p class="text-center">No users found.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Roles</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td>@user.UserName</td>
+                    <td>@user.Email</td>
+                    <td>@user.FirstName</td>
+                    <td>@user.LastName</td>
+                    <td>@string.Join(", ", user.Roles)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<div class="text-end">
+    <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Back to Books</a>
+</div>

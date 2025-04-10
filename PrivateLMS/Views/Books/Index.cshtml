@@ -1,4 +1,4 @@
-@model IEnumerable<PrivateLMS.Models.BookViewModel>
+@model IEnumerable<PrivateLMS.ViewModels.BookViewModel>
 @{
     ViewData["Title"] = "Books";
 }
@@ -55,7 +55,7 @@
                     </p>
                     <div>
                         <a asp-action="Details" asp-route-id="@book.BookId" class="btn btn-info btn-sm">View Details</a>
-                        @if (book.IsAvailable && book.AvailableCopies > 0)
+                        @if (book.IsAvailable && book.AvailableCopies > 0 && User.Identity.IsAuthenticated)
                         {
                             <a asp-action="Loan" asp-route-id="@book.BookId" class="btn btn-primary btn-sm">Loan</a>
                         }

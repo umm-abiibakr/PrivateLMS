@@ -6,7 +6,7 @@
 <div class="container mt-5">
     <h2>Step 2: Account Information</h2>
     <form asp-action="Step2" method="post">
-        <div asp-validation-summary="All" class="text-danger"></div>
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
         <div class="mb-3">
             <label asp-for="Username" class="form-label">Username</label>
@@ -26,6 +26,13 @@
             <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
         </div>
 
-        <button type="submit" class="btn btn-primary">Next</button>
+        <div class="text-end">
+            <button type="submit" class="btn btn-primary">Next</button>
+            <a asp-action="Step1" class="btn btn-secondary">Back</a>
+        </div>
     </form>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

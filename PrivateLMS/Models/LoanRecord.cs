@@ -12,7 +12,7 @@ namespace PrivateLMS.Models
         public int BookId { get; set; }
 
         [Required]
-        public int UserId { get; set; } 
+        public int UserId { get; set; }
 
         [DataType(DataType.DateTime)]
         public DateTime LoanDate { get; set; } = DateTime.UtcNow;
@@ -30,7 +30,8 @@ namespace PrivateLMS.Models
 
         public bool IsRenewed { get; set; }
 
-        public Book Book { get; set; }
-        public User User { get; set; } 
+        public Book Book { get; set; } = null!; 
+
+        public ApplicationUser User { get; set; } = null!; // Non-nullable with null-forgiving operator
     }
 }

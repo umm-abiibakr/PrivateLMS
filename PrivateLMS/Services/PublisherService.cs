@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PrivateLMS.Data;
 using PrivateLMS.Models;
+using PrivateLMS.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace PrivateLMS.Services
@@ -23,6 +23,7 @@ namespace PrivateLMS.Services
         public async Task<List<PublisherViewModel>> GetAllPublishersAsync()
         {
             return await _context.Publishers
+                .AsNoTracking()
                 .Select(p => new PublisherViewModel
                 {
                     PublisherId = p.PublisherId,
@@ -33,9 +34,10 @@ namespace PrivateLMS.Services
                 .ToListAsync();
         }
 
-        public async Task<PublisherViewModel> GetPublisherDetailsAsync(int publisherId)
+        public async Task<PublisherViewModel?> GetPublisherDetailsAsync(int publisherId)
         {
             var publisher = await _context.Publishers
+                .AsNoTracking()
                 .FirstOrDefaultAsync(p => p.PublisherId == publisherId);
 
             if (publisher == null)
@@ -52,7 +54,7 @@ namespace PrivateLMS.Services
             };
         }
 
-        public async Task<bool> CreatePublisherAsync(PublisherViewModel model, string logoImagePath)
+        public async Task<bool> CreatePublisherAsync(PublisherViewModel model, string? logoImagePath)
         {
             var publisher = new Publisher
             {
@@ -66,7 +68,7 @@ namespace PrivateLMS.Services
             return true;
         }
 
-        public async Task<bool> UpdatePublisherAsync(int id, PublisherViewModel model, string logoImagePath)
+        public async Task<bool> UpdatePublisherAsync(int id, PublisherViewModel model, string? logoImagePath)
         {
             var publisher = await _context.Publishers.FindAsync(id);
             if (publisher == null)

@@ -17,16 +17,12 @@
         <dd class="col-sm-10">@(Model.BirthDate?.ToShortDateString() ?? "Unknown")</dd>
         <dt class="col-sm-2">Death Date</dt>
         <dd class="col-sm-10">@(Model.DeathDate?.ToShortDateString() ?? "N/A")</dd>
-        <dt class="col-sm-2">Books</dt>
+        <dt class="col-sm-2">Number of Books</dt>
         <dd class="col-sm-10">
+            @Model.BookCount
             @if (Model.BookCount > 0)
             {
-                <p>@Model.BookCount book(s)</p>
                 <p class="text-danger">Cannot delete: This author has associated books.</p>
-            }
-            else
-            {
-                <span>No books by this author.</span>
             }
         </dd>
     </dl>
@@ -36,5 +32,5 @@
     <input type="hidden" asp-for="AuthorId" />
     @Html.AntiForgeryToken()
     <button type="submit" class="btn btn-danger @(Model.BookCount > 0 ? "disabled" : "")">Delete</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
 </form>

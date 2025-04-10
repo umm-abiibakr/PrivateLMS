@@ -16,3 +16,4 @@ namespace PrivateLMS.Models
         public string? LogoImagePath { get; set; } 
     }
 }
+

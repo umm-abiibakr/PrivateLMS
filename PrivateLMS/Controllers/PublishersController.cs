@@ -1,6 +1,7 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PrivateLMS.Services;
-using PrivateLMS.Models;
+using PrivateLMS.ViewModels;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -18,6 +19,7 @@ namespace PrivateLMS.Controllers
             _webHostEnvironment = webHostEnvironment;
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
             try
@@ -28,42 +30,45 @@ namespace PrivateLMS.Controllers
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = $"An error occurred while loading publishers: {ex.Message}";
-                return View("Error");
+                return RedirectToAction("Error", "Home");
             }
         }
 
+        [Authorize]
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
+            if (!id.HasValue)
             {
                 TempData["ErrorMessage"] = "Publisher ID was not provided.";
-                return View("NotFound");
+                return PartialView("_NotFound");
             }
 
             try
             {
                 var publisher = await _publisherService.GetPublisherDetailsAsync(id.Value);
-                if (publisher == null)
+                if (publisher is null)
                 {
                     TempData["ErrorMessage"] = "Publisher not found.";
-                    return View("NotFound");
+                    return PartialView("_NotFound");
                 }
                 return View(publisher);
             }
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = $"An error occurred while loading publisher details: {ex.Message}";
-                return View("Error");
+                return RedirectToAction("Error", "Home");
             }
         }
 
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
-            return View();
+            return View(new PublisherViewModel());
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create(PublisherViewModel model)
         {
             if (!ModelState.IsValid)
@@ -74,7 +79,7 @@ namespace PrivateLMS.Controllers
             try
             {
                 string? logoImagePath = null;
-                if (model.LogoImage != null)
+                if (model.LogoImage is not null)
                 {
                     var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images/publisher-logos");
                     Directory.CreateDirectory(uploadsFolder);
@@ -104,39 +109,41 @@ namespace PrivateLMS.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
+            if (!id.HasValue)
             {
                 TempData["ErrorMessage"] = "Publisher ID was not provided.";
-                return View("NotFound");
+                return PartialView("_NotFound");
             }
 
             try
             {
                 var publisher = await _publisherService.GetPublisherDetailsAsync(id.Value);
-                if (publisher == null)
+                if (publisher is null)
                 {
                     TempData["ErrorMessage"] = "Publisher not found.";
-                    return View("NotFound");
+                    return PartialView("_NotFound");
                 }
                 return View(publisher);
             }
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = $"An error occurred while loading publisher for edit: {ex.Message}";
-                return View("Error");
+                return RedirectToAction("Error", "Home");
             }
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, PublisherViewModel model)
         {
             if (id != model.PublisherId)
             {
                 TempData["ErrorMessage"] = "Publisher ID mismatch.";
-                return View("NotFound");
+                return PartialView("_NotFound");
             }
 
             if (!ModelState.IsValid)
@@ -147,7 +154,7 @@ namespace PrivateLMS.Controllers
             try
             {
                 string? logoImagePath = null;
-                if (model.LogoImage != null)
+                if (model.LogoImage is not null)
                 {
                     var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images/publisher-logos");
                     Directory.CreateDirectory(uploadsFolder);
@@ -164,7 +171,7 @@ namespace PrivateLMS.Controllers
                 if (!success)
                 {
                     TempData["ErrorMessage"] = "Publisher not found.";
-                    return View("NotFound");
+                    return PartialView("_NotFound");
                 }
 
                 TempData["SuccessMessage"] = "Publisher updated successfully.";
@@ -177,33 +184,35 @@ namespace PrivateLMS.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
+            if (!id.HasValue)
             {
                 TempData["ErrorMessage"] = "Publisher ID was not provided.";
-                return View("NotFound");
+                return PartialView("_NotFound");
             }
 
             try
             {
                 var publisher = await _publisherService.GetPublisherDetailsAsync(id.Value);
-                if (publisher == null)
+                if (publisher is null)
                 {
                     TempData["ErrorMessage"] = "Publisher not found.";
-                    return View("NotFound");
+                    return PartialView("_NotFound");
                 }
                 return View(publisher);
             }
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = $"An error occurred while loading publisher for deletion: {ex.Message}";
-                return View("Error");
+                return RedirectToAction("Error", "Home");
             }
         }
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             try
@@ -212,7 +221,7 @@ namespace PrivateLMS.Controllers
                 if (!success)
                 {
                     TempData["ErrorMessage"] = "Publisher not found.";
-                    return View("NotFound");
+                    return PartialView("_NotFound");
                 }
 
                 TempData["SuccessMessage"] = "Publisher deleted successfully.";
@@ -221,7 +230,7 @@ namespace PrivateLMS.Controllers
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = $"An error occurred while deleting the publisher: {ex.Message}";
-                return View("Error");
+                return RedirectToAction("Error", "Home");
             }
         }
     }

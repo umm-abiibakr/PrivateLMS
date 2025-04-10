@@ -1,16 +1,24 @@
-@model PrivateLMS.Models.CategoryViewModel
+@model PrivateLMS.ViewModels.CategoryViewModel
+@{
+    ViewData["Title"] = "Delete Category";
+}
 
 <h2>Delete Category</h2>
 
-<p>Are you sure you want to delete this category?</p>
+<p>Are you sure you want to delete this category? This action cannot be undone if no books are associated.</p>
 
 <div>
     <dl class="row">
-        <dt class="col-sm-2">Publisher Name</dt>
+        <dt class="col-sm-2">Category Name</dt>
         <dd class="col-sm-10">@Model.CategoryName</dd>
-        <dt class="col-sm-2">Book Count</dt>
-        <dd class="col-sm-10">@Model.BookCount</dd>
-
+        <dt class="col-sm-2">Number of Books</dt>
+        <dd class="col-sm-10">
+            @Model.BookCount
+            @if (Model.BookCount > 0)
+            {
+                <p class="text-danger">Cannot delete: This category has associated books.</p>
+            }
+        </dd>
         <dt class="col-sm-2">Books</dt>
         <dd class="col-sm-10">
             @if (Model.Books.Any())
@@ -33,6 +41,6 @@
 <form asp-action="Delete" method="post">
     <input type="hidden" asp-for="CategoryId" />
     @Html.AntiForgeryToken()
-    <button type="submit" class="btn btn-danger">Delete</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    <button type="submit" class="btn btn-danger @(Model.BookCount > 0 ? "disabled" : "")">Delete</button>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
 </form>

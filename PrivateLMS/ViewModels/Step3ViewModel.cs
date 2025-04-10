@@ -4,27 +4,36 @@ namespace PrivateLMS.ViewModels
 {
     public class Step3ViewModel
     {
-        [Phone]
-        [Required(ErrorMessage = "The PhoneNumber field is required.")]
-        public string PhoneNumber { get; set; }
+        [Required(ErrorMessage = "The Phone Number field is required.")]
+        [Phone(ErrorMessage = "Please enter a valid phone number.")]
+        [StringLength(20, ErrorMessage = "Phone number cannot exceed 20 characters.")]
+        [Display(Name = "Phone Number")]
+        public string PhoneNumber { get; set; } = string.Empty;
 
-        [EmailAddress]
         [Required(ErrorMessage = "The Email field is required.")]
-        public string Email { get; set; }
+        [EmailAddress(ErrorMessage = "Please enter a valid email address.")]
+        [StringLength(100, ErrorMessage = "Email cannot exceed 100 characters.")]
+        public string Email { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "The Address field is required.")]
-        public string Address { get; set; }
+        [StringLength(200, ErrorMessage = "Address cannot exceed 200 characters.")]
+        public string Address { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "The City field is required.")]
-        public string City { get; set; }
+        [StringLength(100, ErrorMessage = "City cannot exceed 100 characters.")]
+        public string City { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "The State field is required.")]
-        public string State { get; set; }
+        [StringLength(100, ErrorMessage = "State cannot exceed 100 characters.")]
+        public string State { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "The PostalCode field is required.")]
-        public string PostalCode { get; set; }
+        [Required(ErrorMessage = "The Postal Code field is required.")]
+        [StringLength(20, ErrorMessage = "Postal code cannot exceed 20 characters.")]
+        [Display(Name = "Postal Code")]
+        public string PostalCode { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "The Country field is required.")]
-        public string Country { get; set; }
+        [StringLength(100, ErrorMessage = "Country cannot exceed 100 characters.")]
+        public string Country { get; set; } = string.Empty;
     }
 }

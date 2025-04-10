@@ -1,53 +1,115 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using PrivateLMS.Models;
-using PrivateLMS.Data;
-using Microsoft.AspNetCore.Http;
+using PrivateLMS.ViewModels;
+using System.Threading.Tasks;
 
 namespace PrivateLMS.Controllers
 {
+    [AllowAnonymous]
     public class LoginController : Controller
     {
-        private readonly LibraryDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
 
-        public LoginController(LibraryDbContext context)
+        public LoginController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
         {
-            _context = context;
+            _userManager = userManager;
+            _signInManager = signInManager;
         }
 
-        // GET: Login
         public IActionResult Index()
         {
-            return View();
+            return View(new LoginViewModel());
         }
 
-        // POST: Login
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Index(Login model)
+        public async Task<IActionResult> Index(LoginViewModel model)
         {
             if (ModelState.IsValid)
             {
-                // Check credentials against the database
-                var user = _context.Users
-                    .FirstOrDefault(u => u.Username == model.Username && u.Password == model.Password);
-
-                if (user != null)
+                var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberMe, lockoutOnFailure: false);
+                if (result.Succeeded)
                 {
-                    HttpContext.Session.SetString("Username", model.Username);
-                    HttpContext.Session.SetString("Role", user.Role); 
-                    return RedirectToAction("Index", "Books");
+                    var user = await _userManager.FindByNameAsync(model.Username);
+                    if (user != null && await _userManager.IsInRoleAsync(user, "Admin"))
+                    {
+                        return RedirectToAction("Index", "Books");
+                    }
+                    return RedirectToAction("MyLoans", "Loans");
                 }
-
-                ModelState.AddModelError(string.Empty, "Invalid username or password.");
+                ModelState.AddModelError("", "Invalid login attempt.");
             }
             return View(model);
         }
 
-        // Logout
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout()
         {
-            HttpContext.Session.Clear();
-            return RedirectToAction("Index", "Books");
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Index", "Login");
+        }
+
+        public IActionResult ForgotPassword()
+        {
+            return View(new ForgotPasswordViewModel());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user == null || !await _userManager.IsEmailConfirmedAsync(user))
+                {
+                    // Don't reveal user existence or email confirmation status
+                    TempData["SuccessMessage"] = "If an account with that email exists, a password reset link has been sent.";
+                    return RedirectToAction("Index");
+                }
+
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                // Placeholder: In production, send this via email
+                TempData["SuccessMessage"] = $"Password reset token generated: {token}. In a real app, this would be emailed to {model.Email}.";
+                return RedirectToAction("Index");
+            }
+            return View(model);
+        }
+
+        public IActionResult ResetPassword()
+        {
+            return View(new ResetPasswordViewModel());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByNameAsync(model.UserName);
+                if (user == null)
+                {
+                    TempData["SuccessMessage"] = "If the username exists, the password has been reset.";
+                    return RedirectToAction("Index");
+                }
+
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var result = await _userManager.ResetPasswordAsync(user, token, model.NewPassword);
+                if (result.Succeeded)
+                {
+                    TempData["SuccessMessage"] = "Password reset successfully. Please log in with your new password.";
+                    return RedirectToAction("Index");
+                }
+
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
+            }
+            return View(model);
         }
     }
 }

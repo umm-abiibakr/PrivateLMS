@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PrivateLMS.Data;
+using PrivateLMS.Models;
 using PrivateLMS.Services;
 using PrivateLMS.ViewModels;
 using System;
@@ -9,23 +11,27 @@ using System.Threading.Tasks;
 
 namespace PrivateLMS.Controllers
 {
-    //[Authorize]
+    [Authorize]
     public class LoansController : Controller
     {
         private readonly LibraryDbContext _context;
         private readonly ILoanService _loanService;
         private readonly IFineService _fineService;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public LoansController(LibraryDbContext context, ILoanService loanService, IFineService fineService, IHttpContextAccessor httpContextAccessor)
+        public LoansController(
+            LibraryDbContext context,
+            ILoanService loanService,
+            IFineService fineService,
+            UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _loanService = loanService;
             _fineService = fineService;
-            _httpContextAccessor = httpContextAccessor;
+            _userManager = userManager;
         }
 
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
             try
@@ -44,14 +50,14 @@ namespace PrivateLMS.Controllers
         {
             try
             {
-                var username = _httpContextAccessor.HttpContext?.Session.GetString("Username");
-                if (string.IsNullOrEmpty(username))
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
                 {
                     TempData["ErrorMessage"] = "You must be logged in to view your loans.";
                     return RedirectToAction("Index", "Login");
                 }
 
-                var loans = await _loanService.GetUserLoansAsync(username);
+                var loans = await _loanService.GetUserLoansAsync(user.UserName);
                 return View(loans);
             }
             catch (Exception ex)
@@ -63,25 +69,18 @@ namespace PrivateLMS.Controllers
 
         public async Task<IActionResult> Create(int? bookId)
         {
-            if (bookId == null)
+            if (!bookId.HasValue)
             {
                 TempData["ErrorMessage"] = "Book ID was not provided for loaning.";
-                return View("NotFound");
+                return PartialView("_NotFound");
             }
 
             try
             {
-                var username = _httpContextAccessor.HttpContext?.Session.GetString("Username");
-                if (string.IsNullOrEmpty(username))
-                {
-                    TempData["ErrorMessage"] = "You must be logged in to loan a book.";
-                    return RedirectToAction("Index", "Login");
-                }
-
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+                var user = await _userManager.GetUserAsync(User);
                 if (user == null)
                 {
-                    TempData["ErrorMessage"] = "User not found.";
+                    TempData["ErrorMessage"] = "You must be logged in to loan a book.";
                     return RedirectToAction("Index", "Login");
                 }
 
@@ -91,7 +90,8 @@ namespace PrivateLMS.Controllers
                     TempData["ErrorMessage"] = "The book is not available or does not exist.";
                     return View("NotAvailable");
                 }
-                loanViewModel.UserId = user.UserId;
+
+                loanViewModel.UserId = user.Id;
                 loanViewModel.LoanerName = $"{user.FirstName} {user.LastName}";
                 return View(loanViewModel);
             }
@@ -111,9 +111,9 @@ namespace PrivateLMS.Controllers
                 var loanViewModel = await _loanService.GetLoanFormAsync(model.BookId);
                 if (loanViewModel != null)
                 {
+                    var user = await _userManager.FindByIdAsync(model.UserId.ToString());
                     model.BookTitle = loanViewModel.BookTitle;
                     model.DueDate = loanViewModel.DueDate;
-                    var user = await _context.Users.FindAsync(model.UserId);
                     model.LoanerName = user != null ? $"{user.FirstName} {user.LastName}" : "Unknown";
                 }
                 return View(model);
@@ -121,6 +121,13 @@ namespace PrivateLMS.Controllers
 
             try
             {
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null || user.Id != model.UserId)
+                {
+                    TempData["ErrorMessage"] = "Invalid user session.";
+                    return RedirectToAction("Index", "Login");
+                }
+
                 var success = await _loanService.CreateLoanAsync(model);
                 if (!success)
                 {
@@ -134,15 +141,18 @@ namespace PrivateLMS.Controllers
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = $"An error occurred while processing the loan: {ex.Message}";
-                return RedirectToAction("Error", "Home");
+                var user = await _userManager.FindByIdAsync(model.UserId.ToString());
+                model.LoanerName = user != null ? $"{user.FirstName} {user.LastName}" : "Unknown";
+                return View(model);
             }
         }
+
         public async Task<IActionResult> Return(int? loanRecordId)
         {
-            if (loanRecordId == null)
+            if (!loanRecordId.HasValue)
             {
                 TempData["ErrorMessage"] = "Loan Record ID was not provided for returning.";
-                return View("NotFound");
+                return PartialView("_NotFound");
             }
 
             try
@@ -153,6 +163,14 @@ namespace PrivateLMS.Controllers
                     TempData["ErrorMessage"] = "The loan record does not exist or has already been returned.";
                     return View("AlreadyReturned");
                 }
+
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null || user.Id != returnViewModel.UserId)
+                {
+                    TempData["ErrorMessage"] = "You do not have permission to return this loan.";
+                    return RedirectToAction("MyLoans");
+                }
+
                 return View(returnViewModel);
             }
             catch (Exception ex)
@@ -173,6 +191,13 @@ namespace PrivateLMS.Controllers
 
             try
             {
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null || user.Id != model.UserId)
+                {
+                    TempData["ErrorMessage"] = "You do not have permission to return this loan.";
+                    return RedirectToAction("MyLoans");
+                }
+
                 var success = await _loanService.ReturnLoanAsync(model.LoanRecordId);
                 if (!success)
                 {
@@ -192,19 +217,18 @@ namespace PrivateLMS.Controllers
             }
         }
 
-        // GET: Loans/Renew/5
         public async Task<IActionResult> Renew(int? id)
         {
-            if (id == null)
+            if (!id.HasValue)
             {
                 TempData["ErrorMessage"] = "Loan ID was not provided for renewal.";
-                return View("NotFound");
+                return PartialView("_NotFound");
             }
 
             try
             {
-                var username = _httpContextAccessor.HttpContext?.Session.GetString("Username");
-                if (string.IsNullOrEmpty(username))
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
                 {
                     TempData["ErrorMessage"] = "You must be logged in to renew a loan.";
                     return RedirectToAction("Index", "Login");
@@ -213,12 +237,12 @@ namespace PrivateLMS.Controllers
                 var loan = await _context.LoanRecords
                     .Include(lr => lr.Book)
                     .Include(lr => lr.User)
-                    .FirstOrDefaultAsync(lr => lr.LoanRecordId == id.Value && lr.User.Username == username);
+                    .FirstOrDefaultAsync(lr => lr.LoanRecordId == id.Value && lr.User.UserName == user.UserName);
 
                 if (loan == null)
                 {
                     TempData["ErrorMessage"] = "Loan not found or you do not have permission to renew it.";
-                    return View("NotFound");
+                    return PartialView("_NotFound");
                 }
 
                 if (loan.ReturnDate != null)
@@ -238,7 +262,7 @@ namespace PrivateLMS.Controllers
                     LoanRecordId = loan.LoanRecordId,
                     BookTitle = loan.Book?.Title ?? "Unknown",
                     UserId = loan.UserId,
-                    LoanerName = loan.User != null ? $"{loan.User.FirstName} {loan.User.LastName}" : "Unknown",
+                    LoanerName = $"{loan.User.FirstName} {loan.User.LastName}",
                     LoanDate = loan.LoanDate,
                     DueDate = loan.DueDate,
                     IsRenewed = loan.IsRenewed
@@ -252,15 +276,14 @@ namespace PrivateLMS.Controllers
             }
         }
 
-        // POST: Loans/Renew/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Renew(int id)
         {
             try
             {
-                var username = _httpContextAccessor.HttpContext?.Session.GetString("Username");
-                if (string.IsNullOrEmpty(username))
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
                 {
                     TempData["ErrorMessage"] = "You must be logged in to renew a loan.";
                     return RedirectToAction("Index", "Login");
@@ -268,7 +291,7 @@ namespace PrivateLMS.Controllers
 
                 var loan = await _context.LoanRecords
                     .Include(lr => lr.User)
-                    .FirstOrDefaultAsync(lr => lr.LoanRecordId == id && lr.User.Username == username);
+                    .FirstOrDefaultAsync(lr => lr.LoanRecordId == id && lr.User.UserName == user.UserName);
 
                 if (loan == null)
                 {

@@ -6,7 +6,7 @@
 <div class="container mt-5">
     <h2>Step 3: Contact Information</h2>
     <form asp-action="Step3" method="post">
-        <div asp-validation-summary="All" class="text-danger"></div>
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
         <div class="mb-3">
             <label asp-for="PhoneNumber" class="form-label">Phone Number</label>
@@ -50,6 +50,13 @@
             <span asp-validation-for="Country" class="text-danger"></span>
         </div>
 
-        <button type="submit" class="btn btn-primary">Next</button>
+        <div class="text-end">
+            <button type="submit" class="btn btn-primary">Next</button>
+            <a asp-action="Step2" class="btn btn-secondary">Back</a>
+        </div>
     </form>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,14 +1,19 @@
-@model IEnumerable<PrivateLMS.Models.CategoryViewModel>
+@model IEnumerable<PrivateLMS.ViewModels.CategoryViewModel>
+@{
+    ViewData["Title"] = "Categories";
+}
 
-<h2>Categories</h2>
+<h2 class="text-center mb-4">Categories</h2>
 
-<a asp-action="Create" class="btn btn-primary">Add Category</a>
+<div class="text-end mb-3">
+    <a asp-action="Create" class="btn btn-primary">Add Category</a>
+</div>
 
 <table class="table table-striped">
     <thead>
         <tr>
             <th>Category Name</th>
-            <th>Book Count</th>
+            <th>Number of Books</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -19,11 +24,13 @@
                 <td>@category.CategoryName</td>
                 <td>@category.BookCount</td>
                 <td>
-                    <a asp-action="Details" asp-route-id="@category.CategoryId" class="btn btn-info">Details</a>
-                    <a asp-action="Edit" asp-route-id="@category.CategoryId" class="btn btn-warning">Edit</a>
-                    <a asp-action="Delete" asp-route-id="@category.CategoryId" class="btn btn-danger">Delete</a>
+                    <a asp-action="Details" asp-route-id="@category.CategoryId" class="btn btn-info btn-sm">Details</a>
+                    <a asp-action="Edit" asp-route-id="@category.CategoryId" class="btn btn-warning btn-sm">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@category.CategoryId" class="btn btn-danger btn-sm">Delete</a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+<a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Back to Books</a>

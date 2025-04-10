@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
 
-namespace PrivateLMS.Models
+namespace PrivateLMS.ViewModels 
 {
     public class PublisherViewModel
     {
@@ -9,14 +9,15 @@ namespace PrivateLMS.Models
 
         [Required(ErrorMessage = "Please enter Publisher Name")]
         [StringLength(100, ErrorMessage = "Publisher name cannot exceed 100 characters.")]
-        public string PublisherName { get; set; }
+        public string PublisherName { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Please enter Publisher Location")]
         [StringLength(100, ErrorMessage = "Location cannot exceed 100 characters.")]
-        public string Location { get; set; }
+        public string Location { get; set; } = string.Empty;
 
         public string? LogoImagePath { get; set; }
+
         [Display(Name = "Publisher Logo")]
-        public IFormFile? LogoImage { get; set; } 
+        public IFormFile? LogoImage { get; set; }
     }
 }

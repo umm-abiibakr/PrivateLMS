@@ -1,9 +1,8 @@
-﻿<h2>Not Available</h2>
-
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+﻿@{
+    ViewData["Title"] = "Not Available";
 }
+
+<h2>Not Available</h2>
 
 <p>The book you are trying to loan is not available.</p>
 <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Back to Books</a>
