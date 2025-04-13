@@ -15,6 +15,7 @@
                     <li><a class="dropdown-item" asp-controller="Loans" asp-action="Index">Loans</a></li>
                     <li><a class="dropdown-item" asp-controller="Publishers" asp-action="Index">Publishers</a></li>
                     <li><a class="dropdown-item" asp-controller="Users" asp-action="Index">Users</a></li>
+                    <li><a class="dropdown-item" asp-controller="UserActivities" asp-action="Index">Activity Log</a></li>
                 </ul>
             </div>
         }
@@ -29,10 +30,16 @@
                         <span class="nav-link">Welcome, @User.Identity.Name</span>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" asp-controller="Users" asp-action="Profile">Profile</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" asp-controller="Loans" asp-action="MyLoans">My Loans</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" asp-controller="Fines" asp-action="MyFines">My Fines</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Books" asp-action="Recommendations">Recommendations</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" asp-controller="Login" asp-action="Logout">Logout</a>

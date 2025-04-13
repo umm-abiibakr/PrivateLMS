@@ -1,0 +1,108 @@
+﻿@model PrivateLMS.ViewModels.UserViewModel
+@{
+    ViewData["Title"] = "Create User";
+}
+
+<h2 class="text-center mb-4">Create User</h2>
+
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="UserName" class="form-label">Username</label>
+        <input asp-for="UserName" class="form-control" />
+        <span asp-validation-for="UserName" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label">Email</label>
+        <input asp-for="Email" class="form-control" type="email" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Password" class="form-label">Password</label>
+        <input asp-for="Password" class="form-control" type="password" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="ConfirmPassword" class="form-label">Confirm Password</label>
+        <input asp-for="ConfirmPassword" class="form-control" type="password" />
+        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="FirstName" class="form-label">First Name</label>
+        <input asp-for="FirstName" class="form-control" />
+        <span asp-validation-for="FirstName" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="LastName" class="form-label">Last Name</label>
+        <input asp-for="LastName" class="form-control" />
+        <span asp-validation-for="LastName" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="PhoneNumber" class="form-label">Phone Number</label>
+        <input asp-for="PhoneNumber" class="form-control" />
+        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Gender" class="form-label">Gender</label>
+        <select asp-for="Gender" class="form-control">
+            <option value="">Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+        </select>
+        <span asp-validation-for="Gender" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="DateOfBirth" class="form-label">Date of Birth</label>
+        <input asp-for="DateOfBirth" class="form-control" type="date" />
+        <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Address" class="form-label">Address</label>
+        <input asp-for="Address" class="form-control" />
+        <span asp-validation-for="Address" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="City" class="form-label">City</label>
+        <input asp-for="City" class="form-control" />
+        <span asp-validation-for="City" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="State" class="form-label">State</label>
+        <input asp-for="State" class="form-control" />
+        <span asp-validation-for="State" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="PostalCode" class="form-label">Postal Code</label>
+        <input asp-for="PostalCode" class="form-control" />
+        <span asp-validation-for="PostalCode" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Country" class="form-label">Country</label>
+        <input asp-for="Country" class="form-control" />
+        <span asp-validation-for="Country" class="text-danger"></span>
+    </div>
+    <div class="mb-3 form-check">
+        <input asp-for="TermsAccepted" class="form-check-input" />
+        <label asp-for="TermsAccepted" class="form-check-label">Terms Accepted</label>
+        <span asp-validation-for="TermsAccepted" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Roles</label>
+        <select asp-for="Roles" class="form-control" multiple>
+            <option value="Admin">Admin</option>
+            <option value="User">User</option>
+        </select>
+        <span class="text-muted">Hold Ctrl (Windows) or Cmd (Mac) to select multiple roles.</span>
+    </div>
+
+    <div class="text-center">
+        <button type="submit" class="btn btn-success">Create</button>
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

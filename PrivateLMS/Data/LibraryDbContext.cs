@@ -206,6 +206,13 @@ namespace PrivateLMS.Data
             // Index for performance
             modelBuilder.Entity<LoanRecord>()
                 .HasIndex(lr => lr.UserId);
+
+            modelBuilder.Entity<UserActivity>()
+                .HasOne(ua => ua.User)
+                .WithMany()
+                .HasForeignKey(ua => ua.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
         }
 
         public DbSet<Author> Authors { get; set; }
@@ -214,5 +221,6 @@ namespace PrivateLMS.Data
         public DbSet<Publisher> Publishers { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<BookCategory> BookCategories { get; set; }
+        public DbSet<UserActivity> UserActivities { get; set; }
     }
 }
