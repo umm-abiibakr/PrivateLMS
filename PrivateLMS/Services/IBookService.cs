@@ -16,5 +16,6 @@ namespace PrivateLMS.Services
         Task<List<Category>> GetAllCategoriesAsync();
         Task<bool> DeleteBookAsync(int id);
         Task<List<BookViewModel>> SearchBooksAsync(string? searchTerm);
+        Task<List<BookViewModel>> GetRecommendedBooksAsync(int userId);
     }
 }

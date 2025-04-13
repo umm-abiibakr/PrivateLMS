@@ -2,9 +2,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PrivateLMS.Data;
 using PrivateLMS.Models;
 using PrivateLMS.ViewModels;
-using System.Collections.Generic;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,11 +15,12 @@ namespace PrivateLMS.Controllers
     public class UsersController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole<int>> _roleManager;
 
-
-        public UsersController(UserManager<ApplicationUser> userManager)
+        public UsersController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole<int>> roleManager)
         {
             _userManager = userManager;
+            _roleManager = roleManager;
         }
 
         public async Task<IActionResult> Index()
@@ -33,7 +35,7 @@ namespace PrivateLMS.Controllers
                     Email = u.Email,
                     FirstName = u.FirstName,
                     LastName = u.LastName,
-                    Roles = _userManager.GetRolesAsync(u).Result.ToList()
+                    IsLockedOut = u.LockoutEnd.HasValue && u.LockoutEnd > DateTimeOffset.UtcNow
                 }).ToList();
                 return View(userViewModels);
             }
@@ -42,6 +44,463 @@ namespace PrivateLMS.Controllers
                 TempData["ErrorMessage"] = $"An error occurred while loading users: {ex.Message}";
                 return RedirectToAction("Error", "Home");
             }
+        }
+
+        public async Task<IActionResult> Details(int id)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(id.ToString());
+                if (user == null)
+                {
+                    TempData["ErrorMessage"] = "User not found.";
+                    return PartialView("_NotFound");
+                }
+
+                var viewModel = new UserViewModel
+                {
+                    Id = user.Id,
+                    UserName = user.UserName,
+                    Email = user.Email,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    PhoneNumber = user.PhoneNumber,
+                    Gender = user.Gender,
+                    DateOfBirth = user.DateOfBirth,
+                    Address = user.Address,
+                    City = user.City,
+                    State = user.State,
+                    PostalCode = user.PostalCode,
+                    Country = user.Country,
+                    TermsAccepted = user.TermsAccepted,
+                    Roles = (await _userManager.GetRolesAsync(user)).ToList(),
+                    IsLockedOut = user.LockoutEnd.HasValue && user.LockoutEnd > DateTimeOffset.UtcNow
+                };
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"An error occurred while loading user details: {ex.Message}";
+                return RedirectToAction("Error", "Home");
+            }
+        }
+
+        public IActionResult Create()
+        {
+            return View(new UserViewModel());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(UserViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var user = new ApplicationUser
+                    {
+                        UserName = model.UserName,
+                        Email = model.Email,
+                        FirstName = model.FirstName,
+                        LastName = model.LastName,
+                        PhoneNumber = model.PhoneNumber,
+                        Gender = model.Gender,
+                        DateOfBirth = model.DateOfBirth,
+                        Address = model.Address,
+                        City = model.City,
+                        State = model.State,
+                        PostalCode = model.PostalCode,
+                        Country = model.Country,
+                        TermsAccepted = model.TermsAccepted,
+                        LockoutEnabled = true // Ensure lockout is enabled
+                    };
+
+                    var result = await _userManager.CreateAsync(user, model.Password);
+                    if (result.Succeeded)
+                    {
+                        foreach (var role in model.Roles)
+                        {
+                            if (!await _roleManager.RoleExistsAsync(role))
+                            {
+                                await _roleManager.CreateAsync(new IdentityRole<int> { Name = role, NormalizedName = role.ToUpper() });
+                            }
+                            await _userManager.AddToRoleAsync(user, role);
+                        }
+
+                        TempData["SuccessMessage"] = $"User {user.UserName} created successfully.";
+                        return RedirectToAction(nameof(Index));
+                    }
+
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError("", error.Description);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    TempData["ErrorMessage"] = $"An error occurred while creating the user: {ex.Message}";
+                }
+            }
+            return View(model);
+        }
+
+        public async Task<IActionResult> Edit(int id)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(id.ToString());
+                if (user == null)
+                {
+                    TempData["ErrorMessage"] = "User not found.";
+                    return PartialView("_NotFound");
+                }
+
+                var viewModel = new UserViewModel
+                {
+                    Id = user.Id,
+                    UserName = user.UserName,
+                    Email = user.Email,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    PhoneNumber = user.PhoneNumber,
+                    Gender = user.Gender,
+                    DateOfBirth = user.DateOfBirth,
+                    Address = user.Address,
+                    City = user.City,
+                    State = user.State,
+                    PostalCode = user.PostalCode,
+                    Country = user.Country,
+                    TermsAccepted = user.TermsAccepted,
+                    Roles = (await _userManager.GetRolesAsync(user)).ToList(),
+                    IsLockedOut = user.LockoutEnd.HasValue && user.LockoutEnd > DateTimeOffset.UtcNow
+                };
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"An error occurred while loading user for editing: {ex.Message}";
+                return RedirectToAction("Error", "Home");
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, UserViewModel model)
+        {
+            if (id != model.Id)
+            {
+                TempData["ErrorMessage"] = "User ID mismatch.";
+                return PartialView("_NotFound");
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var user = await _userManager.FindByIdAsync(id.ToString());
+                    if (user == null)
+                    {
+                        TempData["ErrorMessage"] = "User not found.";
+                        return PartialView("_NotFound");
+                    }
+
+                    user.UserName = model.UserName;
+                    user.Email = model.Email;
+                    user.FirstName = model.FirstName;
+                    user.LastName = model.LastName;
+                    user.PhoneNumber = model.PhoneNumber;
+                    user.Gender = model.Gender;
+                    user.DateOfBirth = model.DateOfBirth;
+                    user.Address = model.Address;
+                    user.City = model.City;
+                    user.State = model.State;
+                    user.PostalCode = model.PostalCode;
+                    user.Country = model.Country;
+                    user.TermsAccepted = model.TermsAccepted;
+                    user.LockoutEnabled = true; // Ensure lockout remains enabled
+
+                    var updateResult = await _userManager.UpdateAsync(user);
+                    if (!updateResult.Succeeded)
+                    {
+                        foreach (var error in updateResult.Errors)
+                        {
+                            ModelState.AddModelError("", error.Description);
+                        }
+                        return View(model);
+                    }
+
+                    var currentRoles = await _userManager.GetRolesAsync(user);
+                    var rolesToRemove = currentRoles.Except(model.Roles).ToList();
+                    var rolesToAdd = model.Roles.Except(currentRoles).ToList();
+
+                    if (rolesToRemove.Any())
+                    {
+                        await _userManager.RemoveFromRolesAsync(user, rolesToRemove);
+                    }
+                    if (rolesToAdd.Any())
+                    {
+                        foreach (var role in rolesToAdd)
+                        {
+                            if (!await _roleManager.RoleExistsAsync(role))
+                            {
+                                await _roleManager.CreateAsync(new IdentityRole<int> { Name = role, NormalizedName = role.ToUpper() });
+                            }
+                        }
+                        await _userManager.AddToRolesAsync(user, rolesToAdd);
+                    }
+
+                    TempData["SuccessMessage"] = $"Successfully updated user: {user.UserName}.";
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception ex)
+                {
+                    TempData["ErrorMessage"] = $"An error occurred while updating the user: {ex.Message}";
+                }
+            }
+            return View(model);
+        }
+
+        public async Task<IActionResult> Delete(int id)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(id.ToString());
+                if (user == null)
+                {
+                    TempData["ErrorMessage"] = "User not found.";
+                    return PartialView("_NotFound");
+                }
+
+                var viewModel = new UserViewModel
+                {
+                    Id = user.Id,
+                    UserName = user.UserName,
+                    Email = user.Email,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName
+                };
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"An error occurred while loading user for deletion: {ex.Message}";
+                return RedirectToAction("Error", "Home");
+            }
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(id.ToString());
+                if (user == null)
+                {
+                    TempData["ErrorMessage"] = "User not found.";
+                    return PartialView("_NotFound");
+                }
+
+                var result = await _userManager.DeleteAsync(user);
+                if (!result.Succeeded)
+                {
+                    TempData["ErrorMessage"] = "Failed to delete user.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                TempData["SuccessMessage"] = $"User {user.UserName} deleted successfully.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"An error occurred while deleting the user: {ex.Message}";
+                return RedirectToAction("Error", "Home");
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Ban(int id, string duration = "Permanent")
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(id.ToString());
+                if (user == null)
+                {
+                    TempData["ErrorMessage"] = "User not found.";
+                    return PartialView("_NotFound");
+                }
+
+                // Set ban duration
+                DateTimeOffset? lockoutEnd;
+                switch (duration.ToLower())
+                {
+                    case "1day":
+                        lockoutEnd = DateTimeOffset.UtcNow.AddDays(1);
+                        break;
+                    case "1week":
+                        lockoutEnd = DateTimeOffset.UtcNow.AddDays(7);
+                        break;
+                    case "1month":
+                        lockoutEnd = DateTimeOffset.UtcNow.AddMonths(1);
+                        break;
+                    case "permanent":
+                    default:
+                        lockoutEnd = DateTimeOffset.UtcNow.AddYears(100);
+                        break;
+                }
+
+                var result = await _userManager.SetLockoutEndDateAsync(user, lockoutEnd);
+                if (!result.Succeeded)
+                {
+                    var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                    TempData["ErrorMessage"] = $"Failed to ban user: {errors}";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                // Log ban activity
+                var context = HttpContext.RequestServices.GetService<LibraryDbContext>();
+                if (context != null)
+                {
+                    context.UserActivities.Add(new UserActivity
+                    {
+                        UserId = user.Id,
+                        Action = "Ban",
+                        Timestamp = DateTime.UtcNow,
+                        Details = $"User banned for {duration} by admin"
+                    });
+                    await context.SaveChangesAsync();
+                }
+
+                TempData["SuccessMessage"] = $"User {user.UserName} has been banned.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"An error occurred while banning the user: {ex.Message}";
+                return RedirectToAction("Error", "Home");
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Unban(int id)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(id.ToString());
+                if (user == null)
+                {
+                    TempData["ErrorMessage"] = "User not found.";
+                    return PartialView("_NotFound");
+                }
+
+                await _userManager.SetLockoutEndDateAsync(user, null);
+
+                // Log unban activity
+                var context = HttpContext.RequestServices.GetService<LibraryDbContext>();
+                if (context != null)
+                {
+                    context.UserActivities.Add(new UserActivity
+                    {
+                        UserId = user.Id,
+                        Action = "Unban",
+                        Timestamp = DateTime.UtcNow,
+                        Details = "User unbanned by admin"
+                    });
+                    await context.SaveChangesAsync();
+                }
+
+                TempData["SuccessMessage"] = $"User {user.UserName} has been unbanned.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"An error occurred while unbanning the user: {ex.Message}";
+                return RedirectToAction("Error", "Home");
+            }
+        }
+
+        [Authorize]
+        public async Task<IActionResult> Profile()
+        {
+            try
+            {
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
+                {
+                    TempData["ErrorMessage"] = "You must be logged in to view your profile.";
+                    return RedirectToAction("Index", "Login");
+                }
+
+                var viewModel = new UserProfileViewModel
+                {
+                    UserName = user.UserName,
+                    Email = user.Email,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    PhoneNumber = user.PhoneNumber,
+                    Address = user.Address,
+                    City = user.City,
+                    State = user.State,
+                    PostalCode = user.PostalCode,
+                    Country = user.Country
+                };
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"An error occurred while loading your profile: {ex.Message}";
+                return RedirectToAction("Error", "Home");
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        public async Task<IActionResult> Profile(UserProfileViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var user = await _userManager.GetUserAsync(User);
+                    if (user == null)
+                    {
+                        TempData["ErrorMessage"] = "You must be logged in to update your profile.";
+                        return RedirectToAction("Index", "Login");
+                    }
+
+                    user.Email = model.Email;
+                    user.FirstName = model.FirstName;
+                    user.LastName = model.LastName;
+                    user.PhoneNumber = model.PhoneNumber;
+                    user.Address = model.Address;
+                    user.City = model.City;
+                    user.State = model.State;
+                    user.PostalCode = model.PostalCode;
+                    user.Country = model.Country;
+
+                    var result = await _userManager.UpdateAsync(user);
+                    if (!result.Succeeded)
+                    {
+                        foreach (var error in result.Errors)
+                        {
+                            ModelState.AddModelError("", error.Description);
+                        }
+                        return View(model);
+                    }
+
+                    TempData["SuccessMessage"] = "Profile updated successfully.";
+                    return RedirectToAction("Profile");
+                }
+                catch (Exception ex)
+                {
+                    TempData["ErrorMessage"] = $"An error occurred while updating your profile: {ex.Message}";
+                }
+            }
+            return View(model);
         }
     }
 }

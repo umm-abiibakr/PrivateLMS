@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using PrivateLMS.Data;
 using PrivateLMS.Models;
 using PrivateLMS.ViewModels;
 using System.Threading.Tasks;
@@ -30,17 +31,49 @@ namespace PrivateLMS.Controllers
         {
             if (ModelState.IsValid)
             {
-                var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberMe, lockoutOnFailure: false);
-                if (result.Succeeded)
+                var user = await _userManager.FindByNameAsync(model.Username);
+                if (user != null)
                 {
-                    var user = await _userManager.FindByNameAsync(model.Username);
-                    if (user != null && await _userManager.IsInRoleAsync(user, "Admin"))
+                    if (await _userManager.IsLockedOutAsync(user))
                     {
-                        return RedirectToAction("Index", "Books");
+                        ModelState.AddModelError("", "This account is currently banned.");
+                        return View(model);
                     }
-                    return RedirectToAction("MyLoans", "Loans");
+
+                    var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberMe, lockoutOnFailure: true);
+                    if (result.Succeeded)
+                    {
+                        // Log login
+                        var context = HttpContext.RequestServices.GetService<LibraryDbContext>();
+                        if (context != null)
+                        {
+                            context.UserActivities.Add(new UserActivity
+                            {
+                                UserId = user.Id,
+                                Action = "Login",
+                                Timestamp = DateTime.UtcNow,
+                                Details = $"User logged in at {DateTime.UtcNow}"
+                            });
+                            await context.SaveChangesAsync();
+                        }
+
+                        if (await _userManager.IsInRoleAsync(user, "Admin"))
+                        {
+                            return RedirectToAction("Index", "Books");
+                        }
+                        return RedirectToAction("MyLoans", "Loans");
+                    }
+                    else if (result.IsLockedOut)
+                    {
+                        ModelState.AddModelError("", "This account is currently banned.");
+                        return View(model);
+                    }
+                    ModelState.AddModelError("", "Invalid login attempt.");
                 }
-                ModelState.AddModelError("", "Invalid login attempt.");
+                else
+                {
+                    ModelState.AddModelError("", "Invalid login attempt.");
+                }
             }
             return View(model);
         }
@@ -65,13 +98,11 @@ namespace PrivateLMS.Controllers
                 var user = await _userManager.FindByEmailAsync(model.Email);
                 if (user == null || !await _userManager.IsEmailConfirmedAsync(user))
                 {
-                    // Don't reveal user existence or email confirmation status
                     TempData["SuccessMessage"] = "If an account with that email exists, a password reset link has been sent.";
                     return RedirectToAction("Index");
                 }
 
                 var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-                // Placeholder: In production, send this via email
                 TempData["SuccessMessage"] = $"Password reset token generated: {token}. In a real app, this would be emailed to {model.Email}.";
                 return RedirectToAction("Index");
             }

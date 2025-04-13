@@ -46,6 +46,27 @@ namespace PrivateLMS.Controllers
             }
         }
 
+        public async Task<IActionResult> Recommendations()
+        {
+            try
+            {
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
+                {
+                    TempData["ErrorMessage"] = "You must be logged in to view recommendations.";
+                    return RedirectToAction("Index", "Login");
+                }
+
+                var recommendations = await _bookService.GetRecommendedBooksAsync(user.Id);
+                return View(recommendations);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"An error occurred while loading recommendations: {ex.Message}";
+                return RedirectToAction("Error", "Home");
+            }
+        }
+
         [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {

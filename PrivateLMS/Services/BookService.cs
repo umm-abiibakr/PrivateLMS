@@ -196,5 +196,38 @@ namespace PrivateLMS.Services
                 throw new Exception($"Error searching books with term '{searchTerm}': {ex.Message}", ex);
             }
         }
+
+        public async Task<List<BookViewModel>> GetRecommendedBooksAsync(int userId)
+        {
+            // Example: Recommend books from categories of user's past loans
+            var userLoans = await _context.LoanRecords
+                .Where(lr => lr.UserId == userId)
+                .Select(lr => lr.BookId)
+                .ToListAsync();
+
+            var categories = await _context.BookCategories
+                .Where(bc => userLoans.Contains(bc.BookId))
+                .Select(bc => bc.CategoryId)
+                .Distinct()
+                .ToListAsync();
+
+            var recommendedBooks = await _context.Books
+                .Include(b => b.BookCategories)
+                .Where(b => b.BookCategories.Any(bc => categories.Contains(bc.CategoryId)))
+                .Where(b => b.IsAvailable && b.AvailableCopies > 0)
+                .Select(b => new BookViewModel
+                {
+                    BookId = b.BookId,
+                    Title = b.Title,
+                    Description = b.Description,
+                    AvailableCopies = b.AvailableCopies,
+                    IsAvailable = b.IsAvailable,
+                    CoverImagePath = b.CoverImagePath
+                })
+                .Take(6) // Limit to 6 recommendations
+                .ToListAsync();
+
+            return recommendedBooks;
+        }
     }
 }
