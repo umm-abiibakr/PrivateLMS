@@ -3,36 +3,47 @@
     ViewData["Title"] = "Edit Author";
 }
 
-<h2>Edit Author</h2>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Edit Author</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <form asp-action="Edit" method="post">
+                        <input type="hidden" asp-for="AuthorId" />
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-<form asp-action="Edit" method="post">
-    <input type="hidden" asp-for="AuthorId" />
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label">Author Name</label>
+                            <input asp-for="Name" class="form-control" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Biography" class="form-label">Biography</label>
+                            <textarea asp-for="Biography" class="form-control" rows="5"></textarea>
+                            <span asp-validation-for="Biography" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="BirthDate" class="form-label">Birth Date</label>
+                            <input asp-for="BirthDate" type="date" class="form-control" />
+                            <span asp-validation-for="BirthDate" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="DeathDate" class="form-label">Death Date</label>
+                            <input asp-for="DeathDate" type="date" class="form-control" />
+                            <span asp-validation-for="DeathDate" class="text-danger"></span>
+                        </div>
 
-    <div class="mb-3">
-        <label asp-for="Name" class="form-label">Author Name</label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary">Update</button>
+                            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="mb-3">
-        <label asp-for="Biography" class="form-label">Biography</label>
-        <textarea asp-for="Biography" class="form-control" rows="3"></textarea>
-        <span asp-validation-for="Biography" class="text-danger"></span>
-    </div>
-    <div class="mb-3">
-        <label asp-for="BirthDate" class="form-label">Birth Date</label>
-        <input asp-for="BirthDate" type="date" class="form-control" />
-        <span asp-validation-for="BirthDate" class="text-danger"></span>
-    </div>
-    <div class="mb-3">
-        <label asp-for="DeathDate" class="form-label">Death Date</label>
-        <input asp-for="DeathDate" type="date" class="form-control" />
-        <span asp-validation-for="DeathDate" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Update</button>
-    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
-</form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

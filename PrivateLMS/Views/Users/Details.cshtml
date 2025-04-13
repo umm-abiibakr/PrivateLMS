@@ -3,44 +3,51 @@
     ViewData["Title"] = "User Details";
 }
 
-<h2 class="text-center mb-4">User Details: @Model.UserName</h2>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">User Details: @Model.UserName</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4 text-end">Username</dt>
+                        <dd class="col-sm-8">@Model.UserName</dd>
+                        <dt class="col-sm-4 text-end">Email</dt>
+                        <dd class="col-sm-8">@Model.Email</dd>
+                        <dt class="col-sm-4 text-end">First Name</dt>
+                        <dd class="col-sm-8">@Model.FirstName</dd>
+                        <dt class="col-sm-4 text-end">Last Name</dt>
+                        <dd class="col-sm-8">@Model.LastName</dd>
+                        <dt class="col-sm-4 text-end">Phone Number</dt>
+                        <dd class="col-sm-8">@(Model.PhoneNumber ?? "N/A")</dd>
+                        <dt class="col-sm-4 text-end">Gender</dt>
+                        <dd class="col-sm-8">@Model.Gender</dd>
+                        <dt class="col-sm-4 text-end">Date of Birth</dt>
+                        <dd class="col-sm-8">@Model.DateOfBirth.ToShortDateString()</dd>
+                        <dt class="col-sm-4 text-end">Address</dt>
+                        <dd class="col-sm-8">@Model.Address</dd>
+                        <dt class="col-sm-4 text-end">City</dt>
+                        <dd class="col-sm-8">@(Model.City ?? "N/A")</dd>
+                        <dt class="col-sm-4 text-end">State</dt>
+                        <dd class="col-sm-8">@(Model.State ?? "N/A")</dd>
+                        <dt class="col-sm-4 text-end">Postal Code</dt>
+                        <dd class="col-sm-8">@(Model.PostalCode ?? "N/A")</dd>
+                        <dt class="col-sm-4 text-end">Country</dt>
+                        <dd class="col-sm-8">@(Model.Country ?? "N/A")</dd>
+                        <dt class="col-sm-4 text-end">Terms Accepted</dt>
+                        <dd class="col-sm-8">@(Model.TermsAccepted ? "Yes" : "No")</dd>
+                        <dt class="col-sm-4 text-end">Roles</dt>
+                        <dd class="col-sm-8">@string.Join(", ", Model.Roles)</dd>
+                        <dt class="col-sm-4 text-end">Status</dt>
+                        <dd class="col-sm-8">@(Model.IsLockedOut ? "Banned" : "Active")</dd>
+                    </dl>
 
-<div>
-    <dl class="row">
-        <dt class="col-sm-3">Username</dt>
-        <dd class="col-sm-9">@Model.UserName</dd>
-        <dt class="col-sm-3">Email</dt>
-        <dd class="col-sm-9">@Model.Email</dd>
-        <dt class="col-sm-3">First Name</dt>
-        <dd class="col-sm-9">@Model.FirstName</dd>
-        <dt class="col-sm-3">Last Name</dt>
-        <dd class="col-sm-9">@Model.LastName</dd>
-        <dt class="col-sm-3">Phone Number</dt>
-        <dd class="col-sm-9">@(Model.PhoneNumber ?? "N/A")</dd>
-        <dt class="col-sm-3">Gender</dt>
-        <dd class="col-sm-9">@Model.Gender</dd>
-        <dt class="col-sm-3">Date of Birth</dt>
-        <dd class="col-sm-9">@Model.DateOfBirth.ToShortDateString()</dd>
-        <dt class="col-sm-3">Address</dt>
-        <dd class="col-sm-9">@Model.Address</dd>
-        <dt class="col-sm-3">City</dt>
-        <dd class="col-sm-9">@(Model.City ?? "N/A")</dd>
-        <dt class="col-sm-3">State</dt>
-        <dd class="col-sm-9">@(Model.State ?? "N/A")</dd>
-        <dt class="col-sm-3">Postal Code</dt>
-        <dd class="col-sm-9">@(Model.PostalCode ?? "N/A")</dd>
-        <dt class="col-sm-3">Country</dt>
-        <dd class="col-sm-9">@(Model.Country ?? "N/A")</dd>
-        <dt class="col-sm-3">Terms Accepted</dt>
-        <dd class="col-sm-9">@(Model.TermsAccepted ? "Yes" : "No")</dd>
-        <dt class="col-sm-3">Roles</dt>
-        <dd class="col-sm-9">@string.Join(", ", Model.Roles)</dd>
-        <dt class="col-sm-3">Status</dt>
-        <dd class="col-sm-9">@(Model.IsLockedOut ? "Banned" : "Active")</dd>
-    </dl>
-</div>
-
-<div class="text-center">
-    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
-    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                    <div class="text-center">
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning me-2">Edit</a>
+                        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

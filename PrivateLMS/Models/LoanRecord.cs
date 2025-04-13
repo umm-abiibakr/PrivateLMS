@@ -23,15 +23,12 @@ namespace PrivateLMS.Models
         [DataType(DataType.DateTime)]
         public DateTime? ReturnDate { get; set; }
 
-        [Range(0, double.MaxValue, ErrorMessage = "Fine amount cannot be negative.")]
-        public decimal FineAmount { get; set; }
-
-        public bool IsFinePaid { get; set; }
-
         public bool IsRenewed { get; set; }
 
-        public Book Book { get; set; } = null!; 
+        public Book Book { get; set; } = null!;
 
-        public ApplicationUser User { get; set; } = null!; // Non-nullable with null-forgiving operator
+        public ApplicationUser User { get; set; } = null!;
+
+        public ICollection<Fine> Fines { get; set; } = new List<Fine>(); 
     }
 }

@@ -57,7 +57,7 @@ namespace PrivateLMS.Controllers
                     return RedirectToAction("Index", "Login");
                 }
 
-                var loans = await _loanService.GetUserLoansAsync(user.UserName);
+                var loans = await _loanService.GetAllUserLoansAsync(user.UserName);
                 return View(loans);
             }
             catch (Exception ex)
@@ -204,8 +204,6 @@ namespace PrivateLMS.Controllers
                     TempData["ErrorMessage"] = "The loan record does not exist or has already been returned.";
                     return View("AlreadyReturned");
                 }
-
-                await _fineService.UpdateFineAsync(model.LoanRecordId);
 
                 TempData["SuccessMessage"] = "Successfully returned the book.";
                 return RedirectToAction("MyLoans");

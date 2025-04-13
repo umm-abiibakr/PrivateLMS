@@ -3,27 +3,34 @@
     ViewData["Title"] = "Author Details";
 }
 
-<h2>Author Details</h2>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Author Details</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4 text-end">Name</dt>
+                        <dd class="col-sm-8">@Model.Name</dd>
+                        <dt class="col-sm-4 text-end">Biography</dt>
+                        <dd class="col-sm-8">@(Model.Biography ?? "No biography available")</dd>
+                        <dt class="col-sm-4 text-end">Birth Date</dt>
+                        <dd class="col-sm-8">@(Model.BirthDate?.ToShortDateString() ?? "Unknown")</dd>
+                        <dt class="col-sm-4 text-end">Death Date</dt>
+                        <dd class="col-sm-8">@(Model.DeathDate?.ToShortDateString() ?? "N/A")</dd>
+                        <dt class="col-sm-4 text-end">Number of Books</dt>
+                        <dd class="col-sm-8">@Model.BookCount</dd>
+                    </dl>
 
-<div>
-    <dl class="row">
-        <dt class="col-sm-2">Name</dt>
-        <dd class="col-sm-10">@Model.Name</dd>
-        <dt class="col-sm-2">Biography</dt>
-        <dd class="col-sm-10">@(Model.Biography ?? "No biography available")</dd>
-        <dt class="col-sm-2">Birth Date</dt>
-        <dd class="col-sm-10">@(Model.BirthDate?.ToShortDateString() ?? "Unknown")</dd>
-        <dt class="col-sm-2">Death Date</dt>
-        <dd class="col-sm-10">@(Model.DeathDate?.ToShortDateString() ?? "N/A")</dd>
-        <dt class="col-sm-2">Number of Books</dt>
-        <dd class="col-sm-10">@Model.BookCount</dd>
-    </dl>
-</div>
-
-<div>
-    @if (User.IsInRole("Admin"))
-    {
-        <a asp-action="Edit" asp-route-id="@Model.AuthorId" class="btn btn-warning">Edit</a>
-    }
-    <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Back to Books</a>
+                    <div class="text-center">
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-action="Edit" asp-route-id="@Model.AuthorId" class="btn btn-warning me-2">Edit</a>
+                        }
+                        <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Back to Books</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

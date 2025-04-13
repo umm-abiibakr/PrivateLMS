@@ -5,6 +5,8 @@ namespace PrivateLMS.ViewModels
 {
     public class FineViewModel
     {
+        public int Id { get; set; }
+
         public int LoanRecordId { get; set; }
 
         [Display(Name = "Book Title")]
@@ -25,11 +27,15 @@ namespace PrivateLMS.ViewModels
         [Display(Name = "Return Date")]
         public DateTime? ReturnDate { get; set; }
 
+        [DataType(DataType.Date)]
+        [Display(Name = "Issued Date")]
+        public DateTime IssuedDate { get; set; }
+
         [DataType(DataType.Currency)]
         [Display(Name = "Fine Amount")]
-        public decimal FineAmount { get; set; }
+        public decimal Amount { get; set; }
 
         [Display(Name = "Fine Paid")]
-        public bool IsFinePaid { get; set; }
+        public bool IsPaid { get; set; }
     }
 }

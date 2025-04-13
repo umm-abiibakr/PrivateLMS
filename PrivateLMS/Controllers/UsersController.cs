@@ -6,6 +6,7 @@ using PrivateLMS.Data;
 using PrivateLMS.Models;
 using PrivateLMS.ViewModels;
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -16,11 +17,16 @@ namespace PrivateLMS.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole<int>> _roleManager;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public UsersController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole<int>> roleManager)
+        public UsersController(
+            UserManager<ApplicationUser> userManager,
+            RoleManager<IdentityRole<int>> roleManager,
+            IWebHostEnvironment webHostEnvironment)
         {
             _userManager = userManager;
             _roleManager = roleManager;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         public async Task<IActionResult> Index()
@@ -113,7 +119,7 @@ namespace PrivateLMS.Controllers
                         PostalCode = model.PostalCode,
                         Country = model.Country,
                         TermsAccepted = model.TermsAccepted,
-                        LockoutEnabled = true // Ensure lockout is enabled
+                        LockoutEnabled = true
                     };
 
                     var result = await _userManager.CreateAsync(user, model.Password);
@@ -218,7 +224,7 @@ namespace PrivateLMS.Controllers
                     user.PostalCode = model.PostalCode;
                     user.Country = model.Country;
                     user.TermsAccepted = model.TermsAccepted;
-                    user.LockoutEnabled = true; // Ensure lockout remains enabled
+                    user.LockoutEnabled = true;
 
                     var updateResult = await _userManager.UpdateAsync(user);
                     if (!updateResult.Succeeded)
@@ -321,7 +327,7 @@ namespace PrivateLMS.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Ban(int id, string duration = "Permanent")
+        public async Task<IActionResult> Ban(int id, string banReason, string duration = "Permanent")
         {
             try
             {
@@ -332,7 +338,12 @@ namespace PrivateLMS.Controllers
                     return PartialView("_NotFound");
                 }
 
-                // Set ban duration
+                if (string.IsNullOrWhiteSpace(banReason))
+                {
+                    TempData["ErrorMessage"] = "Ban reason is required.";
+                    return RedirectToAction(nameof(Index));
+                }
+
                 DateTimeOffset? lockoutEnd;
                 switch (duration.ToLower())
                 {
@@ -359,7 +370,7 @@ namespace PrivateLMS.Controllers
                     return RedirectToAction(nameof(Index));
                 }
 
-                // Log ban activity
+                // Log ban with reason
                 var context = HttpContext.RequestServices.GetService<LibraryDbContext>();
                 if (context != null)
                 {
@@ -368,7 +379,7 @@ namespace PrivateLMS.Controllers
                         UserId = user.Id,
                         Action = "Ban",
                         Timestamp = DateTime.UtcNow,
-                        Details = $"User banned for {duration} by admin"
+                        Details = $"User banned for {duration} with reason: {banReason}"
                     });
                     await context.SaveChangesAsync();
                 }
@@ -445,7 +456,8 @@ namespace PrivateLMS.Controllers
                     City = user.City,
                     State = user.State,
                     PostalCode = user.PostalCode,
-                    Country = user.Country
+                    Country = user.Country,
+                    ProfilePicturePath = user.ProfilePicturePath
                 };
                 return View(viewModel);
             }
@@ -481,6 +493,30 @@ namespace PrivateLMS.Controllers
                     user.State = model.State;
                     user.PostalCode = model.PostalCode;
                     user.Country = model.Country;
+
+                    if (model.ProfilePicture != null)
+                    {
+                        var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images/profile-pictures");
+                        Directory.CreateDirectory(uploadsFolder);
+                        var fileName = Guid.NewGuid().ToString() + Path.GetExtension(model.ProfilePicture.FileName);
+                        var filePath = Path.Combine(uploadsFolder, fileName);
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await model.ProfilePicture.CopyToAsync(stream);
+                        }
+                        var newProfilePicturePath = $"/images/profile-pictures/{fileName}";
+
+                        if (!string.IsNullOrEmpty(user.ProfilePicturePath))
+                        {
+                            var oldFilePath = Path.Combine(_webHostEnvironment.WebRootPath, user.ProfilePicturePath.TrimStart('/'));
+                            if (System.IO.File.Exists(oldFilePath))
+                            {
+                                System.IO.File.Delete(oldFilePath);
+                            }
+                        }
+
+                        user.ProfilePicturePath = newProfilePicturePath;
+                    }
 
                     var result = await _userManager.UpdateAsync(user);
                     if (!result.Succeeded)

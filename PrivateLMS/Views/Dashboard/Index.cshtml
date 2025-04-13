@@ -1,0 +1,127 @@
+﻿@model PrivateLMS.ViewModels.UserDashboardViewModel
+@{
+    ViewData["Title"] = "User Dashboard";
+}
+
+<div class="container">
+    <h2 class="text-center mb-5">User Dashboard</h2>
+
+    <!-- Active Loans Section -->
+    <section class="mb-5">
+        <h3 class="text-center mb-4">Active Loans</h3>
+        @if (!Model.ActiveLoans.Any())
+        {
+            <p class="text-center text-muted">You have no active loans.</p>
+        }
+        else
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Book</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var loan in Model.ActiveLoans)
+                    {
+                        <tr>
+                            <td>@loan.BookTitle</td>
+                            <td>@(loan.DueDate.HasValue ? loan.DueDate.Value.ToString("g") : "N/A")</td>
+                            <td>
+                                @if (loan.DaysOverdue > 0)
+                                {
+                                    <span class="badge bg-danger">Overdue by @loan.DaysOverdue day@(loan.DaysOverdue != 1 ? "s" : "")</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success">Pending</span>
+                                }
+                            </td>
+                            <td>
+                                <a asp-controller="Loans" asp-action="Renew" asp-route-id="@loan.LoanRecordId" class="btn btn-primary btn-sm">Renew</a>
+                                <a asp-controller="Loans" asp-action="Return" asp-route-loanRecordId="@loan.LoanRecordId" class="btn btn-success btn-sm">Return</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </section>
+
+    <!-- Fines Section -->
+    <section class="mb-5">
+        <h3 class="text-center mb-4">Unpaid Fines</h3>
+        @if (!Model.Fines.Any())
+        {
+            <p class="text-center text-muted">You have no unpaid fines.</p>
+        }
+        else
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Book</th>
+                        <th>Amount</th>
+                        <th>Issued Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var fine in Model.Fines)
+                    {
+                        <tr>
+                            <td>@fine.BookTitle</td>
+                            <td>NGN @fine.Amount.ToString("F2")</td>
+                            <td>@fine.IssuedDate.ToString("g")</td>
+                            <td>
+                                <a asp-action="PayFine" asp-route-id="@fine.Id" class="btn btn-warning btn-sm">Pay</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </section>
+
+    <!-- Recent Ratings Section -->
+    <section class="mb-5">
+        <h3 class="text-center mb-4">Your Recent Ratings</h3>
+        @if (!Model.RecentRatings.Any())
+        {
+            <p class="text-center text-muted">You haven't rated any books yet.</p>
+        }
+        else
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Book</th>
+                        <th>Rating</th>
+                        <th>Rated On</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var rating in Model.RecentRatings)
+                    {
+                        <tr>
+                            <td>@rating.BookTitle</td>
+                            <td>@rating.Rating stars</td>
+                            <td>@rating.RatedOn.ToString("g")</td>
+                            <td>
+                                <a asp-controller="Books" asp-action="Details" asp-route-id="@rating.BookId" class="btn btn-primary btn-sm">View Book</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </section>
+
+    <div class="text-center">
+        <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Back to Home</a>
+    </div>
+</div>

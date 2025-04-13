@@ -1,72 +1,102 @@
 ﻿@model IEnumerable<PrivateLMS.ViewModels.LoanViewModel>
 @{
     ViewData["Title"] = "My Loans";
+    var activeLoans = Model.Where(lr => lr.ReturnDate == null).ToList();
+    var pastLoans = Model.Where(lr => lr.ReturnDate != null).ToList();
 }
 
-<h2 class="text-center mb-4">My Loans</h2>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">My Loans</h2>
 
-@if (!Model.Any())
-{
-    <p class="text-center">You have no active loans.</p>
-}
-else
-{
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Loan ID</th>
-                <th>Book Title</th>
-                <th>Loan Date</th>
-                <th>Due Date</th>
-                <th>Return Date</th>
-                <th>Renewed</th>
-                <th>Fine Amount</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var loan in Model)
-            {
+    <!-- Active Loans -->
+    <h3 class="mb-3">Active Loans</h3>
+    @if (!activeLoans.Any())
+    {
+        <p class="text-center">You have no active loans.</p>
+    }
+    else
+    {
+        <table class="table table-striped table-hover mb-5">
+            <thead>
                 <tr>
-                    <td>@loan.LoanRecordId</td>
-                    <td>@loan.BookTitle</td>
-                    <td>@loan.LoanDate.ToShortDateString()</td>
-                    <td>
-                        @(loan.DueDate?.ToShortDateString() ?? "N/A")
-                        @if (loan.DueDate.HasValue && loan.DueDate < DateTime.Now && !loan.ReturnDate.HasValue)
-                        {
-                            <span class="badge bg-danger ms-2">Overdue</span>
-                        }
-                    </td>
-                    <td>@(loan.ReturnDate?.ToShortDateString() ?? "Not Returned")</td>
-                    <td>@(loan.IsRenewed ? "Yes" : "No")</td>
-                    <td>
-                        @if (loan.FineAmount > 0)
-                        {
-                            @loan.FineAmount.ToString("C", new System.Globalization.CultureInfo("en-NG"))
-                        }
-                        else
-                        {
-                            <span>-</span>
-                        }
-                    </td>
-                    <td>
-                        @if (!loan.ReturnDate.HasValue)
-                        {
-                            <a asp-action="Return" asp-route-loanRecordId="@loan.LoanRecordId" class="btn btn-primary btn-sm">Return</a>
-                            @if (!loan.IsRenewed)
-                            {
-                                <a asp-action="Renew" asp-route-id="@loan.LoanRecordId" class="btn btn-info btn-sm">Renew</a>
-                            }
-                        }
-                    </td>
+                    <th>Book</th>
+                    <th>Loan Date</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
                 </tr>
-            }
-        </tbody>
-    </table>
-}
+            </thead>
+            <tbody>
+                @foreach (var loan in activeLoans)
+                {
+                    <tr>
+                        <td>@loan.BookTitle</td>
+                        <td>@loan.LoanDate.ToString("g")</td>
+                        <td>@(loan.DueDate?.ToString("g") ?? "N/A")</td>
+                        <td>
+                            @if (loan.DaysOverdue > 0)
+                            {
+                                <span class="badge bg-danger">Overdue by @loan.DaysOverdue day@(loan.DaysOverdue != 1 ? "s" : "")</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning">Pending</span>
+                            }
+                        </td>
+                        <td>
+                            <a asp-action="Renew" asp-route-id="@loan.LoanRecordId" class="btn btn-primary btn-sm me-1">Renew</a>
+                            <a asp-action="Return" asp-route-loanRecordId="@loan.LoanRecordId" class="btn btn-success btn-sm">Return</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
 
-<div class="text-end">
-    <a asp-controller="Fines" asp-action="MyFines" class="btn btn-primary me-2">View My Fines</a>
-    <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Back to Books</a>
+    <!-- Past Loans -->
+    <h3 class="mb-3">Past Loans</h3>
+    @if (!pastLoans.Any())
+    {
+        <p class="text-center">You have no past loans.</p>
+    }
+    else
+    {
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Book</th>
+                    <th>Loan Date</th>
+                    <th>Due Date</th>
+                    <th>Return Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var loan in pastLoans)
+                {
+                    <tr>
+                        <td>@loan.BookTitle</td>
+                        <td>@loan.LoanDate.ToString("g")</td>
+                        <td>@(loan.DueDate?.ToString("g") ?? "N/A")</td>
+                        <td>@(loan.ReturnDate?.ToString("g") ?? "N/A")</td>
+                        <td>
+                            @if (loan.ReturnDate.HasValue && loan.DueDate.HasValue && loan.ReturnDate > loan.DueDate)
+                            {
+                                var daysLate = (loan.ReturnDate.Value - loan.DueDate.Value).Days;
+                                <span class="badge bg-danger">Returned Late (@daysLate day@(daysLate != 1 ? "s" : "") late)</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success">Returned</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    <div class="text-end mt-3">
+        <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Back to Books</a>
+    </div>
 </div>

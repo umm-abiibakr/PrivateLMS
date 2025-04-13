@@ -3,50 +3,54 @@
     ViewData["Title"] = "Book Recommendations";
 }
 
-<h2 class="text-center mb-4">Book Recommendations</h2>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Book Recommendations</h2>
 
-@if (!Model.Any())
-{
-    <p class="text-center">No recommendations available. Try borrowing some books!</p>
-}
-else
-{
-    <div class="row row-cols-1 row-cols-md-3 g-4">
-        @foreach (var book in Model)
-        {
-            <div class="col">
-                <div class="card h-100 text-center">
-                    @if (!string.IsNullOrEmpty(book.CoverImagePath))
-                    {
-                        <img src="@book.CoverImagePath" class="card-img-top mx-auto d-block" alt="@book.Title Cover" style="max-height: 200px; max-width: 100%; object-fit: cover;" />
-                    }
-                    else
-                    {
-                        <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
-                            <span>No Cover</span>
+    @if (!Model.Any())
+    {
+        <p class="text-center">No recommendations available. Try borrowing some books!</p>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            @foreach (var book in Model)
+            {
+                <div class="col">
+                    <div class="card h-100 text-center">
+                        @if (!string.IsNullOrEmpty(book.CoverImagePath))
+                        {
+                            <img src="@book.CoverImagePath" class="card-img-top mx-auto d-block" alt="@book.Title Cover" style="max-height: 200px; max-width: 100%; object-fit: cover;" />
+                        }
+                        else
+                        {
+                            <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                                <span>No Cover</span>
+                            </div>
+                        }
+                        <div class="card-body">
+                            <h5 class="card-title">@book.Title</h5>
+                            <p class="card-text">
+                                @if (!string.IsNullOrEmpty(book.Description))
+                                {
+                                    <small class="text-muted">@(book.Description.Length > 50 ? book.Description.Substring(0, 50) + "..." : book.Description)</small>
+                                }
+                                <br />
+                                <span>Copies: @book.AvailableCopies</span>
+                                <br />
+                                @if (book.IsAvailable)
+                                {
+                                    <span class="badge bg-success">Available</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Not Available</span>
+                                }
+                                <br />
+                                <small class="text-muted">Rating: @(book.RatingCount > 0 ? $"{book.AverageRating:F1} ({book.RatingCount} ratings)" : "Not yet rated")</small>
+                            </p>
                         </div>
-                    }
-                    <div class="card-body">
-                        <h5 class="card-title">@book.Title</h5>
-                        <p class="card-text">
-                            @if (!string.IsNullOrEmpty(book.Description))
-                            {
-                                <small class="text-muted">@(book.Description.Length > 50 ? book.Description.Substring(0, 50) + "..." : book.Description)</small>
-                            }
-                            <br />
-                            <span>Copies: @book.AvailableCopies</span>
-                            <br />
-                            @if (book.IsAvailable)
-                            {
-                                <span class="badge bg-success">Available</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-danger">Not Available</span>
-                            }
-                        </p>
-                        <div>
-                            <a asp-action="Details" asp-route-id="@book.BookId" class="btn btn-info btn-sm">View Details</a>
+                        <div class="card-footer">
+                            <a asp-action="Details" asp-route-id="@book.BookId" class="btn btn-info btn-sm me-2">View Details</a>
                             @if (book.IsAvailable && book.AvailableCopies > 0)
                             {
                                 <a asp-action="Loan" asp-route-id="@book.BookId" class="btn btn-primary btn-sm">Loan</a>
@@ -54,11 +58,11 @@ else
                         </div>
                     </div>
                 </div>
-            </div>
-        }
-    </div>
-}
+            }
+        </div>
+    }
 
-<div class="text-end mt-3">
-    <a asp-action="Index" class="btn btn-secondary">Back to Books</a>
+    <div class="text-end mt-4">
+        <a asp-action="Index" class="btn btn-secondary">Back to Books</a>
+    </div>
 </div>

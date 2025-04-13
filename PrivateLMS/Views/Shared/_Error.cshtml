@@ -4,13 +4,17 @@
 
 <div class="container mt-5 text-center">
     <h2>Error</h2>
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
-    }
-    else
-    {
-        <p>An unexpected error occurred. Please try again later.</p>
-    }
-    <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Back to Books</a>
+    <div class="card mt-4">
+        <div class="card-body">
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+            }
+            else
+            {
+                <p>An unexpected error occurred. Please try again later.</p>
+            }
+            <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Back to Books</a>
+        </div>
+    </div>
 </div>

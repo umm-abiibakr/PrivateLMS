@@ -3,35 +3,47 @@
     ViewData["Title"] = "Edit Publisher";
 }
 
-<h2>Edit Publisher</h2>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Edit Publisher</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                        <input type="hidden" asp-for="PublisherId" />
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-<form asp-action="Edit" method="post" enctype="multipart/form-data">
-    <input type="hidden" asp-for="PublisherId" />
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="mb-3">
+                            <label asp-for="PublisherName" class="form-label">Publisher Name</label>
+                            <input asp-for="PublisherName" class="form-control" />
+                            <span asp-validation-for="PublisherName" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Location" class="form-label">Location</label>
+                            <input asp-for="Location" class="form-control" />
+                            <span asp-validation-for="Location" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="LogoImage" class="form-label">Publisher Logo</label>
+                            @if (!string.IsNullOrEmpty(Model.LogoImagePath))
+                            {
+                                <img src="@Model.LogoImagePath" alt="@Model.PublisherName Logo" class="img-fluid mb-2" style="max-width: 100px;" />
+                                <p>Replace current logo:</p>
+                            }
+                            <input asp-for="LogoImage" type="file" class="form-control" accept="image/*" />
+                            <span asp-validation-for="LogoImage" class="text-danger"></span>
+                        </div>
 
-    <div class="mb-3">
-        <label asp-for="PublisherName" class="form-label">Publisher Name</label>
-        <input asp-for="PublisherName" class="form-control" />
-        <span asp-validation-for="PublisherName" class="text-danger"></span>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary">Update</button>
+                            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="mb-3">
-        <label asp-for="Location" class="form-label">Location</label>
-        <input asp-for="Location" class="form-control" />
-        <span asp-validation-for="Location" class="text-danger"></span>
-    </div>
-    <div class="mb-3">
-        <label asp-for="LogoImage" class="form-label">Publisher Logo</label>
-        @if (!string.IsNullOrEmpty(Model.LogoImagePath))
-        {
-            <img src="@Model.LogoImagePath" alt="@Model.PublisherName Logo" style="max-width: 100px; display: block; margin-bottom: 10px;" />
-            <p>Replace current logo:</p>
-        }
-        <input asp-for="LogoImage" type="file" class="form-control" accept="image/*" />
-        <span asp-validation-for="LogoImage" class="text-danger"></span>
-    </div>
-    <button type="submit" class="btn btn-primary">Update</button>
-    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
-</form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

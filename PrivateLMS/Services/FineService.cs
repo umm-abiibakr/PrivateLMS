@@ -22,21 +22,24 @@ namespace PrivateLMS.Services
 
         public async Task<List<FineViewModel>> GetAllFinesAsync()
         {
-            return await _context.LoanRecords
-                .Include(lr => lr.Book)
-                .Include(lr => lr.User)
-                .Where(lr => lr.FineAmount > 0)
+            return await _context.Fines
+                .Include(f => f.LoanRecord)
+                    .ThenInclude(lr => lr.Book)
+                .Include(f => f.LoanRecord)
+                    .ThenInclude(lr => lr.User)
                 .AsNoTracking()
-                .Select(lr => new FineViewModel
+                .Select(f => new FineViewModel
                 {
-                    LoanRecordId = lr.LoanRecordId,
-                    BookTitle = lr.Book != null ? lr.Book.Title ?? "Unknown" : "Unknown",
-                    LoanerName = lr.User != null ? $"{lr.User.FirstName} {lr.User.LastName}" : "Unknown",
-                    LoanDate = lr.LoanDate,
-                    DueDate = lr.DueDate,
-                    ReturnDate = lr.ReturnDate,
-                    FineAmount = lr.FineAmount,
-                    IsFinePaid = lr.IsFinePaid
+                    Id = f.Id,
+                    LoanRecordId = f.LoanId,
+                    BookTitle = f.LoanRecord.Book != null ? f.LoanRecord.Book.Title ?? "Unknown" : "Unknown",
+                    LoanerName = f.LoanRecord.User != null ? $"{f.LoanRecord.User.FirstName} {f.LoanRecord.User.LastName}" : "Unknown",
+                    LoanDate = f.LoanRecord.LoanDate,
+                    DueDate = f.LoanRecord.DueDate,
+                    ReturnDate = f.LoanRecord.ReturnDate,
+                    IssuedDate = f.IssuedDate,
+                    Amount = f.Amount,
+                    IsPaid = f.IsPaid
                 })
                 .ToListAsync();
         }
@@ -48,23 +51,52 @@ namespace PrivateLMS.Services
                 return new List<FineViewModel>();
             }
 
-            return await _context.LoanRecords
-                .Include(lr => lr.Book)
-                .Include(lr => lr.User)
-                .Where(lr => lr.User != null && lr.User.UserName == username && lr.FineAmount > 0)
+            return await _context.Fines
+                .Include(f => f.LoanRecord)
+                    .ThenInclude(lr => lr.Book)
+                .Include(f => f.LoanRecord)
+                    .ThenInclude(lr => lr.User)
+                .Where(f => f.LoanRecord.User != null && f.LoanRecord.User.UserName == username)
                 .AsNoTracking()
-                .Select(lr => new FineViewModel
+                .Select(f => new FineViewModel
                 {
-                    LoanRecordId = lr.LoanRecordId,
-                    BookTitle = lr.Book != null ? lr.Book.Title ?? "Unknown" : "Unknown",
-                    LoanerName = lr.User != null ? $"{lr.User.FirstName} {lr.User.LastName}" : "Unknown",
-                    LoanDate = lr.LoanDate,
-                    DueDate = lr.DueDate,
-                    ReturnDate = lr.ReturnDate,
-                    FineAmount = lr.FineAmount,
-                    IsFinePaid = lr.IsFinePaid
+                    Id = f.Id,
+                    LoanRecordId = f.LoanId,
+                    BookTitle = f.LoanRecord.Book != null ? f.LoanRecord.Book.Title ?? "Unknown" : "Unknown",
+                    LoanerName = f.LoanRecord.User != null ? $"{f.LoanRecord.User.FirstName} {f.LoanRecord.User.LastName}" : "Unknown",
+                    LoanDate = f.LoanRecord.LoanDate,
+                    DueDate = f.LoanRecord.DueDate,
+                    ReturnDate = f.LoanRecord.ReturnDate,
+                    IssuedDate = f.IssuedDate,
+                    Amount = f.Amount,
+                    IsPaid = f.IsPaid
                 })
                 .ToListAsync();
+        }
+
+        public async Task<FineViewModel?> GetFineByIdAsync(int fineId)
+        {
+            return await _context.Fines
+                .Include(f => f.LoanRecord)
+                    .ThenInclude(lr => lr.Book)
+                .Include(f => f.LoanRecord)
+                    .ThenInclude(lr => lr.User)
+                .AsNoTracking()
+                .Where(f => f.Id == fineId)
+                .Select(f => new FineViewModel
+                {
+                    Id = f.Id,
+                    LoanRecordId = f.LoanId,
+                    BookTitle = f.LoanRecord.Book != null ? f.LoanRecord.Book.Title ?? "Unknown" : "Unknown",
+                    LoanerName = f.LoanRecord.User != null ? $"{f.LoanRecord.User.FirstName} {f.LoanRecord.User.LastName}" : "Unknown",
+                    LoanDate = f.LoanRecord.LoanDate,
+                    DueDate = f.LoanRecord.DueDate,
+                    ReturnDate = f.LoanRecord.ReturnDate,
+                    IssuedDate = f.IssuedDate,
+                    Amount = f.Amount,
+                    IsPaid = f.IsPaid
+                })
+                .FirstOrDefaultAsync();
         }
 
         public async Task<decimal> CalculateFineAsync(int loanRecordId)
@@ -85,25 +117,58 @@ namespace PrivateLMS.Services
         public async Task<bool> UpdateFineAsync(int loanRecordId)
         {
             var loan = await _context.LoanRecords
+                .Include(lr => lr.Fines)
                 .FirstOrDefaultAsync(lr => lr.LoanRecordId == loanRecordId);
 
-            if (loan == null) return false;
+            if (loan == null || loan.ReturnDate == null) return false;
 
-            loan.FineAmount = await CalculateFineAsync(loanRecordId);
-            _context.Update(loan);
+            var fineAmount = await CalculateFineAsync(loanRecordId);
+            if (fineAmount <= 0) return true; // No fine to apply
+
+            var existingFine = loan.Fines.FirstOrDefault();
+            if (existingFine != null)
+            {
+                existingFine.Amount = fineAmount;
+                existingFine.IsPaid = false;
+                existingFine.IssuedDate = loan.ReturnDate.Value;
+                _context.Update(existingFine);
+            }
+            else
+            {
+                var fine = new Fine
+                {
+                    UserId = loan.UserId,
+                    LoanId = loanRecordId,
+                    Amount = fineAmount,
+                    IssuedDate = loan.ReturnDate.Value,
+                    IsPaid = false
+                };
+                _context.Fines.Add(fine);
+            }
+
             await _context.SaveChangesAsync();
             return true;
         }
 
-        public async Task<bool> PayFineAsync(int loanRecordId)
+        public async Task<bool> PayFineAsync(int fineId)
         {
-            var loan = await _context.LoanRecords
-                .FirstOrDefaultAsync(lr => lr.LoanRecordId == loanRecordId);
+            var fine = await _context.Fines
+                .FirstOrDefaultAsync(f => f.Id == fineId);
 
-            if (loan == null || loan.IsFinePaid || loan.FineAmount <= 0) return false;
+            if (fine == null || fine.IsPaid || fine.Amount <= 0) return false;
 
-            loan.IsFinePaid = true;
-            _context.Update(loan);
+            fine.IsPaid = true;
+            _context.Update(fine);
+
+            // Log the fine payment
+            _context.UserActivities.Add(new UserActivity
+            {
+                UserId = fine.UserId,
+                Action = "PayFine",
+                Timestamp = DateTime.UtcNow,
+                Details = $"User paid fine of NGN {fine.Amount} for loan ID {fine.LoanId}"
+            });
+
             await _context.SaveChangesAsync();
             return true;
         }

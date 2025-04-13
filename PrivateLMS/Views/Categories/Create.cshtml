@@ -3,19 +3,31 @@
     ViewData["Title"] = "Create Category";
 }
 
-<h2>Create Category</h2>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Create Category</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-<form asp-action="Create" method="post">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="mb-3">
+                            <label asp-for="CategoryName" class="form-label">Category Name</label>
+                            <input asp-for="CategoryName" class="form-control" />
+                            <span asp-validation-for="CategoryName" class="text-danger"></span>
+                        </div>
 
-    <div class="mb-3">
-        <label asp-for="CategoryName" class="form-label">Category Name</label>
-        <input asp-for="CategoryName" class="form-control" />
-        <span asp-validation-for="CategoryName" class="text-danger"></span>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-success">Save</button>
+                            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-    <button type="submit" class="btn btn-success">Save</button>
-    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
-</form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

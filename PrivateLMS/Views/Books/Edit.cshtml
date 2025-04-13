@@ -3,79 +3,91 @@
     ViewData["Title"] = "Edit Book";
 }
 
-<h2>Edit Book</h2>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Edit Book</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                        <input type="hidden" asp-for="BookId" />
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-<form asp-action="Edit" method="post" enctype="multipart/form-data">
-    <input type="hidden" asp-for="BookId" />
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="mb-3">
+                            <label asp-for="Title" class="form-label">Title</label>
+                            <input asp-for="Title" class="form-control" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="AuthorId" class="form-label">Author</label>
+                            <select asp-for="AuthorId" class="form-control" asp-items="@(new SelectList(Model.AvailableAuthors, "AuthorId", "Name"))">
+                                <option value="">Select an Author</option>
+                            </select>
+                            <span asp-validation-for="AuthorId" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="ISBN" class="form-label">ISBN</label>
+                            <input asp-for="ISBN" class="form-control" />
+                            <span asp-validation-for="ISBN" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Language" class="form-label">Language</label>
+                            <input asp-for="Language" class="form-control" />
+                            <span asp-validation-for="Language" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="PublishedDate" class="form-label">Published Date</label>
+                            <input asp-for="PublishedDate" type="date" class="form-control" />
+                            <span asp-validation-for="PublishedDate" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label">Description</label>
+                            <textarea asp-for="Description" class="form-control" rows="5"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="AvailableCopies" class="form-label">Available Copies</label>
+                            <input asp-for="AvailableCopies" class="form-control" type="number" min="0" />
+                            <span asp-validation-for="AvailableCopies" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input asp-for="IsAvailable" class="form-check-input" />
+                            <label asp-for="IsAvailable" class="form-check-label">Available</label>
+                            <span asp-validation-for="IsAvailable" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="CoverImage" class="form-label">Book Cover</label>
+                            @if (!string.IsNullOrEmpty(Model.CoverImagePath))
+                            {
+                                <img src="@Model.CoverImagePath" alt="@Model.Title Cover" class="img-fluid mb-2" style="max-width: 200px;" />
+                                <p>Replace current cover:</p>
+                            }
+                            <input asp-for="CoverImage" type="file" class="form-control" accept="image/*" />
+                            <span asp-validation-for="CoverImage" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="PublisherId" class="form-label">Publisher</label>
+                            <select asp-for="PublisherId" class="form-control" asp-items="@(new SelectList(Model.AvailablePublishers, "PublisherId", "PublisherName"))">
+                                <option value="">Select a Publisher (optional)</option>
+                            </select>
+                            <span asp-validation-for="PublisherId" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="SelectedCategoryIds" class="form-label">Categories</label>
+                            <select asp-for="SelectedCategoryIds" class="form-control" multiple asp-items="@(new SelectList(Model.AvailableCategories, "CategoryId", "CategoryName"))"></select>
+                            <span asp-validation-for="SelectedCategoryIds" class="text-danger"></span>
+                        </div>
 
-    <div class="mb-3">
-        <label asp-for="Title" class="form-label">Title</label>
-        <input asp-for="Title" class="form-control" />
-        <span asp-validation-for="Title" class="text-danger"></span>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary">Update</button>
+                            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="mb-3">
-        <label asp-for="AuthorId" class="form-label">Author</label>
-        <select asp-for="AuthorId" class="form-control" asp-items="@(new SelectList(Model.AvailableAuthors, "AuthorId", "Name"))">
-            <option value="">Select an Author</option>
-        </select>
-        <span asp-validation-for="AuthorId" class="text-danger"></span>
-    </div>
-    <div class="mb-3">
-        <label asp-for="ISBN" class="form-label">ISBN</label>
-        <input asp-for="ISBN" class="form-control" />
-        <span asp-validation-for="ISBN" class="text-danger"></span>
-    </div>
-    <div class="mb-3">
-        <label asp-for="Language" class="form-label">Language</label>
-        <input asp-for="Language" class="form-control" />
-        <span asp-validation-for="Language" class="text-danger"></span>
-    </div>
-    <div class="mb-3">
-        <label asp-for="PublishedDate" class="form-label">Published Date</label>
-        <input asp-for="PublishedDate" type="date" class="form-control" />
-        <span asp-validation-for="PublishedDate" class="text-danger"></span>
-    </div>
-    <div class="mb-3">
-        <label asp-for="Description" class="form-label">Description</label>
-        <textarea asp-for="Description" class="form-control" rows="3"></textarea>
-        <span asp-validation-for="Description" class="text-danger"></span>
-    </div>
-    <div class="mb-3">
-        <label asp-for="AvailableCopies" class="form-label">Available Copies</label>
-        <input asp-for="AvailableCopies" class="form-control" type="number" min="0" />
-        <span asp-validation-for="AvailableCopies" class="text-danger"></span>
-    </div>
-    <div class="mb-3 form-check">
-        <input asp-for="IsAvailable" class="form-check-input" />
-        <label asp-for="IsAvailable" class="form-check-label">Available</label>
-        <span asp-validation-for="IsAvailable" class="text-danger"></span>
-    </div>
-    <div class="mb-3">
-        <label asp-for="CoverImage" class="form-label">Book Cover</label>
-        @if (!string.IsNullOrEmpty(Model.CoverImagePath))
-        {
-            <img src="@Model.CoverImagePath" alt="@Model.Title Cover" style="max-width: 200px; margin-bottom: 10px;" />
-            <p>Replace current cover:</p>
-        }
-        <input asp-for="CoverImage" type="file" class="form-control" accept="image/*" />
-        <span asp-validation-for="CoverImage" class="text-danger"></span>
-    </div>
-    <div class="mb-3">
-        <label asp-for="PublisherId" class="form-label">Publisher</label>
-        <select asp-for="PublisherId" class="form-control" asp-items="@(new SelectList(Model.AvailablePublishers, "PublisherId", "PublisherName"))">
-            <option value="">Select a Publisher (optional)</option>
-        </select>
-        <span asp-validation-for="PublisherId" class="text-danger"></span>
-    </div>
-    <div class="mb-3">
-        <label asp-for="SelectedCategoryIds" class="form-label">Categories</label>
-        <select asp-for="SelectedCategoryIds" class="form-control" multiple asp-items="@(new SelectList(Model.AvailableCategories, "CategoryId", "CategoryName"))"></select>
-        <span asp-validation-for="SelectedCategoryIds" class="text-danger"></span>
-    </div>
-    <button type="submit" class="btn btn-primary">Update</button>
-    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
-</form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

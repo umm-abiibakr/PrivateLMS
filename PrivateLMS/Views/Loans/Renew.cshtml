@@ -3,30 +3,39 @@
     ViewData["Title"] = "Renew Loan";
 }
 
-<h2>Renew Loan: @Model.BookTitle</h2>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Renew Loan: @Model.BookTitle</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <p class="text-center">Are you sure you want to renew this loan? It will extend the due date by 7 days. This is a one-time renewal.</p>
 
-<p>Are you sure you want to renew this loan? It will extend the due date by 7 days. This is a one-time renewal.</p>
+                    <dl class="row">
+                        <dt class="col-sm-4 text-end">Book Title</dt>
+                        <dd class="col-sm-8">@Model.BookTitle</dd>
+                        <dt class="col-sm-4 text-end">Loaner Name</dt>
+                        <dd class="col-sm-8">@Model.LoanerName</dd>
+                        <dt class="col-sm-4 text-end">Loan Date</dt>
+                        <dd class="col-sm-8">@Model.LoanDate.ToShortDateString()</dd>
+                        <dt class="col-sm-4 text-end">Current Due Date</dt>
+                        <dd class="col-sm-8">@(Model.DueDate?.ToShortDateString() ?? "N/A")</dd>
+                        <dt class="col-sm-4 text-end">New Due Date</dt>
+                        <dd class="col-sm-8">@(Model.DueDate?.AddDays(7).ToShortDateString() ?? "N/A")</dd>
+                    </dl>
 
-<div>
-    <dl class="row">
-        <dt class="col-sm-2">Book Title</dt>
-        <dd class="col-sm-10">@Model.BookTitle</dd>
-        <dt class="col-sm-2">Loaner Name</dt>
-        <dd class="col-sm-10">@Model.LoanerName</dd>
-        <dt class="col-sm-2">Loan Date</dt>
-        <dd class="col-sm-10">@Model.LoanDate.ToShortDateString()</dd>
-        <dt class="col-sm-2">Current Due Date</dt>
-        <dd class="col-sm-10">@(Model.DueDate?.ToShortDateString() ?? "N/A")</dd>
-        <dt class="col-sm-2">New Due Date</dt>
-        <dd class="col-sm-10">@(Model.DueDate?.AddDays(7).ToShortDateString() ?? "N/A")</dd>
-    </dl>
+                    <form asp-action="Renew" method="post">
+                        <input type="hidden" asp-for="LoanRecordId" />
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary">Confirm Renewal</button>
+                            <a asp-action="MyLoans" class="btn btn-secondary">Back to My Loans</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-
-<form asp-action="Renew" method="post">
-    <input type="hidden" asp-for="LoanRecordId" />
-    <button type="submit" class="btn btn-primary">Confirm Renewal</button>
-    <a asp-action="MyLoans" class="btn btn-secondary">Back to My Loans</a>
-</form>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

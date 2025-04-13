@@ -1,11 +1,14 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using PrivateLMS.Data;
 using PrivateLMS.Models;
 using PrivateLMS.Services;
 using PrivateLMS.ViewModels;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PrivateLMS.Controllers
@@ -15,28 +18,47 @@ namespace PrivateLMS.Controllers
     {
         private readonly IBookService _bookService;
         private readonly IAuthorService _authorService;
+        private readonly IBookRatingService _bookRatingService;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly LibraryDbContext _context;
 
         public BooksController(
             IBookService bookService,
             IAuthorService authorService,
+            IBookRatingService bookRatingService,
             IWebHostEnvironment webHostEnvironment,
-            UserManager<ApplicationUser> userManager)
+            UserManager<ApplicationUser> userManager,
+            LibraryDbContext context)
         {
             _bookService = bookService;
             _authorService = authorService;
+            _bookRatingService = bookRatingService;
             _webHostEnvironment = webHostEnvironment;
             _userManager = userManager;
+            _context = context;
         }
 
         [AllowAnonymous]
-        public async Task<IActionResult> Index(string? searchTerm = "")
+        public async Task<IActionResult> Index(string? searchTerm = "", int? categoryId = null, int? authorId = null)
         {
             try
             {
                 var books = await _bookService.SearchBooksAsync(searchTerm);
+                if (categoryId.HasValue)
+                {
+                    books = books.Where(b => b.SelectedCategoryIds.Contains(categoryId.Value)).ToList();
+                }
+                if (authorId.HasValue)
+                {
+                    books = books.Where(b => b.AuthorId == authorId.Value).ToList();
+                }
+
                 ViewBag.SearchTerm = searchTerm;
+                ViewBag.CategoryId = categoryId;
+                ViewBag.AuthorId = authorId;
+                ViewBag.Categories = await _bookService.GetAllCategoriesAsync();
+                ViewBag.Authors = await _authorService.GetAllAuthorsAsync();
                 return View(books ?? new List<BookViewModel>());
             }
             catch (Exception ex)
@@ -79,11 +101,18 @@ namespace PrivateLMS.Controllers
             try
             {
                 var book = await _bookService.GetBookDetailsAsync(id.Value);
-                if (book is null)
+                if (book == null)
                 {
                     TempData["ErrorMessage"] = $"No book found with ID {id}.";
                     return PartialView("_NotFound");
                 }
+
+                var user = await _userManager.GetUserAsync(User);
+                if (user != null)
+                {
+                    book.UserRating = await _bookRatingService.GetUserRatingAsync(id.Value, user.Id);
+                }
+
                 return View(book);
             }
             catch (Exception ex)
@@ -123,7 +152,7 @@ namespace PrivateLMS.Controllers
                 try
                 {
                     string? coverImagePath = null;
-                    if (viewModel.CoverImage is not null)
+                    if (viewModel.CoverImage != null)
                     {
                         var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images/book-covers");
                         Directory.CreateDirectory(uploadsFolder);
@@ -170,12 +199,11 @@ namespace PrivateLMS.Controllers
             try
             {
                 var book = await _bookService.GetBookDetailsAsync(id.Value);
-                if (book is null)
+                if (book == null)
                 {
                     TempData["ErrorMessage"] = $"No book found with ID {id}.";
                     return PartialView("_NotFound");
                 }
-                book.SelectedCategoryIds = book.AvailableCategories?.Select(c => c.CategoryId).ToList() ?? new List<int>();
                 return View(book);
             }
             catch (Exception ex)
@@ -201,7 +229,7 @@ namespace PrivateLMS.Controllers
                 try
                 {
                     string? coverImagePath = null;
-                    if (viewModel.CoverImage is not null)
+                    if (viewModel.CoverImage != null)
                     {
                         var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images/book-covers");
                         Directory.CreateDirectory(uploadsFolder);
@@ -247,7 +275,7 @@ namespace PrivateLMS.Controllers
             try
             {
                 var book = await _bookService.GetBookDetailsAsync(id.Value);
-                if (book is null)
+                if (book == null)
                 {
                     TempData["ErrorMessage"] = $"No book found with ID {id} for deletion.";
                     return PartialView("_NotFound");
@@ -269,7 +297,7 @@ namespace PrivateLMS.Controllers
             try
             {
                 var book = await _bookService.GetBookByIdAsync(id);
-                if (book is null)
+                if (book == null)
                 {
                     TempData["ErrorMessage"] = $"No book found with ID {id}.";
                     return PartialView("_NotFound");
@@ -301,7 +329,7 @@ namespace PrivateLMS.Controllers
             }
 
             var user = await _userManager.GetUserAsync(User);
-            if (user is null)
+            if (user == null)
             {
                 TempData["ErrorMessage"] = "You must be logged in to loan a book.";
                 return RedirectToAction("Index", "Login");

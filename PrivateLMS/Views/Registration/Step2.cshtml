@@ -1,38 +1,76 @@
 ﻿@model PrivateLMS.ViewModels.Step2ViewModel
 @{
-    ViewData["Title"] = "Step 2: Account Information";
+    ViewData["Title"] = "Registration - Step 2";
 }
 
-<div class="container mt-5">
-    <h2>Step 2: Account Information</h2>
-    <form asp-action="Step2" method="post">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-        <div class="mb-3">
-            <label asp-for="Username" class="form-label">Username</label>
-            <input asp-for="Username" class="form-control" />
-            <span asp-validation-for="Username" class="text-danger"></span>
+<div class="container">
+    <h2 class="text-center mb-4">Registration - Step 2</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <form asp-action="Step2" method="post">
+                <div asp-validation-summary="All" class="text-danger mb-3"></div>
+                <div class="mb-3">
+                    <label asp-for="Username" class="form-label"></label>
+                    <input asp-for="Username" class="form-control" />
+                    <span asp-validation-for="Username" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Password" class="form-label"></label>
+                    <div class="input-group">
+                        <input asp-for="Password" class="form-control" id="passwordInput" type="password" />
+                        <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+                            <i class="bi bi-eye-slash" id="togglePasswordIcon"></i>
+                        </button>
+                    </div>
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="ConfirmPassword" class="form-label"></label>
+                    <div class="input-group">
+                        <input asp-for="ConfirmPassword" class="form-control" id="confirmPasswordInput" type="password" />
+                        <button type="button" class="btn btn-outline-secondary" id="toggleConfirmPassword">
+                            <i class="bi bi-eye-slash" id="toggleConfirmPasswordIcon"></i>
+                        </button>
+                    </div>
+                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                </div>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a asp-action="Step1" class="btn btn-secondary">Previous</a>
+                    <button type="submit" class="btn btn-primary">Next</button>
+                </div>
+            </form>
         </div>
-
-        <div class="mb-3">
-            <label asp-for="Password" class="form-label">Password</label>
-            <input asp-for="Password" type="password" class="form-control" />
-            <span asp-validation-for="Password" class="text-danger"></span>
-        </div>
-
-        <div class="mb-3">
-            <label asp-for="ConfirmPassword" class="form-label">Confirm Password</label>
-            <input asp-for="ConfirmPassword" type="password" class="form-control" />
-            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-        </div>
-
-        <div class="text-end">
-            <button type="submit" class="btn btn-primary">Next</button>
-            <a asp-action="Step1" class="btn btn-secondary">Back</a>
-        </div>
-    </form>
+    </div>
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.getElementById('togglePassword').addEventListener('click', function () {
+            const passwordInput = document.getElementById('passwordInput');
+            const toggleIcon = document.getElementById('togglePasswordIcon');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('bi-eye-slash');
+                toggleIcon.classList.add('bi-eye');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('bi-eye');
+                toggleIcon.classList.add('bi-eye-slash');
+            }
+        });
+
+        document.getElementById('toggleConfirmPassword').addEventListener('click', function () {
+            const confirmPasswordInput = document.getElementById('confirmPasswordInput');
+            const toggleIcon = document.getElementById('toggleConfirmPasswordIcon');
+            if (confirmPasswordInput.type === 'password') {
+                confirmPasswordInput.type = 'text';
+                toggleIcon.classList.remove('bi-eye-slash');
+                toggleIcon.classList.add('bi-eye');
+            } else {
+                confirmPasswordInput.type = 'password';
+                toggleIcon.classList.remove('bi-eye');
+                toggleIcon.classList.add('bi-eye-slash');
+            }
+        });
+    </script>
 }

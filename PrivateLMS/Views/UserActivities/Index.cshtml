@@ -2,39 +2,65 @@
 @{
     ViewData["Title"] = "User Activity Log";
     int? userId = ViewBag.UserId;
+    string actionType = ViewBag.ActionType;
+    string[] actionTypes = ViewBag.ActionTypes;
 }
 
-<h2 class="text-center mb-4">User Activity Log @(userId.HasValue ? $"for User ID {userId}" : "")</h2>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">User Activity Log @(userId.HasValue ? $"for User ID {userId}" : "")</h2>
 
-@if (!Model.Any())
-{
-    <p class="text-center">No activities found.</p>
-}
-else
-{
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>User</th>
-                <th>Action</th>
-                <th>Timestamp</th>
-                <th>Details</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var activity in Model)
-            {
+    <div class="mb-4">
+        <form asp-action="Index" method="get" class="row g-3">
+            <div class="col-md-4">
+                <label for="userId" class="form-label">User ID (optional):</label>
+                <input type="number" name="userId" id="userId" class="form-control" value="@(userId.HasValue ? userId.Value.ToString() : "")" />
+            </div>
+            <div class="col-md-4">
+                <label for="actionType" class="form-label">Action Type:</label>
+                <select name="actionType" id="actionType" class="form-control">
+                    <option value="" selected="@(string.IsNullOrEmpty(actionType))">All</option>
+                    @foreach (var type in actionTypes)
+                    {
+                        <option value="@type" selected="@(actionType == type)">@type</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">Filter</button>
+            </div>
+        </form>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <p class="text-center">No activities found.</p>
+    }
+    else
+    {
+        <table class="table table-striped table-hover">
+            <thead>
                 <tr>
-                    <td>@activity.User.UserName</td>
-                    <td>@activity.Action</td>
-                    <td>@activity.Timestamp.ToString("g")</td>
-                    <td>@activity.Details</td>
+                    <th>User</th>
+                    <th>Action</th>
+                    <th>Timestamp</th>
+                    <th>Details</th>
                 </tr>
-            }
-        </tbody>
-    </table>
-}
+            </thead>
+            <tbody>
+                @foreach (var activity in Model)
+                {
+                    <tr>
+                        <td>@activity.User.UserName</td>
+                        <td>@activity.Action</td>
+                        <td>@activity.Timestamp.ToString("g")</td>
+                        <td>@activity.Details</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
 
-<div class="text-end">
-    <a asp-controller="Users" asp-action="Index" class="btn btn-secondary">Back to Users</a>
+    <div class="text-end mt-3">
+        <a asp-controller="Users" asp-action="Index" class="btn btn-secondary">Back to Users</a>
+    </div>
 </div>
