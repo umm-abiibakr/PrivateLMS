@@ -47,6 +47,7 @@ builder.Services.AddScoped<IPublisherService, PublisherService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IAuthorService, AuthorService>();
 builder.Services.AddScoped<IFineService, FineService>();
+builder.Services.AddScoped<IBookRatingService, BookRatingService>(); // Added
 
 var app = builder.Build();
 

@@ -12,12 +12,14 @@ namespace PrivateLMS.Services
     public class LoanService : ILoanService
     {
         private readonly LibraryDbContext _context;
+        private readonly IFineService _fineService;
         private const int InitialLoanDays = 21; // 3 weeks
         private const int RenewalDays = 7; // 7 days
 
-        public LoanService(LibraryDbContext context)
+        public LoanService(LibraryDbContext context, IFineService fineService)
         {
             _context = context;
+            _fineService = fineService;
         }
 
         public async Task<List<LoanViewModel>> GetAllLoansAsync()
@@ -37,8 +39,7 @@ namespace PrivateLMS.Services
                     DueDate = lr.DueDate,
                     ReturnDate = lr.ReturnDate,
                     IsRenewed = lr.IsRenewed,
-                    FineAmount = lr.FineAmount,
-                    IsFinePaid = lr.IsFinePaid
+                    DaysOverdue = lr.DueDate.HasValue && lr.ReturnDate == null && lr.DueDate < DateTime.UtcNow ? (int)(DateTime.UtcNow - lr.DueDate.Value).TotalDays : 0
                 })
                 .ToListAsync();
         }
@@ -92,6 +93,17 @@ namespace PrivateLMS.Services
             _context.LoanRecords.Add(loanRecord);
             _context.Update(book);
             await _context.SaveChangesAsync();
+
+            // Log the loan action
+            _context.UserActivities.Add(new UserActivity
+            {
+                UserId = model.UserId,
+                Action = "LoanBook",
+                Timestamp = DateTime.UtcNow,
+                Details = $"User loaned book ID {model.BookId} (Title: {model.BookTitle})"
+            });
+            await _context.SaveChangesAsync();
+
             return true;
         }
 
@@ -138,6 +150,20 @@ namespace PrivateLMS.Services
             }
             _context.Update(loanRecord);
             await _context.SaveChangesAsync();
+
+            // Trigger fine calculation
+            await _fineService.UpdateFineAsync(loanRecordId);
+
+            // Log the return action
+            _context.UserActivities.Add(new UserActivity
+            {
+                UserId = loanRecord.UserId,
+                Action = "ReturnBook",
+                Timestamp = DateTime.UtcNow,
+                Details = $"User returned book ID {loanRecord.BookId} (Title: {loanRecord.Book.Title})"
+            });
+            await _context.SaveChangesAsync();
+
             return true;
         }
 
@@ -151,7 +177,7 @@ namespace PrivateLMS.Services
             return await _context.LoanRecords
                 .Include(lr => lr.Book)
                 .Include(lr => lr.User)
-                .Where(lr => lr.User != null && lr.User.UserName == username)
+                .Where(lr => lr.User != null && lr.User.UserName == username && lr.ReturnDate == null)
                 .AsNoTracking()
                 .Select(lr => new LoanViewModel
                 {
@@ -164,8 +190,92 @@ namespace PrivateLMS.Services
                     DueDate = lr.DueDate,
                     ReturnDate = lr.ReturnDate,
                     IsRenewed = lr.IsRenewed,
-                    FineAmount = lr.FineAmount,
-                    IsFinePaid = lr.IsFinePaid
+                    DaysOverdue = lr.DueDate.HasValue && lr.ReturnDate == null && lr.DueDate < DateTime.UtcNow ? (int)(DateTime.UtcNow - lr.DueDate.Value).TotalDays : 0
+                })
+                .ToListAsync();
+        }
+
+        public async Task<List<LoanViewModel>> GetAllUserLoansAsync(string username)
+        {
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                return new List<LoanViewModel>();
+            }
+
+            return await _context.LoanRecords
+                .Include(lr => lr.Book)
+                .Include(lr => lr.User)
+                .Where(lr => lr.User != null && lr.User.UserName == username)
+                .OrderByDescending(lr => lr.LoanDate)
+                .AsNoTracking()
+                .Select(lr => new LoanViewModel
+                {
+                    LoanRecordId = lr.LoanRecordId,
+                    BookId = lr.BookId,
+                    BookTitle = lr.Book != null ? lr.Book.Title ?? "Unknown" : "Unknown",
+                    UserId = lr.UserId,
+                    LoanerName = lr.User != null ? $"{lr.User.FirstName} {lr.User.LastName}" : "Unknown",
+                    LoanDate = lr.LoanDate,
+                    DueDate = lr.DueDate,
+                    ReturnDate = lr.ReturnDate,
+                    IsRenewed = lr.IsRenewed,
+                    DaysOverdue = lr.DueDate.HasValue && lr.ReturnDate == null && lr.DueDate < DateTime.UtcNow ? (int)(DateTime.UtcNow - lr.DueDate.Value).TotalDays : 0
+                })
+                .ToListAsync();
+        }
+
+        public async Task<List<LoanViewModel>> GetOverdueLoansAsync(string username)
+        {
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                return new List<LoanViewModel>();
+            }
+
+            return await _context.LoanRecords
+                .Include(lr => lr.Book)
+                .Include(lr => lr.User)
+                .Where(lr => lr.User != null && lr.User.UserName == username && lr.ReturnDate == null && lr.DueDate.HasValue && lr.DueDate < DateTime.UtcNow)
+                .AsNoTracking()
+                .Select(lr => new LoanViewModel
+                {
+                    LoanRecordId = lr.LoanRecordId,
+                    BookId = lr.BookId,
+                    BookTitle = lr.Book != null ? lr.Book.Title ?? "Unknown" : "Unknown",
+                    UserId = lr.UserId,
+                    LoanerName = lr.User != null ? $"{lr.User.FirstName} {lr.User.LastName}" : "Unknown",
+                    LoanDate = lr.LoanDate,
+                    DueDate = lr.DueDate,
+                    ReturnDate = lr.ReturnDate,
+                    IsRenewed = lr.IsRenewed,
+                    DaysOverdue = lr.DueDate.HasValue ? (int)(DateTime.UtcNow - lr.DueDate.Value).TotalDays : 0
+                })
+                .ToListAsync();
+        }
+
+        public async Task<List<LoanViewModel>> GetUserActiveLoansAsync(string username)
+        {
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                return new List<LoanViewModel>();
+            }
+
+            return await _context.LoanRecords
+                .Include(lr => lr.Book)
+                .Include(lr => lr.User)
+                .Where(lr => lr.User != null && lr.User.UserName == username && lr.ReturnDate == null)
+                .AsNoTracking()
+                .Select(lr => new LoanViewModel
+                {
+                    LoanRecordId = lr.LoanRecordId,
+                    BookId = lr.BookId,
+                    BookTitle = lr.Book != null ? lr.Book.Title ?? "Unknown" : "Unknown",
+                    UserId = lr.UserId,
+                    LoanerName = lr.User != null ? $"{lr.User.FirstName} {lr.User.LastName}" : "Unknown",
+                    LoanDate = lr.LoanDate,
+                    DueDate = lr.DueDate,
+                    ReturnDate = lr.ReturnDate,
+                    IsRenewed = lr.IsRenewed,
+                    DaysOverdue = lr.DueDate.HasValue && lr.DueDate < DateTime.UtcNow ? (int)(DateTime.UtcNow - lr.DueDate.Value).TotalDays : 0
                 })
                 .ToListAsync();
         }
@@ -184,6 +294,18 @@ namespace PrivateLMS.Services
             loanRecord.IsRenewed = true;
             _context.Update(loanRecord);
             await _context.SaveChangesAsync();
+
+            // Log the renewal action
+            var book = await _context.Books.FindAsync(loanRecord.BookId);
+            _context.UserActivities.Add(new UserActivity
+            {
+                UserId = loanRecord.UserId,
+                Action = "RenewLoan",
+                Timestamp = DateTime.UtcNow,
+                Details = $"User renewed loan for book ID {loanRecord.BookId} (Title: {book?.Title ?? "Unknown"})"
+            });
+            await _context.SaveChangesAsync();
+
             return true;
         }
     }

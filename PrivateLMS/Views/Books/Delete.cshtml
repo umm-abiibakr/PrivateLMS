@@ -3,61 +3,76 @@
     ViewData["Title"] = "Delete Book";
 }
 
-<h2>Delete Book</h2>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Delete Book</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body text-center">
+                    <p class="mb-4">Are you sure you want to delete this book? This action cannot be undone.</p>
 
-<p>Are you sure you want to delete this book? This action cannot be undone.</p>
+                    <div class="mb-4">
+                        @if (!string.IsNullOrEmpty(Model.CoverImagePath))
+                        {
+                            <img src="@Model.CoverImagePath" alt="@Model.Title Cover" style="max-width: 200px;" />
+                        }
+                        else
+                        {
+                            <span>No Cover</span>
+                        }
+                    </div>
 
-<div>
-    <dl class="row">
-        <dt class="col-sm-2">Cover</dt>
-        <dd class="col-sm-10">
-            @if (!string.IsNullOrEmpty(Model.CoverImagePath))
-            {
-                <img src="@Model.CoverImagePath" alt="@Model.Title Cover" style="max-width: 200px;" />
-            }
-            else
-            {
-                <span>No Cover</span>
-            }
-        </dd>
-        <dt class="col-sm-2">Title</dt>
-        <dd class="col-sm-10">@Model.Title</dd>
-        <dt class="col-sm-2">Author</dt>
-        <dd class="col-sm-10">
-            @(Model.AvailableAuthors.FirstOrDefault(a => a.AuthorId == Model.AuthorId)?.Name ?? "Unknown")
-        </dd>
-        <dt class="col-sm-2">ISBN</dt>
-        <dd class="col-sm-10">@Model.ISBN</dd>
-        <dt class="col-sm-2">Language</dt>
-        <dd class="col-sm-10">@Model.Language</dd>
-        <dt class="col-sm-2">Published Date</dt>
-        <dd class="col-sm-10">@Model.PublishedDate.ToShortDateString()</dd>
-        <dt class="col-sm-2">Available Copies</dt>
-        <dd class="col-sm-10">@Model.AvailableCopies</dd>
-        <dt class="col-sm-2">Available</dt>
-        <dd class="col-sm-10">@(Model.IsAvailable ? "Yes" : "No")</dd>
-        <dt class="col-sm-2">Categories</dt>
-        <dd class="col-sm-10">
-            @if (Model.AvailableCategories.Any())
-            {
-                <ul>
-                    @foreach (var category in Model.AvailableCategories)
-                    {
-                        <li>@category.CategoryName</li>
-                    }
-                </ul>
-            }
-            else
-            {
-                <span>No Categories</span>
-            }
-        </dd>
-    </dl>
+                    <dl class="row">
+                        <dt class="col-sm-4 text-end">Title</dt>
+                        <dd class="col-sm-8">@Model.Title</dd>
+                        <dt class="col-sm-4 text-end">Author</dt>
+                        <dd class="col-sm-8">
+                            @(Model.AvailableAuthors.FirstOrDefault(a => a.AuthorId == Model.AuthorId)?.Name ?? "Unknown")
+                        </dd>
+                        <dt class="col-sm-4 text-end">ISBN</dt>
+                        <dd class="col-sm-8">@Model.ISBN</dd>
+                        <dt class="col-sm-4 text-end">Language</dt>
+                        <dd class="col-sm-8">@Model.Language</dd>
+                        <dt class="col-sm-4 text-end">Published Date</dt>
+                        <dd class="col-sm-8">@Model.PublishedDate.ToShortDateString()</dd>
+                        <dt class="col-sm-4 text-end">Available Copies</dt>
+                        <dd class="col-sm-8">@Model.AvailableCopies</dd>
+                        <dt class="col-sm-4 text-end">Available</dt>
+                        <dd class="col-sm-8">@(Model.IsAvailable ? "Yes" : "No")</dd>
+                        <dt class="col-sm-4 text-end">Categories</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.SelectedCategoryIds != null && Model.SelectedCategoryIds.Any())
+                            {
+                                var categories = Model.AvailableCategories.Where(c => Model.SelectedCategoryIds.Contains(c.CategoryId)).ToList();
+                                if (categories.Any())
+                                {
+                                    <ul class="list-unstyled">
+                                        @foreach (var category in categories)
+                                        {
+                                            <li>@category.CategoryName</li>
+                                        }
+                                    </ul>
+                                }
+                                else
+                                {
+                                    <span>No Categories</span>
+                                }
+                            }
+                            else
+                            {
+                                <span>No Categories</span>
+                            }
+                        </dd>
+                    </dl>
+
+                    <form asp-action="Delete" method="post">
+                        <input type="hidden" asp-for="BookId" />
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-danger me-2">Delete</button>
+                        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-
-<form asp-action="Delete" method="post">
-    <input type="hidden" asp-for="BookId" />
-    @Html.AntiForgeryToken()
-    <button type="submit" class="btn btn-danger">Delete</button>
-    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
-</form>

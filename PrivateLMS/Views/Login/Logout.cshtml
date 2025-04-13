@@ -1,12 +1,14 @@
 ﻿@{
-    ViewData["Title"] = "Logout";
+    ViewData["Title"] = "Logged Out";
 }
 
 <div class="container mt-5 text-center">
     <h2>Logged Out</h2>
-    <p>You have been successfully logged out.</p>
+    <div class="alert alert-success" role="alert">
+        <p>You have been successfully logged out.</p>
+    </div>
     <div class="mt-4">
         <a asp-controller="Login" asp-action="Index" class="btn btn-primary me-2">Login Again</a>
-        <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Back to Books</a>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Back to Home</a>
     </div>
 </div>

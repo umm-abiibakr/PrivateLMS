@@ -29,11 +29,7 @@ namespace PrivateLMS.ViewModels
         [Display(Name = "Renewed")]
         public bool IsRenewed { get; set; }
 
-        [DataType(DataType.Currency)]
-        [Display(Name = "Fine Amount")]
-        public decimal FineAmount { get; set; }
-
-        [Display(Name = "Fine Paid")]
-        public bool IsFinePaid { get; set; }
+        [Display(Name = "Days Overdue")]
+        public int DaysOverdue { get; set; }
     }
 }

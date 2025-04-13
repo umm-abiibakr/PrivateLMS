@@ -18,7 +18,7 @@ namespace PrivateLMS.Models
         [DataType(DataType.Date)]
         public DateTime DateOfBirth { get; set; }
 
-        public string Address { get; set; } 
+        public string Address { get; set; }
 
         public string City { get; set; }
 
@@ -29,5 +29,7 @@ namespace PrivateLMS.Models
         public string Country { get; set; }
 
         public bool TermsAccepted { get; set; }
+
+        public string? ProfilePicturePath { get; set; } 
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
 
 namespace PrivateLMS.ViewModels
 {
@@ -37,5 +38,10 @@ namespace PrivateLMS.ViewModels
 
         [StringLength(100)]
         public string? Country { get; set; }
+
+        public string? ProfilePicturePath { get; set; }
+
+        [Display(Name = "Profile Picture")]
+        public IFormFile? ProfilePicture { get; set; }
     }
 }

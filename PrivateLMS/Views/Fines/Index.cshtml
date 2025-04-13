@@ -3,43 +3,47 @@
     ViewData["Title"] = "All Fines";
 }
 
-<h2 class="text-center mb-4">All Fines</h2>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">All Fines</h2>
 
-@if (!Model.Any())
-{
-    <p class="text-center">No fines recorded in the system.</p>
-}
-else
-{
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Book Title</th>
-                <th>Loaner Name</th>
-                <th>Loan Date</th>
-                <th>Due Date</th>
-                <th>Return Date</th>
-                <th>Fine Amount</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var fine in Model)
-            {
+    @if (!Model.Any())
+    {
+        <p class="text-center">No fines recorded in the system.</p>
+    }
+    else
+    {
+        <table class="table table-striped table-hover">
+            <thead>
                 <tr>
-                    <td>@fine.BookTitle</td>
-                    <td>@fine.LoanerName</td>
-                    <td>@fine.LoanDate.ToShortDateString()</td>
-                    <td>@(fine.DueDate?.ToShortDateString() ?? "N/A")</td>
-                    <td>@(fine.ReturnDate?.ToShortDateString() ?? "Not Returned")</td>
-                    <td>@fine.FineAmount.ToString("C", new System.Globalization.CultureInfo("en-NG"))</td>
-                    <td>@(fine.IsFinePaid ? "Paid" : "Unpaid")</td>
+                    <th>Book Title</th>
+                    <th>Loaner Name</th>
+                    <th>Loan Date</th>
+                    <th>Due Date</th>
+                    <th>Return Date</th>
+                    <th>Issued Date</th>
+                    <th>Fine Amount</th>
+                    <th>Status</th>
                 </tr>
-            }
-        </tbody>
-    </table>
-}
+            </thead>
+            <tbody>
+                @foreach (var fine in Model)
+                {
+                    <tr>
+                        <td>@fine.BookTitle</td>
+                        <td>@fine.LoanerName</td>
+                        <td>@fine.LoanDate.ToShortDateString()</td>
+                        <td>@(fine.DueDate?.ToShortDateString() ?? "N/A")</td>
+                        <td>@(fine.ReturnDate?.ToShortDateString() ?? "Not Returned")</td>
+                        <td>@fine.IssuedDate.ToShortDateString()</td>
+                        <td>@fine.Amount.ToString("C", new System.Globalization.CultureInfo("en-NG"))</td>
+                        <td>@(fine.IsPaid ? "Paid" : "Unpaid")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
 
-<div class="text-end">
-    <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Back to Books</a>
+    <div class="text-end">
+        <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Back to Books</a>
+    </div>
 </div>

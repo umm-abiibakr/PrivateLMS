@@ -18,7 +18,7 @@ namespace PrivateLMS.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index(int? userId)
+        public async Task<IActionResult> Index(int? userId, string actionType)
         {
             var query = _context.UserActivities
                 .Include(ua => ua.User)
@@ -29,8 +29,15 @@ namespace PrivateLMS.Controllers
                 query = query.Where(ua => ua.UserId == userId.Value);
             }
 
+            if (!string.IsNullOrEmpty(actionType))
+            {
+                query = query.Where(ua => ua.Action == actionType);
+            }
+
             var activities = await query.OrderByDescending(ua => ua.Timestamp).ToListAsync();
             ViewBag.UserId = userId;
+            ViewBag.ActionType = actionType;
+            ViewBag.ActionTypes = new[] { "Login", "Ban", "Unban", "LoanBook", "ReturnBook", "RateBook" };
             return View(activities);
         }
     }

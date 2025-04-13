@@ -2,7 +2,10 @@
     ViewData["Title"] = "Already Returned";
 }
 
-<h2>Already Returned</h2>
-
-<p>This loan record has already been returned.</p>
-<a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Back to Books</a>
+<div class="container mt-5 text-center">
+    <h2>Already Returned</h2>
+    <div class="alert alert-info" role="alert">
+        <p>This loan record has already been returned.</p>
+    </div>
+    <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Back to Books</a>
+</div>

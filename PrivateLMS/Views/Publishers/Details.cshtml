@@ -3,32 +3,39 @@
     ViewData["Title"] = "Publisher Details";
 }
 
-<h2>Publisher Details</h2>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Publisher Details</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="mb-4">
+                        @if (!string.IsNullOrEmpty(Model.LogoImagePath))
+                        {
+                            <img src="@Model.LogoImagePath" alt="@Model.PublisherName Logo" style="max-width: 100px;" />
+                        }
+                        else
+                        {
+                            <span>No Logo</span>
+                        }
+                    </div>
 
-<div>
-    <dl class="row">
-        <dt class="col-sm-2">Logo</dt>
-        <dd class="col-sm-10">
-            @if (!string.IsNullOrEmpty(Model.LogoImagePath))
-            {
-                <img src="@Model.LogoImagePath" alt="@Model.PublisherName Logo" style="max-width: 100px;" />
-            }
-            else
-            {
-                <span>No Logo</span>
-            }
-        </dd>
-        <dt class="col-sm-2">Publisher Name</dt>
-        <dd class="col-sm-10">@Model.PublisherName</dd>
-        <dt class="col-sm-2">Location</dt>
-        <dd class="col-sm-10">@Model.Location</dd>
-    </dl>
-</div>
+                    <dl class="row">
+                        <dt class="col-sm-4 text-end">Publisher Name</dt>
+                        <dd class="col-sm-8">@Model.PublisherName</dd>
+                        <dt class="col-sm-4 text-end">Location</dt>
+                        <dd class="col-sm-8">@Model.Location</dd>
+                    </dl>
 
-<div>
-    @if (User.IsInRole("Admin"))
-    {
-        <a asp-action="Edit" asp-route-id="@Model.PublisherId" class="btn btn-warning">Edit</a>
-    }
-    <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Back to Books</a>
+                    <div class="mt-4">
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-action="Edit" asp-route-id="@Model.PublisherId" class="btn btn-warning me-2">Edit</a>
+                        }
+                        <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Back to Books</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

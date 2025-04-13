@@ -81,35 +81,28 @@ namespace PrivateLMS.Controllers
                     return RedirectToAction("Index", "Login");
                 }
 
-                var loan = await _context.LoanRecords
-                    .Include(lr => lr.Book)
-                    .Include(lr => lr.User)
-                    .FirstOrDefaultAsync(lr => lr.LoanRecordId == id.Value && lr.User.UserName == user.UserName);
-
-                if (loan == null)
+                var fine = await _fineService.GetFineByIdAsync(id.Value);
+                if (fine == null || fine.LoanerName != $"{user.FirstName} {user.LastName}")
                 {
-                    TempData["ErrorMessage"] = "No fine found for this loan, or you do not have permission to pay it.";
+                    TempData["ErrorMessage"] = "No fine found, or you do not have permission to pay it.";
                     return PartialView("_NotFound");
                 }
 
-                if (loan.IsFinePaid)
+                if (fine.IsPaid)
                 {
                     TempData["ErrorMessage"] = "This fine has already been paid.";
                     return RedirectToAction(nameof(MyFines));
                 }
 
-                var fine = new FineViewModel
+                var payFineViewModel = new PayFineViewModel
                 {
-                    LoanRecordId = loan.LoanRecordId,
-                    BookTitle = loan.Book?.Title ?? "Unknown",
-                    LoanerName = $"{loan.User.FirstName} {loan.User.LastName}",
-                    LoanDate = loan.LoanDate,
-                    DueDate = loan.DueDate,
-                    ReturnDate = loan.ReturnDate,
-                    FineAmount = loan.FineAmount,
-                    IsFinePaid = loan.IsFinePaid
+                    FineId = fine.Id,
+                    BookTitle = fine.BookTitle,
+                    LoanerName = fine.LoanerName,
+                    Amount = fine.Amount,
+                    IssuedDate = fine.IssuedDate
                 };
-                return View(fine);
+                return View(payFineViewModel);
             }
             catch (Exception ex)
             {
@@ -131,13 +124,14 @@ namespace PrivateLMS.Controllers
                     return RedirectToAction("Index", "Login");
                 }
 
-                var loan = await _context.LoanRecords
-                    .Include(lr => lr.User)
-                    .FirstOrDefaultAsync(lr => lr.LoanRecordId == id && lr.User.UserName == user.UserName);
+                var fine = await _context.Fines
+                    .Include(f => f.LoanRecord)
+                        .ThenInclude(lr => lr.User)
+                    .FirstOrDefaultAsync(f => f.Id == id && f.LoanRecord.User.UserName == user.UserName);
 
-                if (loan == null)
+                if (fine == null)
                 {
-                    TempData["ErrorMessage"] = "No fine found for this loan, or you do not have permission to pay it.";
+                    TempData["ErrorMessage"] = "No fine found, or you do not have permission to pay it.";
                     return RedirectToAction(nameof(MyFines));
                 }
 

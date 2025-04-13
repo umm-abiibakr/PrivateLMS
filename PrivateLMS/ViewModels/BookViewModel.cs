@@ -56,5 +56,8 @@ namespace PrivateLMS.ViewModels
         public List<Publisher> AvailablePublishers { get; set; } = new List<Publisher>();
         public List<Category> AvailableCategories { get; set; } = new List<Category>();
         public List<LoanRecord> LoanRecords { get; set; } = new List<LoanRecord>();
+        public float AverageRating { get; set; } // Average rating (1-5)
+        public int RatingCount { get; set; } // Number of ratings
+        public float UserRating { get; set; } // User's rating (0 if not rated)
     }
 }

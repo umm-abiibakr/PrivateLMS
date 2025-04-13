@@ -12,8 +12,8 @@ using PrivateLMS.Data;
 namespace PrivateLMS.Migrations
 {
     [DbContext(typeof(LibraryDbContext))]
-    [Migration("20250410010608_AddIdentityToDbContext")]
-    partial class AddIdentityToDbContext
+    [Migration("20250413075906_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -162,6 +162,11 @@ namespace PrivateLMS.Migrations
                         {
                             UserId = 2,
                             RoleId = 2
+                        },
+                        new
+                        {
+                            UserId = 3,
+                            RoleId = 1
                         });
                 });
 
@@ -260,6 +265,9 @@ namespace PrivateLMS.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ProfilePicturePath")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
@@ -296,7 +304,7 @@ namespace PrivateLMS.Migrations
                             AccessFailedCount = 0,
                             Address = "123 Admin St.",
                             City = "Admin City",
-                            ConcurrencyStamp = "7310f914-be2d-4aca-b22e-f9e09022c3a6",
+                            ConcurrencyStamp = "c174ed08-d8e6-42e4-b9f5-df1c4bda8327",
                             Country = "Admin Country",
                             DateOfBirth = new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin@privatelms.com",
@@ -311,6 +319,7 @@ namespace PrivateLMS.Migrations
                             PhoneNumber = "1234567890",
                             PhoneNumberConfirmed = false,
                             PostalCode = "12345",
+                            SecurityStamp = "b7e8c9d0-1f2e-4a3b-8c9d-0e1f2e4a3b8c",
                             State = "Admin State",
                             TermsAccepted = true,
                             TwoFactorEnabled = false,
@@ -322,7 +331,7 @@ namespace PrivateLMS.Migrations
                             AccessFailedCount = 0,
                             Address = "456 User Rd.",
                             City = "User City",
-                            ConcurrencyStamp = "09432d3b-6c97-424f-bc10-52cccc72ebb0",
+                            ConcurrencyStamp = "a0be1ad4-8f70-46a4-87cd-ae58ec047b82",
                             Country = "User Country",
                             DateOfBirth = new DateTime(1995, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "john.doe@example.com",
@@ -337,10 +346,38 @@ namespace PrivateLMS.Migrations
                             PhoneNumber = "0987654321",
                             PhoneNumberConfirmed = false,
                             PostalCode = "54321",
+                            SecurityStamp = "d4f6a7b9-2c3e-4d5f-9a7b-92c3e4d5f9a7",
                             State = "User State",
                             TermsAccepted = true,
                             TwoFactorEnabled = false,
                             UserName = "user1"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            AccessFailedCount = 0,
+                            Address = "456 Admin Ave",
+                            City = "Admin City",
+                            ConcurrencyStamp = "ef0a564b-5996-4afa-9931-a459bd3aaf63",
+                            Country = "Admin Country",
+                            DateOfBirth = new DateTime(1985, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "admin2@privatelms.com",
+                            EmailConfirmed = true,
+                            FirstName = "Admin",
+                            Gender = "Male",
+                            LastName = "Two",
+                            LockoutEnabled = false,
+                            NormalizedEmail = "ADMIN2@PRIVATELMS.COM",
+                            NormalizedUserName = "ADMIN2",
+                            PasswordHash = "AQAAAAIAAYagAAAAEHk5z5bKX5n5z5bKX5n5z5bKX5n5z5bKX5n5z5bKX5n5z5bKX5n5z5bKX5n5z5bKXw==",
+                            PhoneNumber = "0987654321",
+                            PhoneNumberConfirmed = false,
+                            PostalCode = "54321",
+                            SecurityStamp = "e8c9d0f1-3b4a-5c6d-9e0f-13b4a5c6d9e0",
+                            State = "Admin State",
+                            TermsAccepted = true,
+                            TwoFactorEnabled = false,
+                            UserName = "admin2"
                         });
                 });
 
@@ -411,7 +448,6 @@ namespace PrivateLMS.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ISBN")
@@ -537,6 +573,41 @@ namespace PrivateLMS.Migrations
                         });
                 });
 
+            modelBuilder.Entity("PrivateLMS.Models.BookRating", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BookId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("RatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<float>("Rating")
+                        .HasColumnType("real");
+
+                    b.Property<string>("Review")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookId");
+
+                    b.HasIndex("RatedOn");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("BookRatings");
+                });
+
             modelBuilder.Entity("PrivateLMS.Models.Category", b =>
                 {
                     b.Property<int>("CategoryId")
@@ -572,6 +643,51 @@ namespace PrivateLMS.Migrations
                         });
                 });
 
+            modelBuilder.Entity("PrivateLMS.Models.Fine", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsPaid")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("IssuedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("LoanId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsPaid");
+
+                    b.HasIndex("LoanId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Fines");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Amount = 3000m,
+                            IsPaid = false,
+                            IssuedDate = new DateTime(2025, 4, 7, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            LoanId = 1,
+                            UserId = 2
+                        });
+                });
+
             modelBuilder.Entity("PrivateLMS.Models.LoanRecord", b =>
                 {
                     b.Property<int>("LoanRecordId")
@@ -588,12 +704,6 @@ namespace PrivateLMS.Migrations
 
                     b.Property<DateTime?>("DueDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<decimal>("FineAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<bool>("IsFinePaid")
-                        .HasColumnType("bit");
 
                     b.Property<bool>("IsRenewed")
                         .HasColumnType("bit");
@@ -613,6 +723,8 @@ namespace PrivateLMS.Migrations
 
                     b.HasIndex("BookId1");
 
+                    b.HasIndex("DueDate");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("LoanRecords");
@@ -623,8 +735,6 @@ namespace PrivateLMS.Migrations
                             LoanRecordId = 1,
                             BookId = 1,
                             DueDate = new DateTime(2025, 4, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            FineAmount = 3000m,
-                            IsFinePaid = false,
                             IsRenewed = false,
                             LoanDate = new DateTime(2025, 3, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ReturnDate = new DateTime(2025, 4, 7, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -635,8 +745,6 @@ namespace PrivateLMS.Migrations
                             LoanRecordId = 2,
                             BookId = 2,
                             DueDate = new DateTime(2025, 4, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            FineAmount = 0m,
-                            IsFinePaid = false,
                             IsRenewed = false,
                             LoanDate = new DateTime(2025, 3, 30, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UserId = 2
@@ -691,6 +799,37 @@ namespace PrivateLMS.Migrations
                             Location = "London",
                             PublisherName = "Kathir Books"
                         });
+                });
+
+            modelBuilder.Entity("PrivateLMS.Models.UserActivity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Details")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Timestamp");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserActivities");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -781,6 +920,44 @@ namespace PrivateLMS.Migrations
                     b.Navigation("Category");
                 });
 
+            modelBuilder.Entity("PrivateLMS.Models.BookRating", b =>
+                {
+                    b.HasOne("PrivateLMS.Models.Book", "Book")
+                        .WithMany()
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PrivateLMS.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("PrivateLMS.Models.Fine", b =>
+                {
+                    b.HasOne("PrivateLMS.Models.LoanRecord", "LoanRecord")
+                        .WithMany("Fines")
+                        .HasForeignKey("LoanId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PrivateLMS.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("LoanRecord");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("PrivateLMS.Models.LoanRecord", b =>
                 {
                     b.HasOne("PrivateLMS.Models.Book", "Book")
@@ -796,10 +973,21 @@ namespace PrivateLMS.Migrations
                     b.HasOne("PrivateLMS.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Book");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("PrivateLMS.Models.UserActivity", b =>
+                {
+                    b.HasOne("PrivateLMS.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -819,6 +1007,11 @@ namespace PrivateLMS.Migrations
             modelBuilder.Entity("PrivateLMS.Models.Category", b =>
                 {
                     b.Navigation("BookCategories");
+                });
+
+            modelBuilder.Entity("PrivateLMS.Models.LoanRecord", b =>
+                {
+                    b.Navigation("Fines");
                 });
 #pragma warning restore 612, 618
         }
