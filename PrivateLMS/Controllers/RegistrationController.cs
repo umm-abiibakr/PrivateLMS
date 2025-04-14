@@ -116,7 +116,8 @@ namespace PrivateLMS.Controllers
                         State = TempData["State"]?.ToString(),
                         PostalCode = TempData["PostalCode"]?.ToString(),
                         Country = TempData["Country"]?.ToString(),
-                        TermsAccepted = true
+                        TermsAccepted = true,
+                        IsApproved = false
                     };
 
                     var password = TempData["Password"]?.ToString() ?? throw new Exception("Password is missing.");
@@ -132,7 +133,7 @@ namespace PrivateLMS.Controllers
                     if (result.Succeeded)
                     {
                         await _userManager.AddToRoleAsync(user, "User");
-                        TempData["SuccessMessage"] = "Registration successful! Please log in.";
+                        TempData["SuccessMessage"] = "Registration successful!";
                         return RedirectToAction("Success");
                     }
 

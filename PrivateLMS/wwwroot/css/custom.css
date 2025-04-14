@@ -39,6 +39,15 @@ h1, h2, h3, h4 {
 
 
 /* Buttons */
+
+.btn {
+    font-size: 16px;
+    font-size: 16px;
+    padding: 10px 20px;
+    border-radius: 6px;
+    transition: all 0.3s ease-in-out;
+}
+
 .btn-primary {
     background-color: #a67c52;
     border-color: #a67c52;
@@ -54,6 +63,7 @@ h1, h2, h3, h4 {
         background-color: #7c5e4a;
         border-color: #7c5e4a;
     }
+
 
 .btn-secondary, .btn-success, .btn-danger, .btn-warning, .btn-info {
     font-family: 'Cormorant Garamond', serif;

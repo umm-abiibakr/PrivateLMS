@@ -14,6 +14,7 @@
                             Hello, @User.Identity.Name
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="managementDropdown">
+                            <li><a class="dropdown-item" asp-controller="UserActivities" asp-action="Index">Activity Log</a></li>
                             <li><a class="dropdown-item" asp-controller="Authors" asp-action="Index">Authors</a></li>
                             <li><a class="dropdown-item" asp-controller="Books" asp-action="Index">Books</a></li>
                             <li><a class="dropdown-item" asp-controller="Categories" asp-action="Index">Categories</a></li>
@@ -21,7 +22,6 @@
                             <li><a class="dropdown-item" asp-controller="Loans" asp-action="Index">Loans</a></li>
                             <li><a class="dropdown-item" asp-controller="Publishers" asp-action="Index">Publishers</a></li>
                             <li><a class="dropdown-item" asp-controller="Users" asp-action="Index">Users</a></li>
-                            <li><a class="dropdown-item" asp-controller="UserActivities" asp-action="Index">Activity Log</a></li>
                         </ul>
                     </div>
                 }
@@ -33,7 +33,6 @@
                             Hello, @User.Identity.Name
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="managementDropdown">
-                            <li><a class="dropdown-item" asp-controller="Users" asp-action="Profile">Profile</a></li>
                             <li><a class="dropdown-item" asp-controller="Books" asp-action="Recommendations">Recommendations</a></li>
                             <li><a class="dropdown-item" asp-controller="Loans" asp-action="MyLoans">My Loans</a></li>
                             <li><a class="dropdown-item" asp-controller="Fines" asp-action="MyFines">My Fines</a></li>
@@ -44,6 +43,9 @@
 
                 @if (User.Identity.IsAuthenticated)
                 {
+                    <li>
+                        <a class="nav-link" asp-controller="Users" asp-action="Profile">Profile</a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" asp-controller="Home" asp-action="Index">Home</a>
                     </li>

@@ -102,8 +102,13 @@
                             <label asp-for="TermsAccepted" class="form-check-label">Terms Accepted</label>
                             <span asp-validation-for="TermsAccepted" class="text-danger"></span>
                         </div>
+                        <div class="mb-3 form-check">
+                            <input asp-for="IsApproved" class="form-check-input" checked />
+                            <label asp-for="IsApproved" class="form-check-label">Approved</label>
+                            <span asp-validation-for="IsApproved" class="text-danger"></span>
+                        </div>
                         <div class="mb-3">
-                            <label class="form-label">Roles</label>
+                            <label class="form-label fw-bold">Assign Roles</label>
                             <select asp-for="Roles" class="form-control" multiple>
                                 <option value="Admin">Admin</option>
                                 <option value="User">User</option>
