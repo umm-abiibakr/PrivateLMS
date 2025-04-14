@@ -53,7 +53,7 @@ namespace PrivateLMS.ViewModels
         public bool TermsAccepted { get; set; }
 
         public List<string> Roles { get; set; } = new List<string>();
-
+        public bool IsApproved { get; set; }
         public bool IsLockedOut { get; set; }
 
         [StringLength(100, MinimumLength = 6)]

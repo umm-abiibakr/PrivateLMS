@@ -34,6 +34,11 @@ namespace PrivateLMS.Controllers
                 var user = await _userManager.FindByNameAsync(model.Username);
                 if (user != null)
                 {
+                    if (!user.IsApproved)
+                    {
+                        ModelState.AddModelError("", "This account is pending approval. You will be notified once access is granted.");
+                        return View(model);
+                    }
                     if (await _userManager.IsLockedOutAsync(user))
                     {
                         ModelState.AddModelError("", "This account is currently banned.");
@@ -63,6 +68,7 @@ namespace PrivateLMS.Controllers
                         }
                         return RedirectToAction("MyLoans", "Loans");
                     }
+                    
                     else if (result.IsLockedOut)
                     {
                         ModelState.AddModelError("", "This account is currently banned.");

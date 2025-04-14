@@ -29,7 +29,7 @@ namespace PrivateLMS.Models
         public string Country { get; set; }
 
         public bool TermsAccepted { get; set; }
-
+        public bool IsApproved { get; set; }
         public string? ProfilePicturePath { get; set; } 
     }
 }

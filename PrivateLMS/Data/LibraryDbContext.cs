@@ -133,7 +133,8 @@ namespace PrivateLMS.Data
                     State = "Admin State",
                     PostalCode = "12345",
                     Country = "Admin Country",
-                    TermsAccepted = true
+                    TermsAccepted = true,
+                    IsApproved = true
                 },
                 new ApplicationUser
                 {
@@ -155,7 +156,8 @@ namespace PrivateLMS.Data
                     State = "User State",
                     PostalCode = "54321",
                     Country = "User Country",
-                    TermsAccepted = true
+                    TermsAccepted = true,
+                    IsApproved = true
                 },
                 new ApplicationUser
                 {
@@ -177,7 +179,8 @@ namespace PrivateLMS.Data
                     State = "Admin State",
                     PostalCode = "54321",
                     Country = "Admin Country",
-                    TermsAccepted = true
+                    TermsAccepted = true,
+                    IsApproved = true
                 }
             );
 

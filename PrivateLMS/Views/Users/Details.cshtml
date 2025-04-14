@@ -7,44 +7,108 @@
     <h2 class="text-center mb-4">User Details: @Model.UserName</h2>
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card">
+            <div class="card shadow-sm">
                 <div class="card-body">
                     <dl class="row">
                         <dt class="col-sm-4 text-end">Username</dt>
                         <dd class="col-sm-8">@Model.UserName</dd>
+
                         <dt class="col-sm-4 text-end">Email</dt>
                         <dd class="col-sm-8">@Model.Email</dd>
+
                         <dt class="col-sm-4 text-end">First Name</dt>
                         <dd class="col-sm-8">@Model.FirstName</dd>
+
                         <dt class="col-sm-4 text-end">Last Name</dt>
                         <dd class="col-sm-8">@Model.LastName</dd>
+
                         <dt class="col-sm-4 text-end">Phone Number</dt>
                         <dd class="col-sm-8">@(Model.PhoneNumber ?? "N/A")</dd>
+
                         <dt class="col-sm-4 text-end">Gender</dt>
                         <dd class="col-sm-8">@Model.Gender</dd>
+
                         <dt class="col-sm-4 text-end">Date of Birth</dt>
                         <dd class="col-sm-8">@Model.DateOfBirth.ToShortDateString()</dd>
+
                         <dt class="col-sm-4 text-end">Address</dt>
                         <dd class="col-sm-8">@Model.Address</dd>
+
                         <dt class="col-sm-4 text-end">City</dt>
                         <dd class="col-sm-8">@(Model.City ?? "N/A")</dd>
+
                         <dt class="col-sm-4 text-end">State</dt>
                         <dd class="col-sm-8">@(Model.State ?? "N/A")</dd>
+
                         <dt class="col-sm-4 text-end">Postal Code</dt>
                         <dd class="col-sm-8">@(Model.PostalCode ?? "N/A")</dd>
+
                         <dt class="col-sm-4 text-end">Country</dt>
                         <dd class="col-sm-8">@(Model.Country ?? "N/A")</dd>
+
                         <dt class="col-sm-4 text-end">Terms Accepted</dt>
                         <dd class="col-sm-8">@(Model.TermsAccepted ? "Yes" : "No")</dd>
+
                         <dt class="col-sm-4 text-end">Roles</dt>
                         <dd class="col-sm-8">@string.Join(", ", Model.Roles)</dd>
-                        <dt class="col-sm-4 text-end">Status</dt>
-                        <dd class="col-sm-8">@(Model.IsLockedOut ? "Banned" : "Active")</dd>
+
+                        <dt class="col-sm-4 text-end">Approval Status</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.IsApproved)
+                            {
+                                <span class="badge bg-success">Approved</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark">Pending</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-4 text-end">Account Status</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.IsLockedOut)
+                            {
+                                <span class="badge bg-danger">Banned</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-primary">Active</span>
+                            }
+                        </dd>
                     </dl>
 
                     <div class="text-center">
                         <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning me-2">Edit</a>
-                        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+
+                        @if (!Model.IsApproved)
+                        {
+                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#approveModal">
+                                Approve User
+                            </button>
+
+                            <!-- Modal -->
+                            <div class="modal fade" id="approveModal" tabindex="-1" aria-labelledby="approveModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <form asp-action="Approve" asp-route-id="@Model.Id" method="post">
+                                            @Html.AntiForgeryToken()
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="approveModalLabel">Confirm Approval</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Are you sure you want to approve the user <strong>@Model.UserName</strong>?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn btn-success">Yes, Approve</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        <a asp-action="Index" class="btn btn-secondary ms-2">Back to List</a>
                     </div>
                 </div>
             </div>

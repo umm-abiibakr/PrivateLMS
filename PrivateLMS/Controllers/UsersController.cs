@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 
 namespace PrivateLMS.Controllers
 {
-    [Authorize(Roles = "Admin")]
     public class UsersController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -29,6 +28,7 @@ namespace PrivateLMS.Controllers
             _webHostEnvironment = webHostEnvironment;
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
             try
@@ -41,7 +41,9 @@ namespace PrivateLMS.Controllers
                     Email = u.Email,
                     FirstName = u.FirstName,
                     LastName = u.LastName,
-                    IsLockedOut = u.LockoutEnd.HasValue && u.LockoutEnd > DateTimeOffset.UtcNow
+                    IsLockedOut = u.LockoutEnd.HasValue && u.LockoutEnd > DateTimeOffset.UtcNow,
+                    IsApproved = u.IsApproved
+
                 }).ToList();
                 return View(userViewModels);
             }
@@ -51,7 +53,7 @@ namespace PrivateLMS.Controllers
                 return RedirectToAction("Error", "Home");
             }
         }
-
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Details(int id)
         {
             try
@@ -79,6 +81,7 @@ namespace PrivateLMS.Controllers
                     PostalCode = user.PostalCode,
                     Country = user.Country,
                     TermsAccepted = user.TermsAccepted,
+                    IsApproved = user.IsApproved,
                     Roles = (await _userManager.GetRolesAsync(user)).ToList(),
                     IsLockedOut = user.LockoutEnd.HasValue && user.LockoutEnd > DateTimeOffset.UtcNow
                 };
@@ -91,6 +94,7 @@ namespace PrivateLMS.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View(new UserViewModel());
@@ -119,6 +123,7 @@ namespace PrivateLMS.Controllers
                         PostalCode = model.PostalCode,
                         Country = model.Country,
                         TermsAccepted = model.TermsAccepted,
+                        IsApproved = model.IsApproved,
                         LockoutEnabled = true
                     };
 
@@ -151,6 +156,7 @@ namespace PrivateLMS.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id)
         {
             try
@@ -178,8 +184,9 @@ namespace PrivateLMS.Controllers
                     PostalCode = user.PostalCode,
                     Country = user.Country,
                     TermsAccepted = user.TermsAccepted,
+                    IsApproved = user.IsApproved,
                     Roles = (await _userManager.GetRolesAsync(user)).ToList(),
-                    IsLockedOut = user.LockoutEnd.HasValue && user.LockoutEnd > DateTimeOffset.UtcNow
+                    IsLockedOut = user.LockoutEnd.HasValue && user.LockoutEnd > DateTimeOffset.UtcNow,
                 };
                 return View(viewModel);
             }
@@ -224,6 +231,7 @@ namespace PrivateLMS.Controllers
                     user.PostalCode = model.PostalCode;
                     user.Country = model.Country;
                     user.TermsAccepted = model.TermsAccepted;
+                    user.IsApproved = model.IsApproved;
                     user.LockoutEnabled = true;
 
                     var updateResult = await _userManager.UpdateAsync(user);
@@ -267,6 +275,7 @@ namespace PrivateLMS.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             try
@@ -433,7 +442,35 @@ namespace PrivateLMS.Controllers
             }
         }
 
-        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Approve(int id)
+        {
+            var user = await _userManager.FindByIdAsync(id.ToString());
+            if (user == null) return NotFound();
+
+            user.IsApproved = true;
+            await _userManager.UpdateAsync(user);
+
+            TempData["SuccessMessage"] = $"{user.UserName} approved.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Disapprove(int id)
+        {
+            var user = await _userManager.FindByIdAsync(id.ToString());
+            if (user == null) return NotFound();
+
+            user.IsApproved = false;
+            await _userManager.UpdateAsync(user);
+
+            TempData["SuccessMessage"] = $"{user.UserName} disapproved.";
+            return RedirectToAction(nameof(Index));
+        }
+
+
         public async Task<IActionResult> Profile()
         {
             try
@@ -470,7 +507,6 @@ namespace PrivateLMS.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize]
         public async Task<IActionResult> Profile(UserProfileViewModel model)
         {
             if (ModelState.IsValid)
