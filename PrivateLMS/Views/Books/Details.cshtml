@@ -99,7 +99,9 @@
                         <dd class="col-sm-8">
                             @(Model.RatingCount > 0 ? $"{Model.AverageRating:F1} ({Model.RatingCount} ratings)" : "Not yet rated")
                         </dd>
-                        <form asp-controller="BookRatings" asp-action="Rate" method="post" class="mt-2">
+                        @if (Model.IsAvailable && Model.AvailableCopies > 0 && User.IsInRole("User"))
+                        {
+                            <form asp-controller="BookRatings" asp-action="Rate" method="post" class="mt-2">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="BookId" value="@Model.BookId" />
                             <div class="row justify-content-center">
@@ -119,18 +121,21 @@
                                 </div>
                             </div>
                         </form>
+                        }
+                        
                     </dl>
 
                     <div class="mt-4">
                         @if (User.IsInRole("Admin"))
                         {
                             <a asp-action="Edit" asp-route-id="@Model.BookId" class="btn btn-warning me-2">Edit</a>
+                            <a asp-action="Delete" asp-route-id="@Model.BookId" class="btn btn-danger me-2">Delete</a>
                         }
-                        @if (Model.IsAvailable && Model.AvailableCopies > 0 && User.Identity.IsAuthenticated)
+                        @if (Model.IsAvailable && Model.AvailableCopies > 0 && User.IsInRole("User"))
                         {
                             <a asp-action="Loan" asp-route-id="@Model.BookId" class="btn btn-primary me-2">Loan</a>
                         }
-                        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                        <a asp-action="Index" class="btn btn-secondary">Back</a>
                     </div>
                 </div>
             </div>

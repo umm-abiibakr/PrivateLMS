@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
 using PrivateLMS.Models;
 
-namespace PrivateLMS.ViewModels 
+namespace PrivateLMS.ViewModels
 {
     public class BookViewModel
     {
@@ -46,7 +46,7 @@ namespace PrivateLMS.ViewModels
         public IFormFile? CoverImage { get; set; }
 
         [Display(Name = "Publisher")]
-        public int? PublisherId { get; set; } 
+        public int? PublisherId { get; set; }
 
         [Required(ErrorMessage = "Please select at least one category")]
         [Display(Name = "Categories")]
@@ -59,5 +59,6 @@ namespace PrivateLMS.ViewModels
         public float AverageRating { get; set; } // Average rating (1-5)
         public int RatingCount { get; set; } // Number of ratings
         public float UserRating { get; set; } // User's rating (0 if not rated)
+        public string UserReview { get; set; } = string.Empty;
     }
 }

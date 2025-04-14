@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace PrivateLMS.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitalCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -403,9 +403,9 @@ namespace PrivateLMS.Migrations
                 columns: new[] { "Id", "AccessFailedCount", "Address", "City", "ConcurrencyStamp", "Country", "DateOfBirth", "Email", "EmailConfirmed", "FirstName", "Gender", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "PostalCode", "ProfilePicturePath", "SecurityStamp", "State", "TermsAccepted", "TwoFactorEnabled", "UserName" },
                 values: new object[,]
                 {
-                    { 1, 0, "123 Admin St.", "Admin City", "c174ed08-d8e6-42e4-b9f5-df1c4bda8327", "Admin Country", new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin@privatelms.com", true, "Admin", "Male", "User", false, null, "ADMIN@PRIVATELMS.COM", "ADMIN", "AQAAAAEAACcQAAAAEHs5oK5x5nL5z5bKX5n5z5bKX5n5z5bKX5n5z5bKX5n5z5bKX5n5z5bKX5n5z5bKXw==", "1234567890", false, "12345", null, "b7e8c9d0-1f2e-4a3b-8c9d-0e1f2e4a3b8c", "Admin State", true, false, "admin" },
-                    { 2, 0, "456 User Rd.", "User City", "a0be1ad4-8f70-46a4-87cd-ae58ec047b82", "User Country", new DateTime(1995, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), "john.doe@example.com", true, "John", "Male", "Doe", false, null, "JOHN.DOE@EXAMPLE.COM", "USER1", "AQAAAAEAACcQAAAAEHs5oK5x5nL5z5bKX5n5z5bKX5n5z5bKX5n5z5bKX5n5z5bKX5n5z5bKX5n5z5bKXw==", "0987654321", false, "54321", null, "d4f6a7b9-2c3e-4d5f-9a7b-92c3e4d5f9a7", "User State", true, false, "user1" },
-                    { 3, 0, "456 Admin Ave", "Admin City", "ef0a564b-5996-4afa-9931-a459bd3aaf63", "Admin Country", new DateTime(1985, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin2@privatelms.com", true, "Admin", "Male", "Two", false, null, "ADMIN2@PRIVATELMS.COM", "ADMIN2", "AQAAAAIAAYagAAAAEHk5z5bKX5n5z5bKX5n5z5bKX5n5z5bKX5n5z5bKX5n5z5bKX5n5z5bKX5n5z5bKXw==", "0987654321", false, "54321", null, "e8c9d0f1-3b4a-5c6d-9e0f-13b4a5c6d9e0", "Admin State", true, false, "admin2" }
+                    { 1, 0, "123 Admin St.", "Admin City", "bca300c1-965e-4473-a566-0e0811a1fcee", "Admin Country", new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin@privatelms.com", true, "Admin", "Male", "User", false, null, "ADMIN@PRIVATELMS.COM", "ADMIN", "AQAAAAEAACcQAAAAEHs5oK5x5nL5z5bKX5n5z5bKX5n5z5bKX5n5z5bKX5n5z5bKX5n5z5bKX5n5z5bKXw==", "1234567890", false, "12345", null, "b7e8c9d0-1f2e-4a3b-8c9d-0e1f2e4a3b8c", "Admin State", true, false, "admin" },
+                    { 2, 0, "456 User Rd.", "User City", "67fde9b7-b492-49f6-9e40-18a3703cb827", "User Country", new DateTime(1995, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), "john.doe@example.com", true, "John", "Male", "Doe", false, null, "JOHN.DOE@EXAMPLE.COM", "USER1", "AQAAAAEAACcQAAAAEHs5oK5x5nL5z5bKX5n5z5bKX5n5z5bKX5n5z5bKX5n5z5bKX5n5z5bKX5n5z5bKXw==", "0987654321", false, "54321", null, "d4f6a7b9-2c3e-4d5f-9a7b-92c3e4d5f9a7", "User State", true, false, "user1" },
+                    { 3, 0, "456 Admin Ave", "Admin City", "0b919044-3bad-44d8-8917-c24c80af12d0", "Admin Country", new DateTime(1985, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin2@privatelms.com", true, "Admin", "Male", "Two", false, null, "ADMIN2@PRIVATELMS.COM", "ADMIN2", "AQAAAAIAAYagAAAAEHk5z5bKX5n5z5bKX5n5z5bKX5n5z5bKX5n5z5bKX5n5z5bKX5n5z5bKX5n5z5bKXw==", "0987654321", false, "54321", null, "e8c9d0f1-3b4a-5c6d-9e0f-13b4a5c6d9e0", "Admin State", true, false, "admin2" }
                 });
 
             migrationBuilder.InsertData(

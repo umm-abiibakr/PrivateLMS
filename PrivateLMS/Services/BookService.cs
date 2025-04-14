@@ -4,7 +4,6 @@ using PrivateLMS.Models;
 using PrivateLMS.ViewModels;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,228 +12,72 @@ namespace PrivateLMS.Services
     public class BookService : IBookService
     {
         private readonly LibraryDbContext _context;
-        private readonly IBookRatingService _bookRatingService;
-        private readonly List<(float BorrowFrequency, float CategoryAffinity, float BookPopularity, float RecommendationScore)> _lookupTableData;
-        private bool _isLookupTableLoaded;
 
-        public BookService(LibraryDbContext context, IBookRatingService bookRatingService)
+        public BookService(LibraryDbContext context)
         {
             _context = context;
-            _bookRatingService = bookRatingService;
-            _isLookupTableLoaded = false;
-            _lookupTableData = new List<(float BorrowFrequency, float CategoryAffinity, float BookPopularity, float RecommendationScore)>();
-
-            try
-            {
-                var baseDir = AppDomain.CurrentDomain.BaseDirectory;
-                Console.WriteLine($"Base directory: {baseDir}");
-
-                var path = Path.Combine(baseDir, "lookup_table.csv");
-                Console.WriteLine($"Attempting to load lookup_table.csv from: {path}");
-
-                if (!File.Exists(path))
-                {
-                    throw new FileNotFoundException($"lookup_table.csv not found at path: {path}");
-                }
-
-                var lines = File.ReadAllLines(path).Skip(1); // Skip header
-                foreach (var line in lines)
-                {
-                    var parts = line.Split(',');
-                    if (parts.Length != 4) continue; // Skip malformed lines
-                    if (float.TryParse(parts[0], out float bf) &&
-                        float.TryParse(parts[1], out float ca) &&
-                        float.TryParse(parts[2], out float bp) &&
-                        float.TryParse(parts[3], out float score))
-                    {
-                        _lookupTableData.Add((bf, ca, bp, score));
-                    }
-                }
-
-                if (_lookupTableData.Count == 0)
-                {
-                    throw new InvalidOperationException("Loaded lookup table is empty.");
-                }
-
-                _isLookupTableLoaded = true;
-                Console.WriteLine($"Successfully loaded lookup_table.csv with {_lookupTableData.Count} entries");
-                Console.WriteLine($"First entry: BorrowFrequency={_lookupTableData[0].BorrowFrequency}, " +
-                                 $"CategoryAffinity={_lookupTableData[0].CategoryAffinity}, " +
-                                 $"BookPopularity={_lookupTableData[0].BookPopularity}, " +
-                                 $"Score={_lookupTableData[0].RecommendationScore}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error loading lookup table: {ex.Message}\nStack Trace: {ex.StackTrace}");
-                _lookupTableData.Clear();
-                _isLookupTableLoaded = false;
-            }
-        }
-
-        public async Task<List<BookViewModel>> GetRecommendedBooksAsync(int userId)
-        {
-            if (!_isLookupTableLoaded || _lookupTableData.Count == 0)
-            {
-                Console.WriteLine("Warning: Lookup table not loaded. Returning empty recommendations.");
-                return new List<BookViewModel>();
-            }
-
-            var userLoans = await _context.LoanRecords
-                .Where(lr => lr.UserId == userId)
-                .Select(lr => new { lr.BookId, lr.Book })
-                .ToListAsync();
-
-            float borrowFrequency = Math.Min(userLoans.Count, 150f);
-
-            var books = await _context.Books
-                .Include(b => b.BookCategories)
-                .Where(b => b.IsAvailable && b.AvailableCopies > 0)
-                .ToListAsync();
-
-            var recommendations = new List<(Book Book, float Score)>();
-
-            foreach (var book in books)
-            {
-                var bookCategoryIds = book.BookCategories?.Select(bc => bc.CategoryId).ToList() ?? new List<int>();
-                var categoryLoans = userLoans.Count(l => l.Book.BookCategories?.Any(bc => bookCategoryIds.Contains(bc.CategoryId)) ?? false);
-                float categoryAffinity = Math.Min(categoryLoans, 40f);
-
-                var bookLoans = await _context.LoanRecords.CountAsync(lr => lr.BookId == book.BookId);
-                float bookPopularity = Math.Min(bookLoans + book.AvailableCopies, 400f);
-
-                float score = GetLookupScore(borrowFrequency, categoryAffinity, bookPopularity);
-                recommendations.Add((book, score));
-            }
-
-            var result = recommendations
-                .OrderByDescending(r => r.Score)
-                .Take(6)
-                .Select(r => new BookViewModel
-                {
-                    BookId = r.Book.BookId,
-                    Title = r.Book.Title,
-                    Description = r.Book.Description,
-                    AvailableCopies = r.Book.AvailableCopies,
-                    IsAvailable = r.Book.IsAvailable,
-                    CoverImagePath = r.Book.CoverImagePath,
-                    AverageRating = Task.Run(() => _bookRatingService.GetAverageRatingAsync(r.Book.BookId)).Result,
-                    RatingCount = Task.Run(() => _bookRatingService.GetRatingCountAsync(r.Book.BookId)).Result
-                })
-                .ToList();
-
-            return result;
-        }
-
-        private float GetLookupScore(float bf, float ca, float bp)
-        {
-            if (!_isLookupTableLoaded || _lookupTableData.Count == 0)
-            {
-                Console.WriteLine("Error: Cannot compute score because lookup table is not loaded.");
-                return 0f;
-            }
-
-            float minDist = float.MaxValue;
-            float score = 0f;
-
-            try
-            {
-                foreach (var entry in _lookupTableData)
-                {
-                    float table_bf = entry.BorrowFrequency;
-                    float table_ca = entry.CategoryAffinity;
-                    float table_bp = entry.BookPopularity;
-                    float table_score = entry.RecommendationScore;
-
-                    float dist = (float)Math.Sqrt(
-                        Math.Pow(bf - table_bf, 2) +
-                        Math.Pow(ca - table_ca, 2) +
-                        Math.Pow(bp - table_bp, 2));
-
-                    if (dist < minDist)
-                    {
-                        minDist = dist;
-                        score = table_score;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error in GetLookupScore: {ex.Message}\nStack Trace: {ex.StackTrace}");
-                return 0f;
-            }
-
-            return score;
         }
 
         public async Task<List<BookViewModel>> GetAllBooksAsync()
         {
-            var books = await _context.Books
+            return await _context.Books
                 .Include(b => b.Author)
                 .Include(b => b.Publisher)
                 .Include(b => b.BookCategories)
-                    .ThenInclude(bc => bc.Category)
-                .AsNoTracking()
-                .ToListAsync();
-
-            var bookViewModels = new List<BookViewModel>();
-            foreach (var book in books)
-            {
-                var bookViewModel = new BookViewModel
+                .ThenInclude(bc => bc.Category)
+                .Select(b => new BookViewModel
                 {
-                    BookId = book.BookId,
-                    Title = book.Title,
-                    Description = book.Description,
-                    ISBN = book.ISBN,
-                    Language = book.Language,
-                    PublishedDate = book.PublishedDate,
-                    AvailableCopies = book.AvailableCopies,
-                    IsAvailable = book.IsAvailable,
-                    CoverImagePath = book.CoverImagePath,
-                    AuthorId = book.AuthorId,
-                    PublisherId = book.PublisherId,
-                    SelectedCategoryIds = book.BookCategories?.Select(bc => bc.CategoryId).ToList() ?? new List<int>(),
-                    AverageRating = await _bookRatingService.GetAverageRatingAsync(book.BookId),
-                    RatingCount = await _bookRatingService.GetRatingCountAsync(book.BookId)
-                };
-                bookViewModels.Add(bookViewModel);
-            }
-
-            return bookViewModels;
+                    BookId = b.BookId,
+                    Title = b.Title,
+                    AuthorId = b.AuthorId,
+                    ISBN = b.ISBN,
+                    Language = b.Language,
+                    PublishedDate = b.PublishedDate,
+                    Description = b.Description,
+                    AvailableCopies = b.AvailableCopies,
+                    IsAvailable = b.IsAvailable,
+                    CoverImagePath = b.CoverImagePath,
+                    PublisherId = b.PublisherId,
+                    SelectedCategoryIds = b.BookCategories.Select(bc => bc.CategoryId).ToList(),
+                    AvailableAuthors = _context.Authors.ToList(),
+                    AvailablePublishers = _context.Publishers.ToList(),
+                    AvailableCategories = _context.Categories.ToList()
+                })
+                .ToListAsync();
         }
 
         public async Task<BookViewModel?> GetBookDetailsAsync(int bookId)
         {
             var book = await _context.Books
-                .Include(b => b.BookCategories)
-                    .ThenInclude(bc => bc.Category)
                 .Include(b => b.Author)
                 .Include(b => b.Publisher)
+                .Include(b => b.BookCategories)
+                .ThenInclude(bc => bc.Category)
                 .FirstOrDefaultAsync(b => b.BookId == bookId);
 
-            if (book == null) return null;
+            if (book == null)
+            {
+                return null;
+            }
 
-            var bookViewModel = new BookViewModel
+            return new BookViewModel
             {
                 BookId = book.BookId,
                 Title = book.Title,
-                Description = book.Description,
+                AuthorId = book.AuthorId,
                 ISBN = book.ISBN,
                 Language = book.Language,
                 PublishedDate = book.PublishedDate,
+                Description = book.Description,
                 AvailableCopies = book.AvailableCopies,
                 IsAvailable = book.IsAvailable,
                 CoverImagePath = book.CoverImagePath,
-                AuthorId = book.AuthorId,
                 PublisherId = book.PublisherId,
-                SelectedCategoryIds = book.BookCategories?.Select(bc => bc.CategoryId).ToList() ?? new List<int>(),
+                SelectedCategoryIds = book.BookCategories.Select(bc => bc.CategoryId).ToList(),
                 AvailableAuthors = await _context.Authors.ToListAsync(),
                 AvailablePublishers = await _context.Publishers.ToListAsync(),
-                AvailableCategories = await _context.Categories.ToListAsync(),
-                AverageRating = await _bookRatingService.GetAverageRatingAsync(book.BookId),
-                RatingCount = await _bookRatingService.GetRatingCountAsync(book.BookId)
+                AvailableCategories = await _context.Categories.ToListAsync()
             };
-
-            return bookViewModel;
         }
 
         public async Task<bool> CreateBookAsync(BookViewModel model, string? coverImagePath)
@@ -242,29 +85,26 @@ namespace PrivateLMS.Services
             var book = new Book
             {
                 Title = model.Title,
-                Description = model.Description,
+                AuthorId = model.AuthorId,
                 ISBN = model.ISBN,
                 Language = model.Language,
                 PublishedDate = model.PublishedDate,
+                Description = model.Description,
                 AvailableCopies = model.AvailableCopies,
                 IsAvailable = model.IsAvailable,
                 CoverImagePath = coverImagePath,
-                AuthorId = model.AuthorId,
                 PublisherId = model.PublisherId
             };
 
             _context.Books.Add(book);
             await _context.SaveChangesAsync();
 
-            if (model.SelectedCategoryIds.Any())
+            // Add categories
+            if (model.SelectedCategoryIds != null && model.SelectedCategoryIds.Any())
             {
                 foreach (var categoryId in model.SelectedCategoryIds)
                 {
-                    _context.BookCategories.Add(new BookCategory
-                    {
-                        BookId = book.BookId,
-                        CategoryId = categoryId
-                    });
+                    _context.BookCategories.Add(new BookCategory { BookId = book.BookId, CategoryId = categoryId });
                 }
                 await _context.SaveChangesAsync();
             }
@@ -278,31 +118,34 @@ namespace PrivateLMS.Services
                 .Include(b => b.BookCategories)
                 .FirstOrDefaultAsync(b => b.BookId == id);
 
-            if (book == null) return false;
+            if (book == null)
+            {
+                return false;
+            }
 
             book.Title = model.Title;
-            book.Description = model.Description;
+            book.AuthorId = model.AuthorId;
             book.ISBN = model.ISBN;
             book.Language = model.Language;
             book.PublishedDate = model.PublishedDate;
+            book.Description = model.Description;
             book.AvailableCopies = model.AvailableCopies;
             book.IsAvailable = model.IsAvailable;
-            if (coverImagePath != null) book.CoverImagePath = coverImagePath;
-            book.AuthorId = model.AuthorId;
             book.PublisherId = model.PublisherId;
+            if (!string.IsNullOrEmpty(coverImagePath))
+            {
+                book.CoverImagePath = coverImagePath;
+            }
 
+            // Update categories
             var existingCategories = book.BookCategories.ToList();
             _context.BookCategories.RemoveRange(existingCategories);
 
-            if (model.SelectedCategoryIds.Any())
+            if (model.SelectedCategoryIds != null && model.SelectedCategoryIds.Any())
             {
                 foreach (var categoryId in model.SelectedCategoryIds)
                 {
-                    _context.BookCategories.Add(new BookCategory
-                    {
-                        BookId = book.BookId,
-                        CategoryId = categoryId
-                    });
+                    _context.BookCategories.Add(new BookCategory { BookId = book.BookId, CategoryId = categoryId });
                 }
             }
 
@@ -327,9 +170,16 @@ namespace PrivateLMS.Services
 
         public async Task<bool> DeleteBookAsync(int id)
         {
-            var book = await _context.Books.FindAsync(id);
-            if (book == null) return false;
+            var book = await _context.Books
+                .Include(b => b.BookCategories)
+                .FirstOrDefaultAsync(b => b.BookId == id);
 
+            if (book == null)
+            {
+                return false;
+            }
+
+            _context.BookCategories.RemoveRange(book.BookCategories);
             _context.Books.Remove(book);
             await _context.SaveChangesAsync();
             return true;
@@ -337,91 +187,139 @@ namespace PrivateLMS.Services
 
         public async Task<List<BookViewModel>> SearchBooksAsync(string? searchTerm)
         {
-            var query = _context.Books
+            IQueryable<Book> query = _context.Books
                 .Include(b => b.Author)
                 .Include(b => b.Publisher)
                 .Include(b => b.BookCategories)
-                    .ThenInclude(bc => bc.Category)
-                .AsQueryable();
+                .ThenInclude(bc => bc.Category);
 
             if (!string.IsNullOrEmpty(searchTerm))
             {
-                query = query.Where(b => b.Title.Contains(searchTerm) || b.Description.Contains(searchTerm));
+                searchTerm = searchTerm.ToLower();
+                query = query.Where(b => b.Title.ToLower().Contains(searchTerm) || (b.Description != null && b.Description.ToLower().Contains(searchTerm)));
             }
 
-            var books = await query.ToListAsync();
-            var bookViewModels = new List<BookViewModel>();
-
-            foreach (var book in books)
+            return await query.Select(b => new BookViewModel
             {
-                var bookViewModel = new BookViewModel
-                {
-                    BookId = book.BookId,
-                    Title = book.Title,
-                    Description = book.Description,
-                    ISBN = book.ISBN,
-                    Language = book.Language,
-                    PublishedDate = book.PublishedDate,
-                    AvailableCopies = book.AvailableCopies,
-                    IsAvailable = book.IsAvailable,
-                    CoverImagePath = book.CoverImagePath,
-                    AuthorId = book.AuthorId,
-                    PublisherId = book.PublisherId,
-                    SelectedCategoryIds = book.BookCategories?.Select(bc => bc.CategoryId).ToList() ?? new List<int>(),
-                    AverageRating = await _bookRatingService.GetAverageRatingAsync(book.BookId),
-                    RatingCount = await _bookRatingService.GetRatingCountAsync(book.BookId)
-                };
-                bookViewModels.Add(bookViewModel);
-            }
-
-            return bookViewModels;
+                BookId = b.BookId,
+                Title = b.Title,
+                AuthorId = b.AuthorId,
+                ISBN = b.ISBN,
+                Language = b.Language,
+                PublishedDate = b.PublishedDate,
+                Description = b.Description,
+                AvailableCopies = b.AvailableCopies,
+                IsAvailable = b.IsAvailable,
+                CoverImagePath = b.CoverImagePath,
+                PublisherId = b.PublisherId,
+                SelectedCategoryIds = b.BookCategories.Select(bc => bc.CategoryId).ToList(),
+                AvailableAuthors = _context.Authors.ToList(),
+                AvailablePublishers = _context.Publishers.ToList(),
+                AvailableCategories = _context.Categories.ToList()
+            }).ToListAsync();
         }
 
         public async Task<List<BookViewModel>> SearchBooksByCategoryAsync(string? searchTerm, int? categoryId)
         {
-            var query = _context.Books
+            IQueryable<Book> query = _context.Books
                 .Include(b => b.Author)
                 .Include(b => b.Publisher)
                 .Include(b => b.BookCategories)
-                    .ThenInclude(bc => bc.Category)
-                .AsQueryable();
+                .ThenInclude(bc => bc.Category);
+
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                searchTerm = searchTerm.ToLower();
+                query = query.Where(b => b.Title.ToLower().Contains(searchTerm) || (b.Description != null && b.Description.ToLower().Contains(searchTerm)));
+            }
 
             if (categoryId.HasValue)
             {
                 query = query.Where(b => b.BookCategories.Any(bc => bc.CategoryId == categoryId.Value));
             }
 
-            if (!string.IsNullOrEmpty(searchTerm))
+            return await query.Select(b => new BookViewModel
             {
-                query = query.Where(b => b.Title.Contains(searchTerm) || b.Description.Contains(searchTerm));
-            }
+                BookId = b.BookId,
+                Title = b.Title,
+                AuthorId = b.AuthorId,
+                ISBN = b.ISBN,
+                Language = b.Language,
+                PublishedDate = b.PublishedDate,
+                Description = b.Description,
+                AvailableCopies = b.AvailableCopies,
+                IsAvailable = b.IsAvailable,
+                CoverImagePath = b.CoverImagePath,
+                PublisherId = b.PublisherId,
+                SelectedCategoryIds = b.BookCategories.Select(bc => bc.CategoryId).ToList(),
+                AvailableAuthors = _context.Authors.ToList(),
+                AvailablePublishers = _context.Publishers.ToList(),
+                AvailableCategories = _context.Categories.ToList()
+            }).ToListAsync();
+        }
 
-            var books = await query.ToListAsync();
-            var bookViewModels = new List<BookViewModel>();
+        public async Task<List<BookViewModel>> GetRecommendedBooksAsync(int userId)
+        {
+            // Simple recommendation: Books that the user hasn't loaned yet
+            var userLoans = await _context.LoanRecords
+                .Where(lr => lr.UserId == userId)
+                .Select(lr => lr.BookId)
+                .ToListAsync();
 
-            foreach (var book in books)
-            {
-                var bookViewModel = new BookViewModel
+            return await _context.Books
+                .Where(b => !userLoans.Contains(b.BookId))
+                .OrderBy(b => Guid.NewGuid()) // Randomize for now
+                .Take(5)
+                .Select(b => new BookViewModel
                 {
-                    BookId = book.BookId,
-                    Title = book.Title,
-                    Description = book.Description,
-                    ISBN = book.ISBN,
-                    Language = book.Language,
-                    PublishedDate = book.PublishedDate,
-                    AvailableCopies = book.AvailableCopies,
-                    IsAvailable = book.IsAvailable,
-                    CoverImagePath = book.CoverImagePath,
-                    AuthorId = book.AuthorId,
-                    PublisherId = book.PublisherId,
-                    SelectedCategoryIds = book.BookCategories?.Select(bc => bc.CategoryId).ToList() ?? new List<int>(),
-                    AverageRating = await _bookRatingService.GetAverageRatingAsync(book.BookId),
-                    RatingCount = await _bookRatingService.GetRatingCountAsync(book.BookId)
-                };
-                bookViewModels.Add(bookViewModel);
-            }
+                    BookId = b.BookId,
+                    Title = b.Title,
+                    Description = b.Description,
+                    CoverImagePath = b.CoverImagePath,
+                    IsAvailable = b.IsAvailable,
+                    AvailableCopies = b.AvailableCopies
+                })
+                .ToListAsync();
+        }
 
-            return bookViewModels;
+        public async Task<List<BookViewModel>> GetNewBooksAsync(int count)
+        {
+            return await _context.Books
+                .OrderByDescending(b => b.BookId)
+                .Take(count)
+                .Select(b => new BookViewModel
+                {
+                    BookId = b.BookId,
+                    Title = b.Title,
+                    Description = b.Description,
+                    CoverImagePath = b.CoverImagePath,
+                    IsAvailable = b.IsAvailable,
+                    AvailableCopies = b.AvailableCopies
+                })
+                .ToListAsync();
+        }
+
+        public async Task<List<BookViewModel>> GetPopularBooksAsync(int count)
+        {
+            return await _context.Books
+                .Select(b => new
+                {
+                    Book = b,
+                    LoanCount = _context.LoanRecords.Count(lr => lr.BookId == b.BookId)
+                })
+                .OrderByDescending(x => x.LoanCount)
+                .ThenByDescending(x => x.Book.AvailableCopies)
+                .Take(count)
+                .Select(x => new BookViewModel
+                {
+                    BookId = x.Book.BookId,
+                    Title = x.Book.Title,
+                    Description = x.Book.Description,
+                    CoverImagePath = x.Book.CoverImagePath,
+                    IsAvailable = x.Book.IsAvailable,
+                    AvailableCopies = x.Book.AvailableCopies
+                })
+                .ToListAsync();
         }
     }
 }

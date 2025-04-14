@@ -18,7 +18,7 @@ namespace PrivateLMS.Controllers
             _authorService = authorService;
         }
 
-        [Authorize(Roles = "Admin")]
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             try
@@ -42,7 +42,7 @@ namespace PrivateLMS.Controllers
             }
         }
 
-        [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {
             if (!id.HasValue)

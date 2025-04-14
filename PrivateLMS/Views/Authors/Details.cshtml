@@ -18,8 +18,12 @@
                         <dd class="col-sm-8">@(Model.BirthDate?.ToShortDateString() ?? "Unknown")</dd>
                         <dt class="col-sm-4 text-end">Death Date</dt>
                         <dd class="col-sm-8">@(Model.DeathDate?.ToShortDateString() ?? "N/A")</dd>
+                        @if (User.Identity.IsAuthenticated)
+                        {
                         <dt class="col-sm-4 text-end">Number of Books</dt>
                         <dd class="col-sm-8">@Model.BookCount</dd>
+                        }
+
                     </dl>
 
                     <div class="text-center">

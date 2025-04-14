@@ -11,6 +11,6 @@ namespace PrivateLMS.ViewModels
         public float Rating { get; set; }
 
         [StringLength(1000, ErrorMessage = "Review cannot exceed 1000 characters.")]
-        public string Review { get; set; } = string.Empty;
+        public string? Review { get; set; } = string.Empty;
     }
 }

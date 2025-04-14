@@ -8,6 +8,7 @@ namespace PrivateLMS.ViewModels
         public string BookTitle { get; set; } = string.Empty;
         public string UserName { get; set; } = string.Empty;
         public float Rating { get; set; }
+        public string Review { get; set; } = string.Empty;
         public DateTime RatedOn { get; set; }
     }
 }

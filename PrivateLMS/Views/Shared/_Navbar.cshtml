@@ -1,48 +1,51 @@
 ﻿<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="/">Warathatul Ambiya</a>
-        @if (User.IsInRole("Admin"))
-        {
-            <div class="dropdown me-3">
-                <a class="btn btn-secondary dropdown-toggle" type="button" id="managementDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                    Management
-                </a>
-                <ul class="dropdown-menu" aria-labelledby="managementDropdown">
-                    <li><a class="dropdown-item" asp-controller="Authors" asp-action="Index">Authors</a></li>
-                    <li><a class="dropdown-item" asp-controller="Books" asp-action="Index">Books</a></li>
-                    <li><a class="dropdown-item" asp-controller="Categories" asp-action="Index">Categories</a></li>
-                    <li><a class="dropdown-item" asp-controller="Fines" asp-action="Index">Fines</a></li>
-                    <li><a class="dropdown-item" asp-controller="Loans" asp-action="Index">Loans</a></li>
-                    <li><a class="dropdown-item" asp-controller="Publishers" asp-action="Index">Publishers</a></li>
-                    <li><a class="dropdown-item" asp-controller="Users" asp-action="Index">Users</a></li>
-                    <li><a class="dropdown-item" asp-controller="UserActivities" asp-action="Index">Activity Log</a></li>
-                </ul>
-            </div>
-        }
+        
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarContent">
             <ul class="navbar-nav ms-auto">
+                @if (User.IsInRole("Admin"))
+                {
+                    <div class="dropdown">
+                        <a class="nav-link dropdown-toggle" id="managementDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            Hello, @User.Identity.Name
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="managementDropdown">
+                            <li><a class="dropdown-item" asp-controller="Authors" asp-action="Index">Authors</a></li>
+                            <li><a class="dropdown-item" asp-controller="Books" asp-action="Index">Books</a></li>
+                            <li><a class="dropdown-item" asp-controller="Categories" asp-action="Index">Categories</a></li>
+                            <li><a class="dropdown-item" asp-controller="Fines" asp-action="Index">Fines</a></li>
+                            <li><a class="dropdown-item" asp-controller="Loans" asp-action="Index">Loans</a></li>
+                            <li><a class="dropdown-item" asp-controller="Publishers" asp-action="Index">Publishers</a></li>
+                            <li><a class="dropdown-item" asp-controller="Users" asp-action="Index">Users</a></li>
+                            <li><a class="dropdown-item" asp-controller="UserActivities" asp-action="Index">Activity Log</a></li>
+                        </ul>
+                    </div>
+                }
+
+                @if (User.IsInRole("User"))
+                { 
+                    <div class="dropdown">
+                        <a class="nav-link dropdown-toggle" id="managementDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            Hello, @User.Identity.Name
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="managementDropdown">
+                            <li><a class="dropdown-item" asp-controller="Users" asp-action="Profile">Profile</a></li>
+                            <li><a class="dropdown-item" asp-controller="Books" asp-action="Recommendations">Recommendations</a></li>
+                            <li><a class="dropdown-item" asp-controller="Loans" asp-action="MyLoans">My Loans</a></li>
+                            <li><a class="dropdown-item" asp-controller="Fines" asp-action="MyFines">My Fines</a></li>
+                            <li><a class="dropdown-item" asp-controller="Dashboard" asp-action="Index">Dashboard</a></li>
+                        </ul>
+                    </div>
+                }
+
                 @if (User.Identity.IsAuthenticated)
                 {
                     <li class="nav-item">
-                        <span class="nav-link">Welcome, @User.Identity.Name</span>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Users" asp-action="Profile">Profile</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Loans" asp-action="MyLoans">My Loans</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Fines" asp-action="MyFines">My Fines</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Books" asp-action="Recommendations">Recommendations</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+                        <a class="nav-link" asp-controller="Home" asp-action="Index">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" asp-controller="Login" asp-action="Logout">Logout</a>
@@ -50,6 +53,12 @@
                 }
                 else
                 {
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Authors" asp-action="Index">Authors</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Login" asp-action="Logout">About Us</a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" asp-controller="Login" asp-action="Index">Login</a>
                     </li>
