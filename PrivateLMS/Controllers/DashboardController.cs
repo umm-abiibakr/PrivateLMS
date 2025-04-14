@@ -39,7 +39,7 @@ namespace PrivateLMS.Controllers
                 var user = await _userManager.GetUserAsync(User);
                 if (user == null)
                 {
-                    TempData["ErrorMessage"] = "You must be logged in to view your dashboard.";
+                    TempData["ErrorMessage"] = "You need to be logged in to view your dashboard.";
                     return RedirectToAction("Index", "Login");
                 }
 
@@ -60,6 +60,7 @@ namespace PrivateLMS.Controllers
                             BookTitle = br.Book.Title,
                             UserName = user.UserName,
                             Rating = br.Rating,
+                            Review = br.Review ?? string.Empty, // Added
                             RatedOn = br.RatedOn
                         })
                         .ToListAsync()
@@ -67,11 +68,12 @@ namespace PrivateLMS.Controllers
 
                 return View(viewModel);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                TempData["ErrorMessage"] = $"An error occurred while loading your dashboard: {ex.Message}";
+                TempData["ErrorMessage"] = "We couldn't load your dashboard right now. Please try again later.";
                 return RedirectToAction("Error", "Home");
             }
         }
     }
+
 }

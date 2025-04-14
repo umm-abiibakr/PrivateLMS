@@ -59,7 +59,7 @@ namespace PrivateLMS.Controllers
 
                         if (await _userManager.IsInRoleAsync(user, "Admin"))
                         {
-                            return RedirectToAction("Index", "Books");
+                            return RedirectToAction("Index", "Home");
                         }
                         return RedirectToAction("MyLoans", "Loans");
                     }

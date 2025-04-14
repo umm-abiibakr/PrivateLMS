@@ -12,8 +12,8 @@ using PrivateLMS.Data;
 namespace PrivateLMS.Migrations
 {
     [DbContext(typeof(LibraryDbContext))]
-    [Migration("20250413075906_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250414014049_InitalCreate")]
+    partial class InitalCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -304,7 +304,7 @@ namespace PrivateLMS.Migrations
                             AccessFailedCount = 0,
                             Address = "123 Admin St.",
                             City = "Admin City",
-                            ConcurrencyStamp = "c174ed08-d8e6-42e4-b9f5-df1c4bda8327",
+                            ConcurrencyStamp = "bca300c1-965e-4473-a566-0e0811a1fcee",
                             Country = "Admin Country",
                             DateOfBirth = new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin@privatelms.com",
@@ -331,7 +331,7 @@ namespace PrivateLMS.Migrations
                             AccessFailedCount = 0,
                             Address = "456 User Rd.",
                             City = "User City",
-                            ConcurrencyStamp = "a0be1ad4-8f70-46a4-87cd-ae58ec047b82",
+                            ConcurrencyStamp = "67fde9b7-b492-49f6-9e40-18a3703cb827",
                             Country = "User Country",
                             DateOfBirth = new DateTime(1995, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "john.doe@example.com",
@@ -358,7 +358,7 @@ namespace PrivateLMS.Migrations
                             AccessFailedCount = 0,
                             Address = "456 Admin Ave",
                             City = "Admin City",
-                            ConcurrencyStamp = "ef0a564b-5996-4afa-9931-a459bd3aaf63",
+                            ConcurrencyStamp = "0b919044-3bad-44d8-8917-c24c80af12d0",
                             Country = "Admin Country",
                             DateOfBirth = new DateTime(1985, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin2@privatelms.com",

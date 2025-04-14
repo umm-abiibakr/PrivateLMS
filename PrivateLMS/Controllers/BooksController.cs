@@ -94,7 +94,7 @@ namespace PrivateLMS.Controllers
         {
             if (!id.HasValue)
             {
-                TempData["ErrorMessage"] = "Book ID was not provided.";
+                TempData["ErrorMessage"] = "We couldn't find that book because the ID was missing.";
                 return PartialView("_NotFound");
             }
 
@@ -103,7 +103,7 @@ namespace PrivateLMS.Controllers
                 var book = await _bookService.GetBookDetailsAsync(id.Value);
                 if (book == null)
                 {
-                    TempData["ErrorMessage"] = $"No book found with ID {id}.";
+                    TempData["ErrorMessage"] = "Sorry, we couldn't find a book with that ID.";
                     return PartialView("_NotFound");
                 }
 
@@ -111,13 +111,16 @@ namespace PrivateLMS.Controllers
                 if (user != null)
                 {
                     book.UserRating = await _bookRatingService.GetUserRatingAsync(id.Value, user.Id);
+                    var userRating = await _context.BookRatings
+                        .FirstOrDefaultAsync(br => br.BookId == id.Value && br.UserId == user.Id);
+                    book.UserReview = userRating?.Review ?? string.Empty; 
                 }
 
                 return View(book);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                TempData["ErrorMessage"] = $"An error occurred while loading the book details: {ex.Message}";
+                TempData["ErrorMessage"] = "Something went wrong while trying to load the book details. Please try again.";
                 return RedirectToAction("Error", "Home");
             }
         }

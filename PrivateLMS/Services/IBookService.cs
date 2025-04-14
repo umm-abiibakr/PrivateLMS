@@ -18,5 +18,7 @@ namespace PrivateLMS.Services
         Task<List<BookViewModel>> SearchBooksAsync(string? searchTerm);
         Task<List<BookViewModel>> SearchBooksByCategoryAsync(string? searchTerm, int? categoryId);
         Task<List<BookViewModel>> GetRecommendedBooksAsync(int userId);
+        Task<List<BookViewModel>> GetNewBooksAsync(int count);
+        Task<List<BookViewModel>> GetPopularBooksAsync(int count);
     }
 }

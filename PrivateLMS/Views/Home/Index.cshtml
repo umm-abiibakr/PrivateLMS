@@ -3,12 +3,37 @@
     ViewData["Title"] = "Home";
 }
 
-<div class="container mt-5">
+<div class="container mt-0">
+    <!-- Title and Slogan -->
+    <div class="text-center my-0">
+        <p class="lead slogan">Welcome to the Private Library</p>
+        <h1 class="display-3 mb-3">Warathatul Ambiya</h1>
+        <p class="lead slogan">Take your goodly share!</p>
+    </div>
+
+    <!-- Hadith Banner -->
+    <div class="hadith-banner text-center py-5 mb-5">
+        <p class="hadith-arabic mb-4">
+            إِنَّ الْعُلَمَاءَ وَرَثَةُ الأَنْبِيَاءِ إِنَّ الأَنْبِيَاءَ لَمْ يُوَرِّثُوا دِينَارًا وَلاَ دِرْهَمًا إِنَّمَا وَرَّثُوا الْعِلْمَ فَمَنْ أَخَذَ بِهِ أَخَذَ بِحَظٍّ وَافِر
+        </p>
+        <p class="hadith-english mb-2">
+            “Indeed the scholars are the heirs of the Prophets; the Prophets do not leave behind [for inheritance] dinars or dirhams (i.e., wealth), rather they leave behind knowledge, so whoever acquires that, acquires an abundance of goodness.”
+        </p>
+        <p class="hadith-attribution text-muted">
+            Hasan hadith reported by Abu Dawud (3641), (3642), Tirmidhi (2682), Ibn Majah (223). Translated by Anwar Wright
+        </p>
+    </div>
+
+    <!-- Browse Books Button -->
+    <div class="text-center mb-5">
+        <a asp-controller="Books" asp-action="Index" class="btn btn-primary btn-lg">Browse Books</a>
+    </div>
+
     <!-- Overdue Loan Notifications -->
     @if (User.Identity.IsAuthenticated && Model.OverdueLoans.Any())
     {
         <section class="mb-5">
-            <h2 class="mb-4 text-danger">Overdue Loans</h2>
+            <h3 class="text-center mb-4">Overdue Loans</h3>
             <div class="alert alert-danger" role="alert">
                 <ul class="list-unstyled mb-0">
                     @foreach (var loan in Model.OverdueLoans)
@@ -17,8 +42,7 @@
                         {
                             var daysOverdue = (DateTime.UtcNow - loan.DueDate.Value).Days;
                             <li>
-                                <strong>@loan.BookTitle</strong> is overdue by @daysOverdue day@(daysOverdue != 1 ? "s" : "").
-                                It was due on @loan.DueDate.Value.ToString("g"). Please return it soon to avoid fines.
+                                <strong>@loan.BookTitle</strong> is overdue by @daysOverdue day@(daysOverdue != 1 ? "s" : ""). It was due on @loan.DueDate.Value.ToString("g"). Please return it soon to avoid fines.
                             </li>
                         }
                     }
@@ -27,18 +51,12 @@
         </section>
     }
 
-    <!-- Welcome Section -->
-    <div class="text-center my-5">
-        <h1>Welcome to Warathatul Ambiya</h1>
-        <p class="lead">Discover a wide range of books, borrow your favorites, and share your thoughts with the community.</p>
-    </div>
-
     <!-- New Books Section -->
     <section class="mb-5">
-        <h2 class="mb-4">New Books</h2>
+        <h3 class="text-center mb-4">New Books</h3>
         @if (!Model.NewBooks.Any())
         {
-            <p class="text-center">No new books available at the moment.</p>
+            <p class="text-center text-muted">No new books available at the moment.</p>
         }
         else
         {
@@ -46,14 +64,14 @@
                 @foreach (var book in Model.NewBooks)
                 {
                     <div class="col">
-                        <div class="card h-100">
+                        <div class="card h-100 text-center">
                             @if (!string.IsNullOrEmpty(book.CoverImagePath))
                             {
-                                <img src="@book.CoverImagePath" class="card-img-top" alt="@book.Title Cover" style="height: 200px; object-fit: cover;" />
+                                <img src="@book.CoverImagePath" class="card-img-top" alt="@book.Title Cover" />
                             }
                             else
                             {
-                                <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                                <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center">
                                     <span>No Cover</span>
                                 </div>
                             }
@@ -63,8 +81,8 @@
                                     @(book.Description?.Length > 100 ? book.Description.Substring(0, 100) + "..." : book.Description ?? "No description available")
                                 </p>
                             </div>
-                            <div class="card-footer text-center">
-                                <a asp-controller="Books" asp-action="Details" asp-route-id="@book.BookId" class="btn btn-info btn-sm">View Details</a>
+                            <div class="card-footer">
+                                <a asp-controller="Books" asp-action="Details" asp-route-id="@book.BookId" class="btn btn-primary btn-sm">View Details</a>
                             </div>
                         </div>
                     </div>
@@ -75,10 +93,10 @@
 
     <!-- Popular Books Section -->
     <section class="mb-5">
-        <h2 class="mb-4">Popular Books</h2>
+        <h3 class="text-center mb-4">Popular Books</h3>
         @if (!Model.PopularBooks.Any())
         {
-            <p class="text-center">No popular books available at the moment.</p>
+            <p class="text-center text-muted">No popular books available at the moment.</p>
         }
         else
         {
@@ -86,14 +104,14 @@
                 @foreach (var book in Model.PopularBooks)
                 {
                     <div class="col">
-                        <div class="card h-100">
+                        <div class="card h-100 text-center">
                             @if (!string.IsNullOrEmpty(book.CoverImagePath))
                             {
-                                <img src="@book.CoverImagePath" class="card-img-top" alt="@book.Title Cover" style="height: 200px; object-fit: cover;" />
+                                <img src="@book.CoverImagePath" class="card-img-top" alt="@book.Title Cover" />
                             }
                             else
                             {
-                                <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                                <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center">
                                     <span>No Cover</span>
                                 </div>
                             }
@@ -103,8 +121,8 @@
                                     @(book.Description?.Length > 100 ? book.Description.Substring(0, 100) + "..." : book.Description ?? "No description available")
                                 </p>
                             </div>
-                            <div class="card-footer text-center">
-                                <a asp-controller="Books" asp-action="Details" asp-route-id="@book.BookId" class="btn btn-info btn-sm">View Details</a>
+                            <div class="card-footer">
+                                <a asp-controller="Books" asp-action="Details" asp-route-id="@book.BookId" class="btn btn-primary btn-sm">View Details</a>
                             </div>
                         </div>
                     </div>
@@ -115,10 +133,10 @@
 
     <!-- Book Reviews Section -->
     <section class="mb-5">
-        <h2 class="mb-4">Recent Book Reviews</h2>
+        <h3 class="text-center mb-4">Recent Book Reviews</h3>
         @if (!Model.RecentReviews.Any())
         {
-            <p class="text-center">No reviews available at the moment.</p>
+            <p class="text-center text-muted">No reviews available at the moment.</p>
         }
         else
         {
@@ -126,16 +144,22 @@
                 @foreach (var review in Model.RecentReviews)
                 {
                     <div class="col">
-                        <div class="card h-100">
+                        <div class="card h-100 text-center">
                             <div class="card-body">
                                 <h5 class="card-title">@review.BookTitle</h5>
                                 <p class="card-text">
                                     <strong>@review.UserName</strong> rated it @review.Rating stars<br />
+                                    @if (!string.IsNullOrEmpty(review.Review))
+                                    {
+                                        <small class="text-muted">"@(review.Review.Length > 50 ? review.Review.Substring(0, 50) + "..." : review.Review)"</small>
+
+                                        <br />
+                                    }
                                     <small class="text-muted">Reviewed on @review.RatedOn.ToString("g")</small>
                                 </p>
                             </div>
-                            <div class="card-footer text-center">
-                                <a asp-controller="Books" asp-action="Details" asp-route-id="@review.BookId" class="btn btn-info btn-sm">View Book</a>
+                            <div class="card-footer">
+                                <a asp-controller="Books" asp-action="Details" asp-route-id="@review.BookId" class="btn btn-primary btn-sm">View Book</a>
                             </div>
                         </div>
                     </div>
@@ -148,19 +172,19 @@
     @if (User.Identity.IsAuthenticated && Model.Recommendations.Any())
     {
         <section class="mb-5">
-            <h2 class="mb-4">You May Like to Read This</h2>
+            <h3 class="text-center mb-4">You May Like to Read This</h3>
             <div class="row row-cols-1 row-cols-md-3 g-4">
                 @foreach (var book in Model.Recommendations)
                 {
                     <div class="col">
-                        <div class="card h-100">
+                        <div class="card h-100 text-center">
                             @if (!string.IsNullOrEmpty(book.CoverImagePath))
                             {
-                                <img src="@book.CoverImagePath" class="card-img-top" alt="@book.Title Cover" style="height: 200px; object-fit: cover;" />
+                                <img src="@book.CoverImagePath" class="card-img-top" alt="@book.Title Cover" />
                             }
                             else
                             {
-                                <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                                <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center">
                                     <span>No Cover</span>
                                 </div>
                             }
@@ -170,8 +194,8 @@
                                     @(book.Description?.Length > 100 ? book.Description.Substring(0, 100) + "..." : book.Description ?? "No description available")
                                 </p>
                             </div>
-                            <div class="card-footer text-center">
-                                <a asp-controller="Books" asp-action="Details" asp-route-id="@book.BookId" class="btn btn-info btn-sm">View Details</a>
+                            <div class="card-footer">
+                                <a asp-controller="Books" asp-action="Details" asp-route-id="@book.BookId" class="btn btn-primary btn-sm">View Details</a>
                             </div>
                         </div>
                     </div>
@@ -180,3 +204,4 @@
         </section>
     }
 </div>
+
