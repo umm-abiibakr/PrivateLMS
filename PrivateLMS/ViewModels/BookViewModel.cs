@@ -60,5 +60,7 @@ namespace PrivateLMS.ViewModels
         public int RatingCount { get; set; } // Number of ratings
         public float UserRating { get; set; } // User's rating (0 if not rated)
         public string UserReview { get; set; } = string.Empty;
+
+        public int TotalLoans { get; set; }
     }
 }

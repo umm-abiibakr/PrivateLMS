@@ -7,7 +7,7 @@
     <h2 class="text-center mb-4">Step 1: Personal Information</h2>
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <div class="card">
+            <div class="card shadow-sm">
                 <div class="card-body">
                     <form asp-action="Step1" method="post">
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
@@ -26,7 +26,7 @@
 
                         <div class="mb-3">
                             <label asp-for="Gender" class="form-label">Gender</label>
-                            <select asp-for="Gender" class="form-control">
+                            <select asp-for="Gender" class="form-select">
                                 <option value="">Select Gender</option>
                                 <option value="Male">Male</option>
                                 <option value="Female">Female</option>

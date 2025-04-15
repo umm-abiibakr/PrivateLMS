@@ -9,40 +9,58 @@
     @if (User.IsInRole("Admin"))
     {
         <div class="text-end mb-3">
-            <a asp-action="Create" class="btn btn-primary">Add Author</a>
+            <a asp-action="Create" class="btn btn-success">Add Author</a>
         </div>
     }
 
-
-    <table class="table table-striped table-hover">
-        <thead>
-            <tr>
-                <th>Name</th>
-                @if (User.Identity.IsAuthenticated){<th>Number of Books</th>}
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var author in Model)
-            {
-                <tr>
-                    <td>@author.Name</td>
-                    @if (User.Identity.IsAuthenticated)
-                        {<td>@author.BookCount</td>}
-                    <td>
-                        <a asp-action="Details" asp-route-id="@author.AuthorId" class="btn btn-info btn-sm me-1">Details</a>
-                        @if (User.IsInRole("Admin"))
+    @if (!Model.Any())
+    {
+        <p class="text-center text-muted">No authors available.</p>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Name</th>
+                        @if (User.Identity.IsAuthenticated)
                         {
-                            <a asp-action="Edit" asp-route-id="@author.AuthorId" class="btn btn-warning btn-sm me-1">Edit</a>
-                            <a asp-action="Delete" asp-route-id="@author.AuthorId" class="btn btn-danger btn-sm">Delete</a>
+                            <th>Number of Books</th>
                         }
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                        <th style="width: 200px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var author in Model)
+                    {
+                        <tr>
+                            <td>@author.Name</td>
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                <td>@author.BookCount</td>
+                            }
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a asp-action="Details" asp-route-id="@author.AuthorId"
+                                       class="btn btn-sm btn-outline-info">Details</a>
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <a asp-action="Edit" asp-route-id="@author.AuthorId"
+                                           class="btn btn-sm btn-outline-warning">Edit</a>
+                                        <a asp-action="Delete" asp-route-id="@author.AuthorId"
+                                           class="btn btn-sm btn-outline-danger">Delete</a>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
 
-    <div class="text-end">
+    <div class="text-end mt-3">
         <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Back to Books</a>
     </div>
 </div>

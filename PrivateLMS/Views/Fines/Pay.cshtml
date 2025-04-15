@@ -4,29 +4,33 @@
 }
 
 <div class="container mt-5">
-    <h2 class="text-center mb-4">Pay Fine for @Model.BookTitle</h2>
+    <h2 class="text-center mb-4">Pay Fine for <em>@Model.BookTitle</em></h2>
+
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <div class="card">
+            <div class="card shadow-sm">
                 <div class="card-body">
-                    <p class="text-center">Please confirm payment of the fine below:</p>
+                    <p class="text-center mb-4">Please confirm payment of the following fine:</p>
 
-                    <dl class="row">
-                        <dt class="col-sm-4 text-end">Book Title</dt>
-                        <dd class="col-sm-8">@Model.BookTitle</dd>
-                        <dt class="col-sm-4 text-end">Loaner Name</dt>
-                        <dd class="col-sm-8">@Model.LoanerName</dd>
-                        <dt class="col-sm-4 text-end">Fine Amount</dt>
-                        <dd class="col-sm-8">@Model.Amount.ToString("C", new System.Globalization.CultureInfo("en-NG"))</dd>
-                        <dt class="col-sm-4 text-end">Issued Date</dt>
-                        <dd class="col-sm-8">@Model.IssuedDate.ToShortDateString()</dd>
+                    <dl class="row mb-4">
+                        <dt class="col-sm-5 text-end">Book Title</dt>
+                        <dd class="col-sm-7">@Model.BookTitle</dd>
+
+                        <dt class="col-sm-5 text-end">Loaner Name</dt>
+                        <dd class="col-sm-7">@Model.LoanerName</dd>
+
+                        <dt class="col-sm-5 text-end">Fine Amount</dt>
+                        <dd class="col-sm-7">@Model.Amount.ToString("C", new System.Globalization.CultureInfo("en-NG"))</dd>
+
+                        <dt class="col-sm-5 text-end">Issued Date</dt>
+                        <dd class="col-sm-7">@Model.IssuedDate.ToShortDateString()</dd>
                     </dl>
 
                     <form asp-action="Pay" method="post">
                         <input type="hidden" asp-for="FineId" />
-                        <div class="text-center">
+                        <div class="d-flex justify-content-center gap-3">
                             <button type="submit" class="btn btn-success">Confirm Payment</button>
-                            <a asp-action="MyFines" class="btn btn-secondary">Back to My Fines</a>
+                            <a asp-action="MyFines" class="btn btn-secondary">Cancel</a>
                         </div>
                     </form>
                 </div>

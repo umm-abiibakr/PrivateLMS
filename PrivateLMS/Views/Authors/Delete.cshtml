@@ -7,33 +7,39 @@
     <h2 class="text-center mb-4">Delete Author</h2>
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card">
+            <div class="card shadow-sm">
                 <div class="card-body">
-                    <p class="text-center">Are you sure you want to delete this author? This action cannot be undone if no books are associated.</p>
+                    <p class="text-center text-danger fw-bold">
+                        Are you sure you want to delete this author? This action cannot be undone.
+                    </p>
 
                     <dl class="row">
                         <dt class="col-sm-4 text-end">Name</dt>
                         <dd class="col-sm-8">@Model.Name</dd>
+
                         <dt class="col-sm-4 text-end">Biography</dt>
-                        <dd class="col-sm-8">@(Model.Biography ?? "No biography available")</dd>
+                        <dd class="col-sm-8">@(!string.IsNullOrWhiteSpace(Model.Biography) ? Model.Biography : "No biography available")</dd>
+
                         <dt class="col-sm-4 text-end">Birth Date</dt>
-                        <dd class="col-sm-8">@(Model.BirthDate?.ToShortDateString() ?? "Unknown")</dd>
+                        <dd class="col-sm-8">@Model.BirthDate?.ToShortDateString() ?? "Unknown"</dd>
+
                         <dt class="col-sm-4 text-end">Death Date</dt>
-                        <dd class="col-sm-8">@(Model.DeathDate?.ToShortDateString() ?? "N/A")</dd>
+                        <dd class="col-sm-8">@Model.DeathDate?.ToShortDateString() ?? "N/A"</dd>
+
                         <dt class="col-sm-4 text-end">Number of Books</dt>
                         <dd class="col-sm-8">
-                            @Model.BookCount
+                            <span class="fw-bold">@Model.BookCount</span>
                             @if (Model.BookCount > 0)
                             {
-                                <p class="text-danger mb-0">Cannot delete: This author has associated books.</p>
+                                <div class="text-danger small">This author has associated books and cannot be deleted.</div>
                             }
                         </dd>
                     </dl>
 
-                    <form asp-action="Delete" method="post" class="text-center">
-                        <input type="hidden" asp-for="AuthorId" />
+                    <form asp-action="Delete" method="post" class="text-center mt-4">
                         @Html.AntiForgeryToken()
-                        <button type="submit" class="btn btn-danger @(Model.BookCount > 0 ? "disabled" : "")">Delete</button>
+                        <input type="hidden" asp-for="AuthorId" />
+                        <button type="submit" class="btn btn-danger me-2" @(Model.BookCount > 0 ? "disabled" : "")>Delete</button>
                         <a asp-action="Index" class="btn btn-secondary">Back to List</a>
                     </form>
                 </div>

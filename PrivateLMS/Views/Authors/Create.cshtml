@@ -7,35 +7,39 @@
     <h2 class="text-center mb-4">Create Author</h2>
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card">
+            <div class="card shadow-sm">
                 <div class="card-body">
                     <form asp-action="Create" method="post">
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
                         <div class="mb-3">
                             <label asp-for="Name" class="form-label">Author Name</label>
-                            <input asp-for="Name" class="form-control" />
+                            <input asp-for="Name" class="form-control" placeholder="e.g. Ibn Taymiyyah" />
                             <span asp-validation-for="Name" class="text-danger"></span>
                         </div>
+
                         <div class="mb-3">
                             <label asp-for="Biography" class="form-label">Biography</label>
                             <textarea asp-for="Biography" class="form-control" rows="5"></textarea>
                             <span asp-validation-for="Biography" class="text-danger"></span>
                         </div>
-                        <div class="mb-3">
-                            <label asp-for="BirthDate" class="form-label">Birth Date</label>
-                            <input asp-for="BirthDate" type="date" class="form-control" />
-                            <span asp-validation-for="BirthDate" class="text-danger"></span>
-                        </div>
-                        <div class="mb-3">
-                            <label asp-for="DeathDate" class="form-label">Death Date</label>
-                            <input asp-for="DeathDate" type="date" class="form-control" />
-                            <span asp-validation-for="DeathDate" class="text-danger"></span>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="BirthDate" class="form-label">Birth Date</label>
+                                <input asp-for="BirthDate" type="date" class="form-control" />
+                                <span asp-validation-for="BirthDate" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="DeathDate" class="form-label">Death Date</label>
+                                <input asp-for="DeathDate" type="date" class="form-control" />
+                                <span asp-validation-for="DeathDate" class="text-danger"></span>
+                            </div>
                         </div>
 
                         <div class="text-center">
                             <button type="submit" class="btn btn-success">Create</button>
-                            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                            <a asp-action="Index" class="btn btn-secondary ms-2">Back to List</a>
                         </div>
                     </form>
                 </div>
@@ -49,18 +53,13 @@
     <script>
         tinymce.init({
             selector: 'textarea',
+            height: 300,
             plugins: [
-                'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'image', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'wordcount',
-                'checklist', 'mediaembed', 'casechange', 'formatpainter', 'pageembed', 'a11ychecker', 'tinymcespellchecker', 'permanentpen', 'powerpaste', 'advtable', 'advcode', 'editimage', 'advtemplate', 'ai', 'mentions', 'tinycomments', 'tableofcontents', 'footnotes', 'mergetags', 'autocorrect', 'typography', 'inlinecss', 'markdown', 'importword', 'exportword', 'exportpdf'
+                'autolink', 'link', 'lists', 'charmap', 'emoticons', 'wordcount',
+                'searchreplace', 'visualblocks', 'table', 'anchor', 'codesample'
             ],
-            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
-            tinycomments_mode: 'embedded',
-            tinycomments_author: 'Author name',
-            mergetags_list: [
-                { value: 'First.Name', title: 'First Name' },
-                { value: 'Email', title: 'Email' }
-            ],
-            ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant'))
+            toolbar: 'undo redo | styles | bold italic underline | bullist numlist | link emoticons | removeformat',
+            menubar: false
         });
     </script>
 }

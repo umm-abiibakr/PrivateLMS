@@ -8,7 +8,7 @@
 
     @if (!Model.Any())
     {
-        <p class="text-center">No recommendations available. Try borrowing some books!</p>
+        <p class="text-center text-muted">No recommendations available. Try borrowing some books!</p>
     }
     else
     {
@@ -16,27 +16,30 @@
             @foreach (var book in Model)
             {
                 <div class="col">
-                    <div class="card h-100 text-center">
+                    <div class="card h-100 shadow-sm">
                         @if (!string.IsNullOrEmpty(book.CoverImagePath))
                         {
-                            <img src="@book.CoverImagePath" class="card-img-top mx-auto d-block" alt="@book.Title Cover" style="max-height: 200px; max-width: 100%; object-fit: cover;" />
+                            <img src="@book.CoverImagePath" alt="@book.Title Cover" class="card-img-top" style="height: 250px; object-fit: cover;" />
                         }
                         else
                         {
-                            <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                            <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 250px;">
                                 <span>No Cover</span>
                             </div>
                         }
-                        <div class="card-body">
-                            <h5 class="card-title">@book.Title</h5>
-                            <p class="card-text">
+
+                        <div class="card-body text-start">
+                            <h5 class="card-title text-center">@book.Title</h5>
+                            <p class="card-text small">
                                 @if (!string.IsNullOrEmpty(book.Description))
                                 {
-                                    <small class="text-muted">@(book.Description.Length > 50 ? book.Description.Substring(0, 50) + "..." : book.Description)</small>
+                                    <span class="text-muted d-block mb-1">
+                                        @(book.Description.Length > 70 ? book.Description.Substring(0, 70) + "..." : book.Description)
+                                    </span>
                                 }
-                                <br />
-                                <span>Copies: @book.AvailableCopies</span>
-                                <br />
+
+                                <strong>Copies:</strong> @book.AvailableCopies<br />
+                                <strong>Status:</strong>
                                 @if (book.IsAvailable)
                                 {
                                     <span class="badge bg-success">Available</span>
@@ -46,11 +49,15 @@
                                     <span class="badge bg-danger">Not Available</span>
                                 }
                                 <br />
-                                <small class="text-muted">Rating: @(book.RatingCount > 0 ? $"{book.AverageRating:F1} ({book.RatingCount} ratings)" : "Not yet rated")</small>
+                                <strong>Rating:</strong>
+                                <span class="text-muted">
+                                    @(book.RatingCount > 0 ? $"{book.AverageRating:F1} ({book.RatingCount} rating{(book.RatingCount == 1 ? "" : "s")})" : "Not yet rated")
+                                </span>
                             </p>
                         </div>
-                        <div class="card-footer">
-                            <a asp-action="Details" asp-route-id="@book.BookId" class="btn btn-info btn-sm me-2">View Details</a>
+
+                        <div class="card-footer text-center">
+                            <a asp-action="Details" asp-route-id="@book.BookId" class="btn btn-outline-info btn-sm me-2">View</a>
                             @if (book.IsAvailable && book.AvailableCopies > 0)
                             {
                                 <a asp-action="Loan" asp-route-id="@book.BookId" class="btn btn-primary btn-sm">Loan</a>

@@ -8,55 +8,74 @@
 
     @if (!Model.Any())
     {
-        <p class="text-center">No loan records found.</p>
+        <p class="text-center text-muted">No loan records found.</p>
     }
     else
     {
-        <table class="table table-striped table-hover">
-            <thead>
-                <tr>
-                    <th>Loan ID</th>
-                    <th>Book Title</th>
-                    <th>User ID</th>
-                    <th>Loaner Name</th>
-                    <th>Loan Date</th>
-                    <th>Due Date</th>
-                    <th>Return Date</th>
-                    <th>Renewed</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var loan in Model)
-                {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-light">
                     <tr>
-                        <td>@loan.LoanRecordId</td>
-                        <td>@loan.BookTitle</td>
-                        <td>@loan.UserId</td>
-                        <td>@loan.LoanerName</td>
-                        <td>@loan.LoanDate.ToShortDateString()</td>
-                        <td>
-                            @(loan.DueDate?.ToShortDateString() ?? "N/A")
-                            @if (loan.DueDate.HasValue && loan.DueDate < DateTime.Now && !loan.ReturnDate.HasValue)
-                            {
-                                <span class="badge bg-danger ms-2">Overdue</span>
-                            }
-                        </td>
-                        <td>@(loan.ReturnDate?.ToShortDateString() ?? "Not Returned")</td>
-                        <td>@(loan.IsRenewed ? "Yes" : "No")</td>
-                        <td>
-                            @if (!loan.ReturnDate.HasValue)
-                            {
-                                <a asp-action="Return" asp-route-loanRecordId="@loan.LoanRecordId" class="btn btn-primary btn-sm">Return</a>
-                            }
-                        </td>
+                        <th>Loan ID</th>
+                        <th>Book Title</th>
+                        <th>User ID</th>
+                        <th>Loaner Name</th>
+                        <th>Loan Date</th>
+                        <th>Due Date</th>
+                        <th>Return Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var loan in Model)
+                    {
+                        var isOverdue = loan.DueDate.HasValue && loan.DueDate < DateTime.Now && !loan.ReturnDate.HasValue;
+                        var statusText = loan.ReturnDate.HasValue ? "Returned"
+                        : isOverdue ? "Overdue"
+                        : loan.IsRenewed ? "Renewed"
+                        : "Pending Return";
+
+                        var statusClass = loan.ReturnDate.HasValue ? "bg-success"
+                        : isOverdue ? "bg-danger"
+                        : loan.IsRenewed ? "bg-primary"
+                        : "bg-warning text-dark";
+                        <tr>
+                            <td>@loan.LoanRecordId</td>
+                            <td>@loan.BookTitle</td>
+                            <td>@loan.UserId</td>
+                            <td>@loan.LoanerName</td>
+                            <td>@loan.LoanDate.ToShortDateString()</td>
+                            <td>
+                                @(loan.DueDate?.ToShortDateString() ?? "N/A")
+                            </td>
+                            <td>@(loan.ReturnDate?.ToShortDateString() ?? "Not Returned")</td>
+                            <td>
+                                <span class="badge @statusClass">@statusText</span>
+                            </td>
+                            <td>
+                                @if (loan.ReturnDate.HasValue)
+                                {
+                                    <!-- Undo Return Form -->
+                                    <form asp-action="ToggleReturnStatus" asp-route-loanRecordId="@loan.LoanRecordId" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-outline-secondary btn-sm">Undo</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <!-- Redirect to Return Page -->
+                                    <a asp-action="Return" asp-route-loanRecordId="@loan.LoanRecordId" class="btn btn-success btn-sm">Return</a>
+                                }
+                            </td>
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     }
 
-    <div class="text-end">
+    <div class="text-end mt-4">
         <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Back to Books</a>
     </div>
 </div>

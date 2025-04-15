@@ -7,45 +7,64 @@
     <h2 class="text-center mb-4">Publishers</h2>
 
     <div class="text-end mb-3">
-        <a asp-action="Create" class="btn btn-primary">Add Publisher</a>
+        <a asp-action="Create" class="btn btn-primary btn-sm">
+            <i class="bi bi-plus-circle me-1"></i> Add Publisher
+        </a>
     </div>
 
-    <table class="table table-striped table-hover">
-        <thead>
-            <tr>
-                <th>Logo</th>
-                <th>Publisher Name</th>
-                <th>Location</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var publisher in Model)
-            {
-                <tr>
-                    <td>
-                        @if (!string.IsNullOrEmpty(publisher.LogoImagePath))
-                        {
-                            <img src="@publisher.LogoImagePath" alt="@publisher.PublisherName Logo" style="max-width: 50px;" />
-                        }
-                        else
-                        {
-                            <span>No Logo</span>
-                        }
-                    </td>
-                    <td>@publisher.PublisherName</td>
-                    <td>@publisher.Location</td>
-                    <td>
-                        <a asp-action="Details" asp-route-id="@publisher.PublisherId" class="btn btn-info btn-sm me-1">Details</a>
-                        <a asp-action="Edit" asp-route-id="@publisher.PublisherId" class="btn btn-warning btn-sm me-1">Edit</a>
-                        <a asp-action="Delete" asp-route-id="@publisher.PublisherId" class="btn btn-danger btn-sm">Delete</a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    @if (!Model.Any())
+    {
+        <p class="text-center text-muted">No publishers found.</p>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Logo</th>
+                        <th>Publisher Name</th>
+                        <th>Location</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var publisher in Model)
+                    {
+                        <tr>
+                            <td>
+                                @if (!string.IsNullOrEmpty(publisher.LogoImagePath))
+                                {
+                                    <img src="@publisher.LogoImagePath" alt="@publisher.PublisherName Logo" class="img-thumbnail" style="max-width: 50px;" />
+                                }
+                                else
+                                {
+                                    <span class="text-muted">No Logo</span>
+                                }
+                            </td>
+                            <td>@publisher.PublisherName</td>
+                            <td>@publisher.Location</td>
+                            <td>
+                                <a asp-action="Details" asp-route-id="@publisher.PublisherId" class="btn btn-outline-info btn-sm me-1">
+                                    <i class="bi bi-eye"></i> View
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@publisher.PublisherId" class="btn btn-outline-warning btn-sm me-1">
+                                    <i class="bi bi-pencil-square"></i> Edit
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@publisher.PublisherId" class="btn btn-outline-danger btn-sm">
+                                    <i class="bi bi-trash"></i> Delete
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
 
-    <div class="text-end">
-        <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Back to Books</a>
+    <div class="text-end mt-3">
+        <a asp-controller="Books" asp-action="Index" class="btn btn-secondary btn-sm">
+            <i class="bi bi-arrow-left-circle"></i> Back to Books
+        </a>
     </div>
 </div>

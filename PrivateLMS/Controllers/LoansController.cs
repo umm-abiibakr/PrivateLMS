@@ -46,6 +46,7 @@ namespace PrivateLMS.Controllers
             }
         }
 
+        [Authorize(Roles = "User")]
         public async Task<IActionResult> MyLoans()
         {
             try
@@ -165,7 +166,7 @@ namespace PrivateLMS.Controllers
                 }
 
                 var user = await _userManager.GetUserAsync(User);
-                if (user == null || user.Id != returnViewModel.UserId)
+                if (!User.IsInRole("Admin"))
                 {
                     TempData["ErrorMessage"] = "You do not have permission to return this loan.";
                     return RedirectToAction("MyLoans");
@@ -192,7 +193,7 @@ namespace PrivateLMS.Controllers
             try
             {
                 var user = await _userManager.GetUserAsync(User);
-                if (user == null || user.Id != model.UserId)
+                if (!User.IsInRole("Admin"))
                 {
                     TempData["ErrorMessage"] = "You do not have permission to return this loan.";
                     return RedirectToAction("MyLoans");
@@ -206,7 +207,7 @@ namespace PrivateLMS.Controllers
                 }
 
                 TempData["SuccessMessage"] = "Successfully returned the book.";
-                return RedirectToAction("MyLoans");
+                return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
@@ -313,5 +314,25 @@ namespace PrivateLMS.Controllers
                 return RedirectToAction("MyLoans");
             }
         }
+
+        [HttpPost]
+        public async Task<IActionResult> ToggleReturnStatus(int loanRecordId)
+        {
+            var loan = await _context.LoanRecords.FindAsync(loanRecordId);
+            if (loan == null)
+            {
+                return NotFound();
+            }
+
+            if (loan.ReturnDate.HasValue)
+            {
+                // Unmark as returned
+                loan.ReturnDate = null;
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index)); // back to loan list
+        }
+
     }
 }

@@ -9,39 +9,41 @@
     <h2 class="text-center mb-4">Books</h2>
 
     <!-- Search and Filter Form -->
-    <div class="mb-4">
-        <form asp-action="Index" method="get" class="row g-3 justify-content-center">
-            <div class="col-md-4">
-                <input type="text" name="searchTerm" class="form-control" placeholder="Search by title or description..." value="@ViewBag.SearchTerm" />
-            </div>
-            <div class="col-md-3">
-                <select name="categoryId" class="form-control">
-                    <option value="">All Categories</option>
-                    @foreach (var category in categories)
-                    {
-                        <option value="@category.CategoryId" selected="@(ViewBag.CategoryId == category.CategoryId)">@category.CategoryName</option>
-                    }
-                </select>
-            </div>
-            <div class="col-md-3">
-                <select name="authorId" class="form-control">
-                    <option value="">All Authors</option>
-                    @foreach (var author in authors)
-                    {
-                        <option value="@author.AuthorId" selected="@(ViewBag.AuthorId == author.AuthorId)">@author.Name</option>
-                    }
-                </select>
-            </div>
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-primary w-100">Filter</button>
-            </div>
-        </form>
-    </div>
+    <form asp-action="Index" method="get" class="row g-3 justify-content-center mb-4">
+        <div class="col-md-4">
+            <input type="text" name="searchTerm" class="form-control" placeholder="Search by title or description..." value="@ViewBag.SearchTerm" />
+        </div>
+        <div class="col-md-3">
+            <select name="categoryId" class="form-select">
+                <option value="">All Categories</option>
+                @foreach (var category in categories)
+                {
+                    <option value="@category.CategoryId" selected="@(ViewBag.CategoryId == category.CategoryId)">
+                        @category.CategoryName
+                    </option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select name="authorId" class="form-select">
+                <option value="">All Authors</option>
+                @foreach (var author in authors)
+                {
+                    <option value="@author.AuthorId" selected="@(ViewBag.AuthorId == author.AuthorId)">
+                        @author.Name
+                    </option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2 d-grid">
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+    </form>
 
     @if (User.IsInRole("Admin"))
     {
         <div class="text-center mb-4">
-            <a asp-action="Create" class="btn btn-primary">Add a New Book</a>
+            <a asp-action="Create" class="btn btn-success">Add New Book</a>
         </div>
     }
 
@@ -55,29 +57,31 @@
             @foreach (var book in Model)
             {
                 <div class="col">
-                    <div class="card h-100 text-center">
+                    <div class="card h-100 shadow-sm">
                         @if (!string.IsNullOrEmpty(book.CoverImagePath))
                         {
-                            <img src="@book.CoverImagePath" class="card-img-top mx-auto d-block" alt="@book.Title Cover" />
+                            <img src="@book.CoverImagePath" alt="@book.Title Cover" class="card-img-top" style="height: 250px; object-fit: cover;" />
                         }
                         else
                         {
-                            <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center">
+                            <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 250px;">
                                 <span>No Cover</span>
                             </div>
                         }
-                        <div class="card-body">
-                            <h5 class="card-title">@book.Title</h5>
-                            <p class="card-text">
+
+                        <div class="card-body text-start">
+                            <h5 class="card-title text-center">@book.Title</h5>
+                            <p class="card-text small">
                                 @if (!string.IsNullOrEmpty(book.Description))
                                 {
-                                    <small class="text-muted">@(book.Description.Length > 50 ? book.Description.Substring(0, 50) + "..." : book.Description)</small>
+                                    <span class="text-muted d-block mb-1">
+                                        @(book.Description.Length > 70 ? book.Description.Substring(0, 70) + "..." : book.Description)
+                                    </span>
                                 }
-                                <br />
-                                <span>Author: @(authors.FirstOrDefault(a => a.AuthorId == book.AuthorId)?.Name ?? "Unknown")</span>
-                                <br />
-                                <span>Copies: @book.AvailableCopies</span>
-                                <br />
+
+                                <strong>Author:</strong> @(authors.FirstOrDefault(a => a.AuthorId == book.AuthorId)?.Name ?? "Unknown")<br />
+                                <strong>Copies:</strong> @book.AvailableCopies<br />
+                                <strong>Status:</strong>
                                 @if (book.IsAvailable)
                                 {
                                     <span class="badge bg-success">Available</span>
@@ -87,11 +91,15 @@
                                     <span class="badge bg-danger">Not Available</span>
                                 }
                                 <br />
-                                <small class="text-muted">Rating: @(book.RatingCount > 0 ? $"{book.AverageRating:F1} ({book.RatingCount} ratings)" : "Not yet rated")</small>
+                                <strong>Rating:</strong>
+                                <span class="text-muted">
+                                    @(book.RatingCount > 0 ? $"{book.AverageRating:F1} ({book.RatingCount} rating{(book.RatingCount == 1 ? "" : "s")})" : "Not yet rated")
+                                </span>
                             </p>
                         </div>
-                        <div class="card-footer">
-                            <a asp-action="Details" asp-route-id="@book.BookId" class="btn btn-primary btn-sm me-2">View Details</a>
+
+                        <div class="card-footer text-center">
+                            <a asp-action="Details" asp-route-id="@book.BookId" class="btn btn-outline-primary btn-sm me-2">View</a>
                             @if (book.IsAvailable && book.AvailableCopies > 0 && User.IsInRole("User"))
                             {
                                 <a asp-action="Loan" asp-route-id="@book.BookId" class="btn btn-primary btn-sm">Loan</a>

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PrivateLMS.Data;
 
@@ -11,9 +12,11 @@ using PrivateLMS.Data;
 namespace PrivateLMS.Migrations
 {
     [DbContext(typeof(LibraryDbContext))]
-    partial class LibraryDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250415002843_IsReturnedAdded")]
+    partial class IsReturnedAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -304,7 +307,7 @@ namespace PrivateLMS.Migrations
                             AccessFailedCount = 0,
                             Address = "123 Admin St.",
                             City = "Admin City",
-                            ConcurrencyStamp = "0a2e4d56-7212-4e56-a237-c3351c173dd7",
+                            ConcurrencyStamp = "04e6cd12-3136-4c72-9942-24c266b48744",
                             Country = "Admin Country",
                             DateOfBirth = new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin@privatelms.com",
@@ -332,7 +335,7 @@ namespace PrivateLMS.Migrations
                             AccessFailedCount = 0,
                             Address = "456 User Rd.",
                             City = "User City",
-                            ConcurrencyStamp = "c2464dd3-0bbd-4e0f-83c6-78144768a0dc",
+                            ConcurrencyStamp = "df414425-e3de-4d9f-86fb-646c4907ad77",
                             Country = "User Country",
                             DateOfBirth = new DateTime(1995, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "john.doe@example.com",
@@ -360,7 +363,7 @@ namespace PrivateLMS.Migrations
                             AccessFailedCount = 0,
                             Address = "456 Admin Ave",
                             City = "Admin City",
-                            ConcurrencyStamp = "a6552d5a-771f-4ea2-8e03-719122aff36c",
+                            ConcurrencyStamp = "1d26e5d8-87d7-4c18-a2cd-a82a4574f3bb",
                             Country = "Admin Country",
                             DateOfBirth = new DateTime(1985, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin2@privatelms.com",
@@ -710,6 +713,9 @@ namespace PrivateLMS.Migrations
                     b.Property<bool>("IsRenewed")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsReturned")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("LoanDate")
                         .HasColumnType("datetime2");
 
@@ -738,6 +744,7 @@ namespace PrivateLMS.Migrations
                             BookId = 1,
                             DueDate = new DateTime(2025, 4, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsRenewed = false,
+                            IsReturned = false,
                             LoanDate = new DateTime(2025, 3, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             ReturnDate = new DateTime(2025, 4, 7, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UserId = 2
@@ -748,6 +755,7 @@ namespace PrivateLMS.Migrations
                             BookId = 2,
                             DueDate = new DateTime(2025, 4, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsRenewed = false,
+                            IsReturned = false,
                             LoanDate = new DateTime(2025, 3, 30, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UserId = 2
                         });

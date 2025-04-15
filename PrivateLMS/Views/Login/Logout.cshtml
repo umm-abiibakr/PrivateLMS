@@ -3,12 +3,16 @@
 }
 
 <div class="container mt-5 text-center">
-    <h2>Logged Out</h2>
-    <div class="alert alert-success" role="alert">
-        <p>You have been successfully logged out.</p>
-    </div>
-    <div class="mt-4">
-        <a asp-controller="Login" asp-action="Index" class="btn btn-primary me-2">Login Again</a>
-        <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Back to Home</a>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h2 class="mb-3 text-success">Logged Out</h2>
+            <div class="alert alert-success">
+                You have been successfully logged out.
+            </div>
+            <div class="mt-4">
+                <a asp-controller="Login" asp-action="Index" class="btn btn-primary me-2">Login Again</a>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Back to Home</a>
+            </div>
+        </div>
     </div>
 </div>

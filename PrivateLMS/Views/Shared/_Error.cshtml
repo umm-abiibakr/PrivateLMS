@@ -2,19 +2,32 @@
     ViewData["Title"] = "Error";
 }
 
-<div class="container mt-5 text-center">
-    <h2>Error</h2>
-    <div class="card mt-4">
-        <div class="card-body">
-            @if (TempData["ErrorMessage"] != null)
-            {
-                <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
-            }
-            else
-            {
-                <p>An unexpected error occurred. Please try again later.</p>
-            }
-            <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Back to Books</a>
+<div class="container mt-5">
+    <h2 class="text-center text-danger mb-4">Something Went Wrong</h2>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted">An unexpected error occurred. Please try again later.</p>
+                    }
+
+                    <div class="mt-4">
+                        <a asp-controller="Books" asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left-circle me-1"></i> Back to Books
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
