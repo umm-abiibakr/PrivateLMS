@@ -5,35 +5,43 @@
 
 <div class="container mt-5">
     <h2 class="text-center mb-4">Publisher Details</h2>
+
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <div class="card">
+            <div class="card shadow-sm border-0">
                 <div class="card-body text-center">
+
                     <div class="mb-4">
                         @if (!string.IsNullOrEmpty(Model.LogoImagePath))
                         {
-                            <img src="@Model.LogoImagePath" alt="@Model.PublisherName Logo" style="max-width: 100px;" />
+                            <img src="@Model.LogoImagePath" alt="@Model.PublisherName Logo" class="img-thumbnail" style="max-width: 120px;" />
                         }
                         else
                         {
-                            <span>No Logo</span>
+                            <div class="text-muted">No Logo Available</div>
                         }
                     </div>
 
-                    <dl class="row">
-                        <dt class="col-sm-4 text-end">Publisher Name</dt>
+                    <dl class="row justify-content-center text-start">
+                        <dt class="col-sm-4 text-end fw-semibold">Publisher Name</dt>
                         <dd class="col-sm-8">@Model.PublisherName</dd>
-                        <dt class="col-sm-4 text-end">Location</dt>
+
+                        <dt class="col-sm-4 text-end fw-semibold">Location</dt>
                         <dd class="col-sm-8">@Model.Location</dd>
                     </dl>
 
                     <div class="mt-4">
                         @if (User.IsInRole("Admin"))
                         {
-                            <a asp-action="Edit" asp-route-id="@Model.PublisherId" class="btn btn-warning me-2">Edit</a>
+                            <a asp-action="Edit" asp-route-id="@Model.PublisherId" class="btn btn-warning btn-sm me-2">
+                                <i class="bi bi-pencil-square me-1"></i>Edit
+                            </a>
                         }
-                        <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Back to Books</a>
+                        <a asp-controller="Publishers" asp-action="Index" class="btn btn-secondary btn-sm">
+                            <i class="bi bi-arrow-left-circle"></i> Back to List
+                        </a>
                     </div>
+
                 </div>
             </div>
         </div>

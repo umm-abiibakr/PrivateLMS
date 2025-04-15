@@ -7,26 +7,29 @@
     <h2 class="text-center mb-4">Author Details</h2>
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card">
+            <div class="card shadow-sm">
                 <div class="card-body">
                     <dl class="row">
                         <dt class="col-sm-4 text-end">Name</dt>
                         <dd class="col-sm-8">@Model.Name</dd>
+
                         <dt class="col-sm-4 text-end">Biography</dt>
-                        <dd class="col-sm-8">@(Model.Biography ?? "No biography available")</dd>
+                        <dd class="col-sm-8">@(!string.IsNullOrWhiteSpace(Model.Biography) ? Model.Biography : "No biography available")</dd>
+
                         <dt class="col-sm-4 text-end">Birth Date</dt>
-                        <dd class="col-sm-8">@(Model.BirthDate?.ToShortDateString() ?? "Unknown")</dd>
+                        <dd class="col-sm-8">@Model.BirthDate?.ToShortDateString() Unknown</dd>
+
                         <dt class="col-sm-4 text-end">Death Date</dt>
-                        <dd class="col-sm-8">@(Model.DeathDate?.ToShortDateString() ?? "N/A")</dd>
+                        <dd class="col-sm-8">@Model.DeathDate?.ToShortDateString() N/A</dd>
+
                         @if (User.Identity.IsAuthenticated)
                         {
-                        <dt class="col-sm-4 text-end">Number of Books</dt>
-                        <dd class="col-sm-8">@Model.BookCount</dd>
+                            <dt class="col-sm-4 text-end">Number of Books</dt>
+                            <dd class="col-sm-8">@Model.BookCount</dd>
                         }
-
                     </dl>
 
-                    <div class="text-center">
+                    <div class="text-center mt-4">
                         @if (User.IsInRole("Admin"))
                         {
                             <a asp-action="Edit" asp-route-id="@Model.AuthorId" class="btn btn-warning me-2">Edit</a>

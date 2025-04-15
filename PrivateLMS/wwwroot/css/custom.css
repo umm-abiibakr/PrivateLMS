@@ -1,7 +1,9 @@
-/* Base Styles */
+/* ================================
+   Base Layout
+================================== */
 body {
     font-family: 'Cormorant Garamond', serif;
-    background-color: #f9f6f2;
+    background-color: #fdfbf7;
     color: #3b2f2f;
     font-size: 18px;
     line-height: 1.8;
@@ -9,22 +11,28 @@ body {
     padding: 0;
 }
 
-h1, h2, h3, h4 {
+/* ================================
+   Headings
+================================== */
+h1, h2, h3, h4, h5 {
     font-family: 'Cormorant Garamond', serif;
     color: #4a3c2e;
-    font-weight: 500;
-    margin-bottom: 0.5em;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
 }
 
-/* Navigation */
+/* ================================
+   Navbar
+================================== */
 .navbar {
     font-family: 'Poppins', sans-serif;
+    background-color: #3b2f2f;
 }
 
 .navbar-brand {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 1.5rem;
-    color: #f9f6f2 !important;
+    font-size: 1.6rem;
+    color: #fdfbf7 !important;
 }
 
 .nav-link {
@@ -33,17 +41,16 @@ h1, h2, h3, h4 {
 }
 
     .nav-link:hover {
-            color: #e0d8c6 !important;
-
+        color: #fff !important;
     }
 
-
-/* Buttons */
-
+/* ================================
+   Buttons
+================================== */
 .btn {
+    font-family: 'Cormorant Garamond', serif;
     font-size: 16px;
-    font-size: 16px;
-    padding: 10px 20px;
+    padding: 10px 22px;
     border-radius: 6px;
     transition: all 0.3s ease-in-out;
 }
@@ -52,11 +59,6 @@ h1, h2, h3, h4 {
     background-color: #a67c52;
     border-color: #a67c52;
     color: #fff;
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 16px;
-    padding: 10px 20px;
-    border-radius: 6px;
-    transition: all 0.3s ease-in-out;
 }
 
     .btn-primary:hover {
@@ -64,48 +66,62 @@ h1, h2, h3, h4 {
         border-color: #7c5e4a;
     }
 
-
-.btn-secondary, .btn-success, .btn-danger, .btn-warning, .btn-info {
-    font-family: 'Cormorant Garamond', serif;
-}
-
-/* Hadith Banner */
-.hadith-banner {
-    background-color: #f3e6d4;
-    border-left: 5px solid #a67c52;
-    padding: 30px;
-    font-family: 'Cormorant Garamond', serif;
+.btn-secondary {
+    background-color: transparent;
     color: #4a3c2e;
+    border: 1px solid #d8c9b4;
 }
 
-.hadith-arabic {
-    font-size: 24px;
-    font-family: 'Amiri', serif;
-    direction: rtl;
+    .btn-secondary:hover {
+        background-color: #f3e6d4;
+    }
+
+.btn-danger {
+    background-color: #bb4c4c;
+    border-color: #a84242;
+}
+
+    .btn-danger:hover {
+        background-color: #933f3f;
+    }
+
+.btn-warning {
+    background-color: #e1b97d;
+    border-color: #e1b97d;
     color: #3b2f2f;
 }
 
-.hadith-english {
-    font-size: 18px;
-    font-style: italic;
+    .btn-warning:hover {
+        background-color: #cfa464;
+        border-color: #cfa464;
+    }
+
+/* ================================
+   Forms
+================================== */
+.form-label {
+    font-weight: 500;
+    color: #4a3c2e;
 }
 
-.hadith-attribution {
-    font-size: 14px;
-    color: #7c5e4a;
-}
-
-/* Cards */
-.card {
-    background-color: #f9f6f2;
+.form-control {
     border: 1px solid #d8c9b4;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-    font-family: 'Cormorant Garamond', serif;
-    transition: all 0.3s ease;
+    background-color: #fffdf9;
+    color: #3b2f2f;
+}
+
+/* ================================
+   Cards
+================================== */
+.card {
+    background-color: #fdfbf7;
+    border: 1px solid #e5d8c9;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.3s ease;
 }
 
     .card:hover {
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
     }
 
 .card-title {
@@ -113,9 +129,8 @@ h1, h2, h3, h4 {
     font-weight: 600;
 }
 
-.card-text {
+.card-text, .text-muted {
     color: #6d5844;
-    font-size: 15px;
 }
 
 .card-footer {
@@ -123,39 +138,15 @@ h1, h2, h3, h4 {
     border-top: none;
 }
 
-/* Quote / Reflection Block */
-.quote {
-    font-style: italic;
-    color: #6d5844;
-    border-left: 3px solid #a67c52;
-    padding-left: 16px;
-    margin: 24px 0;
-}
-
-/* Section Blocks */
-section {
-    padding: 60px 20px;
-    max-width: 900px;
-    margin: auto;
-}
-
-/* Footer */
-footer {
-    background-color: #f3e6d4;
-    text-align: center;
-    padding: 20px;
-    font-size: 14px;
-    color: #4a3c2e;
-    font-family: 'Cormorant Garamond', serif;
-}
-
-    footer p {
-        margin-bottom: 0.5rem;
-    }
-
-/* Utilities */
+/* ================================
+   Utilities
+================================== */
 .text-center {
     text-align: center;
+}
+
+.text-end {
+    text-align: end;
 }
 
 .mt-4 {
@@ -166,12 +157,135 @@ footer {
     margin-bottom: 1.5rem;
 }
 
-/* Arabic Note */
+.mt-5 {
+    margin-top: 3rem;
+}
+
+.mb-5 {
+    margin-bottom: 3rem;
+}
+
+.alert {
+    font-family: 'Lato', sans-serif;
+    font-size: 16px;
+}
+
+/* ================================
+   Footer
+================================== */
+footer {
+    background-color: #f3e6d4;
+    color: #4a3c2e;
+    font-size: 14px;
+    font-family: 'Cormorant Garamond', serif;
+    padding: 20px 0;
+    text-align: center;
+}
+
+    footer a {
+        color: #4a3c2e;
+        text-decoration: underline;
+    }
+
+        footer a:hover {
+            text-decoration: none;
+        }
+
+/* ================================
+   Custom Poetic Elements
+================================== */
+.hadith-banner {
+    background-color: #f3e6d4;
+    border-left: 5px solid #a67c52;
+    padding: 30px;
+    color: #4a3c2e;
+}
+
+.hadith-arabic {
+    font-family: 'Amiri', serif;
+    font-size: 24px;
+    direction: rtl;
+    color: #3b2f2f;
+}
+
+.hadith-english {
+    font-style: italic;
+    font-size: 18px;
+    color: #5c4433;
+}
+
+.hadith-attribution {
+    font-size: 14px;
+    color: #7c5e4a;
+}
+
 .arabic-phrase {
     font-family: 'Amiri', serif;
     font-size: 18px;
-    color: #4a3c2e;
-    margin-top: -10px;
-    margin-bottom: 20px;
     text-align: center;
+    color: #4a3c2e;
+    margin: 0 0 20px;
+}
+
+.quote {
+    font-style: italic;
+    color: #6d5844;
+    border-left: 3px solid #a67c52;
+    padding-left: 16px;
+    margin: 24px 0;
+}
+
+/* ================================
+   Responsive & Poetic Dashboard
+================================ */
+
+@media (max-width: 576px) {
+    .card-body p.display-6 {
+        font-size: 1.25rem !important;
+    }
+
+    h2.display-5 {
+        font-size: 1.75rem !important;
+    }
+
+    .table th,
+    .table td {
+        font-size: 0.85rem;
+    }
+
+    .btn {
+        padding: 8px 16px;
+        font-size: 15px;
+    }
+
+    canvas {
+        max-width: 100% !important;
+        height: auto !important;
+    }
+
+    #chatbox {
+        width: 90vw;
+        right: 5vw;
+    }
+}
+
+/* Status Badge Styling */
+.badge-returned {
+    background-color: #A8D5BA;
+    color: #3b2f2f;
+}
+
+.badge-pending {
+    background-color: #F7C59F;
+    color: #3b2f2f;
+}
+
+.badge-overdue {
+    background-color: #EF767A;
+    color: #fff;
+}
+
+.badge-renewed {
+    background-color: #8E9AAF;
+    color: #fff;
 }

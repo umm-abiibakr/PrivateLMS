@@ -1,18 +1,38 @@
 ﻿<style>
-    footer p {
+    footer {
         font-family: 'Noto Sans Arabic', sans-serif;
-        margin-bottom: 0.5rem;
+        background-color: #f8f9fa;
+        border-top: 1px solid #dee2e6;
+        padding-top: 1.5rem;
+        padding-bottom: 1.5rem;
     }
 
-    footer .fst-italic {
-        font-style: italic;
-    }
+        footer p,
+        footer a {
+            margin-bottom: 0.5rem;
+            color: #6c757d;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+            footer a:hover {
+                color: #343a40;
+                text-decoration: underline;
+            }
+
+        footer .branding {
+            font-weight: 600;
+            font-size: 1rem;
+        }
 </style>
 
-<footer class="border-top footer text-muted text-center py-4 bg-light">
+<footer class="text-center">
     <div class="container">
-        <p class="mb-1">Warathatul Ambiya</p>
+        <p class="branding mb-1">Warathatul Ambiya</p>
         <a asp-controller="Home" asp-action="Index">Back to Home</a>
-        <p>© @DateTime.Now.Year - PrivateLMS - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a></p>
+        <p>
+            © @DateTime.Now.Year - PrivateLMS -
+            <a asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </p>
     </div>
 </footer>

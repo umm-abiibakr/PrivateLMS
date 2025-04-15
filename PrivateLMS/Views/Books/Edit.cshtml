@@ -7,7 +7,7 @@
     <h2 class="text-center mb-4">Edit Book</h2>
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card">
+            <div class="card shadow-sm">
                 <div class="card-body">
                     <form asp-action="Edit" method="post" enctype="multipart/form-data">
                         <input type="hidden" asp-for="BookId" />
@@ -18,68 +18,80 @@
                             <input asp-for="Title" class="form-control" />
                             <span asp-validation-for="Title" class="text-danger"></span>
                         </div>
+
                         <div class="mb-3">
                             <label asp-for="AuthorId" class="form-label">Author</label>
-                            <select asp-for="AuthorId" class="form-control" asp-items="@(new SelectList(Model.AvailableAuthors, "AuthorId", "Name"))">
+                            <select asp-for="AuthorId" class="form-select" asp-items="@(new SelectList(Model.AvailableAuthors, "AuthorId", "Name"))">
                                 <option value="">Select an Author</option>
                             </select>
                             <span asp-validation-for="AuthorId" class="text-danger"></span>
                         </div>
+
                         <div class="mb-3">
                             <label asp-for="ISBN" class="form-label">ISBN</label>
                             <input asp-for="ISBN" class="form-control" />
                             <span asp-validation-for="ISBN" class="text-danger"></span>
                         </div>
+
                         <div class="mb-3">
                             <label asp-for="Language" class="form-label">Language</label>
                             <input asp-for="Language" class="form-control" />
                             <span asp-validation-for="Language" class="text-danger"></span>
                         </div>
+
                         <div class="mb-3">
                             <label asp-for="PublishedDate" class="form-label">Published Date</label>
                             <input asp-for="PublishedDate" type="date" class="form-control" />
                             <span asp-validation-for="PublishedDate" class="text-danger"></span>
                         </div>
+
                         <div class="mb-3">
                             <label asp-for="Description" class="form-label">Description</label>
                             <textarea asp-for="Description" class="form-control" rows="5"></textarea>
                             <span asp-validation-for="Description" class="text-danger"></span>
                         </div>
+
                         <div class="mb-3">
                             <label asp-for="AvailableCopies" class="form-label">Available Copies</label>
                             <input asp-for="AvailableCopies" class="form-control" type="number" min="0" />
                             <span asp-validation-for="AvailableCopies" class="text-danger"></span>
                         </div>
-                        <div class="mb-3 form-check">
-                            <input asp-for="IsAvailable" class="form-check-input" />
+
+                        <div class="form-check form-switch mb-3">
+                            <input asp-for="IsAvailable" class="form-check-input" type="checkbox" role="switch" />
                             <label asp-for="IsAvailable" class="form-check-label">Available</label>
                             <span asp-validation-for="IsAvailable" class="text-danger"></span>
                         </div>
+
                         <div class="mb-3">
                             <label asp-for="CoverImage" class="form-label">Book Cover</label>
                             @if (!string.IsNullOrEmpty(Model.CoverImagePath))
                             {
-                                <img src="@Model.CoverImagePath" alt="@Model.Title Cover" class="img-fluid mb-2" style="max-width: 200px;" />
-                                <p>Replace current cover:</p>
+                                <div class="mb-2">
+                                    <img src="@Model.CoverImagePath" alt="@Model.Title Cover" class="img-thumbnail" style="max-width: 200px;" />
+                                    <p class="mt-2 small">Replace current cover:</p>
+                                </div>
                             }
                             <input asp-for="CoverImage" type="file" class="form-control" accept="image/*" />
                             <span asp-validation-for="CoverImage" class="text-danger"></span>
                         </div>
+
                         <div class="mb-3">
                             <label asp-for="PublisherId" class="form-label">Publisher</label>
-                            <select asp-for="PublisherId" class="form-control" asp-items="@(new SelectList(Model.AvailablePublishers, "PublisherId", "PublisherName"))">
+                            <select asp-for="PublisherId" class="form-select" asp-items="@(new SelectList(Model.AvailablePublishers, "PublisherId", "PublisherName"))">
                                 <option value="">Select a Publisher (optional)</option>
                             </select>
                             <span asp-validation-for="PublisherId" class="text-danger"></span>
                         </div>
+
                         <div class="mb-3">
                             <label asp-for="SelectedCategoryIds" class="form-label">Categories</label>
-                            <select asp-for="SelectedCategoryIds" class="form-control" multiple asp-items="@(new SelectList(Model.AvailableCategories, "CategoryId", "CategoryName"))"></select>
+                            <select asp-for="SelectedCategoryIds" class="form-select" multiple asp-items="@(new SelectList(Model.AvailableCategories, "CategoryId", "CategoryName"))"></select>
                             <span asp-validation-for="SelectedCategoryIds" class="text-danger"></span>
                         </div>
 
-                        <div class="text-center">
-                            <button type="submit" class="btn btn-primary">Update</button>
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-primary me-2">Update</button>
                             <a asp-action="Index" class="btn btn-secondary">Back to List</a>
                         </div>
                     </form>
@@ -95,17 +107,12 @@
         tinymce.init({
             selector: 'textarea',
             plugins: [
-                'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'image', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'wordcount',
-                'checklist', 'mediaembed', 'casechange', 'formatpainter', 'pageembed', 'a11ychecker', 'tinymcespellchecker', 'permanentpen', 'powerpaste', 'advtable', 'advcode', 'editimage', 'advtemplate', 'ai', 'mentions', 'tinycomments', 'tableofcontents', 'footnotes', 'mergetags', 'autocorrect', 'typography', 'inlinecss', 'markdown', 'importword', 'exportword', 'exportpdf'
+                'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'image', 'link', 'lists', 'media',
+                'searchreplace', 'table', 'visualblocks', 'wordcount', 'checklist', 'mediaembed', 'formatpainter',
+                'a11ychecker', 'spellchecker', 'advtable', 'advcode', 'editimage'
             ],
-            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
-            tinycomments_mode: 'embedded',
-            tinycomments_author: 'Author name',
-            mergetags_list: [
-                { value: 'First.Name', title: 'First Name' },
-                { value: 'Email', title: 'Email' }
-            ],
-            ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant'))
+            toolbar: 'undo redo | bold italic underline | link image media | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent',
+            menubar: false
         });
     </script>
 }

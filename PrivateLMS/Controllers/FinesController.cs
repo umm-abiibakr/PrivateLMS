@@ -151,5 +151,26 @@ namespace PrivateLMS.Controllers
                 return RedirectToAction("Error", "Home");
             }
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> TogglePaidStatus(int id)
+        {
+            var fine = await _context.Fines.FindAsync(id);
+
+            if (fine == null)
+            {
+                TempData["ErrorMessage"] = "Fine not found.";
+                return RedirectToAction("Index");
+            }
+
+            fine.IsPaid = !fine.IsPaid;
+            _context.Fines.Update(fine);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = $"Fine marked as {(fine.IsPaid ? "Paid" : "Unpaid")}.";
+            return RedirectToAction("Index");
+        }
     }
 }

@@ -8,42 +8,54 @@
 
     @if (!Model.Any())
     {
-        <p class="text-center">No fines recorded in the system.</p>
+        <p class="text-center text-muted">No fines recorded in the system.</p>
     }
     else
     {
-        <table class="table table-striped table-hover">
-            <thead>
-                <tr>
-                    <th>Book Title</th>
-                    <th>Loaner Name</th>
-                    <th>Loan Date</th>
-                    <th>Due Date</th>
-                    <th>Return Date</th>
-                    <th>Issued Date</th>
-                    <th>Fine Amount</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var fine in Model)
-                {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-light">
                     <tr>
-                        <td>@fine.BookTitle</td>
-                        <td>@fine.LoanerName</td>
-                        <td>@fine.LoanDate.ToShortDateString()</td>
-                        <td>@(fine.DueDate?.ToShortDateString() ?? "N/A")</td>
-                        <td>@(fine.ReturnDate?.ToShortDateString() ?? "Not Returned")</td>
-                        <td>@fine.IssuedDate.ToShortDateString()</td>
-                        <td>@fine.Amount.ToString("C", new System.Globalization.CultureInfo("en-NG"))</td>
-                        <td>@(fine.IsPaid ? "Paid" : "Unpaid")</td>
+                        <th>Book Title</th>
+                        <th>Loaner Name</th>
+                        <th>Loan Date</th>
+                        <th>Due Date</th>
+                        <th>Return Date</th>
+                        <th>Issued Date</th>
+                        <th>Fine Amount</th>
+                        <th>Status</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var fine in Model)
+                    {
+                        <tr>
+                            <td>@fine.BookTitle</td>
+                            <td>@fine.LoanerName</td>
+                            <td>@fine.LoanDate.ToShortDateString()</td>
+                            <td>@(fine.DueDate?.ToShortDateString() ?? "N/A")</td>
+                            <td>@(fine.ReturnDate?.ToShortDateString() ?? "Not Returned")</td>
+                            <td>@fine.IssuedDate.ToShortDateString()</td>
+                            <td>@fine.Amount.ToString("C", new System.Globalization.CultureInfo("en-NG"))</td>
+                            <td class="text-center">
+                                <form asp-action="TogglePaidStatus" asp-route-id="@fine.Id" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" onchange="this.form.submit()" @(fine.IsPaid ? "checked" : "")>
+                                        <label class="form-check-label">
+                                            @(fine.IsPaid ? "Paid" : "Unpaid")
+                                        </label>
+                                    </div>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     }
 
-    <div class="text-end">
-        <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Back to Books</a>
+    <div class="text-end mt-3">
+        <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Back to Home Page</a>
     </div>
 </div>

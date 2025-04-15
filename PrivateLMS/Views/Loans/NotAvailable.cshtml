@@ -2,10 +2,20 @@
     ViewData["Title"] = "Not Available";
 }
 
-<div class="container mt-5 text-center">
-    <h2>Not Available</h2>
-    <div class="alert alert-warning" role="alert">
-        <p>The book you are trying to loan is not available.</p>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="mb-4 text-warning">Not Available</h2>
+                    <div class="alert alert-warning">
+                        <p class="mb-0">The book you are trying to loan is currently not available.</p>
+                    </div>
+                    <div class="mt-4">
+                        <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Back to Books</a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Back to Books</a>
 </div>

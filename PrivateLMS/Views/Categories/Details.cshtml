@@ -7,18 +7,20 @@
     <h2 class="text-center mb-4">Category Details</h2>
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card">
+            <div class="card shadow-sm">
                 <div class="card-body">
                     <dl class="row">
                         <dt class="col-sm-4 text-end">Category Name</dt>
                         <dd class="col-sm-8">@Model.CategoryName</dd>
+
                         <dt class="col-sm-4 text-end">Number of Books</dt>
                         <dd class="col-sm-8">@Model.BookCount</dd>
+
                         <dt class="col-sm-4 text-end">Books</dt>
                         <dd class="col-sm-8">
                             @if (Model.Books != null && Model.Books.Any())
                             {
-                                <ul class="list-unstyled">
+                                <ul class="list-unstyled mb-0">
                                     @foreach (var book in Model.Books)
                                     {
                                         <li>@book</li>
@@ -27,12 +29,12 @@
                             }
                             else
                             {
-                                <p>No books in this category.</p>
+                                <span class="text-muted">No books in this category.</span>
                             }
                         </dd>
                     </dl>
 
-                    <div class="text-center">
+                    <div class="text-center mt-4">
                         <a asp-action="Edit" asp-route-id="@Model.CategoryId" class="btn btn-warning me-2">Edit</a>
                         <a asp-action="Index" class="btn btn-secondary">Back to List</a>
                     </div>
