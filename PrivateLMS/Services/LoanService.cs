@@ -65,46 +65,43 @@ namespace PrivateLMS.Services
 
         public async Task<bool> CreateLoanAsync(LoanViewModel model)
         {
-            var book = await _context.Books
-                .FirstOrDefaultAsync(b => b.BookId == model.BookId);
-
-            if (book == null || !book.IsAvailable || book.AvailableCopies <= 0)
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                return false;
+                var book = await _context.Books.FindAsync(model.BookId);
+                if (book == null || !book.IsAvailable)
+                {
+                    return false;
+                }
+
+                var activeLoanCount = await _context.LoanRecords
+                    .Where(lr => lr.UserId == model.UserId && lr.ReturnDate == null)
+                    .CountAsync();
+                if (activeLoanCount >= 3)
+                {
+                    return false;
+                }
+
+                var loanRecord = new LoanRecord
+                {
+                    BookId = model.BookId,
+                    UserId = model.UserId,
+                    LoanDate = DateTime.UtcNow,
+                    DueDate = model.DueDate,
+                    IsRenewed = false
+                };
+
+                book.IsAvailable = false;
+                _context.LoanRecords.Add(loanRecord);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return true;
             }
-
-            var user = await _context.Users.FindAsync(model.UserId);
-            if (user == null)
+            catch
             {
-                return false;
+                await transaction.RollbackAsync();
+                throw;
             }
-
-            var loanRecord = new LoanRecord
-            {
-                BookId = book.BookId,
-                UserId = model.UserId,
-                LoanDate = DateTime.UtcNow,
-                DueDate = DateTime.UtcNow.AddDays(InitialLoanDays),
-                IsRenewed = false
-            };
-
-            book.AvailableCopies--;
-            book.IsAvailable = book.AvailableCopies > 0;
-            _context.LoanRecords.Add(loanRecord);
-            _context.Update(book);
-            await _context.SaveChangesAsync();
-
-            // Log the loan action
-            _context.UserActivities.Add(new UserActivity
-            {
-                UserId = model.UserId,
-                Action = "LoanBook",
-                Timestamp = DateTime.UtcNow,
-                Details = $"User loaned book ID {model.BookId} (Title: {model.BookTitle})"
-            });
-            await _context.SaveChangesAsync();
-
-            return true;
         }
 
         public async Task<ReturnViewModel?> GetReturnFormAsync(int loanRecordId)
@@ -307,6 +304,13 @@ namespace PrivateLMS.Services
             await _context.SaveChangesAsync();
 
             return true;
+        }
+
+        public async Task<int> GetActiveLoanCountAsync(int userId)
+        {
+            return await _context.LoanRecords
+                .Where(lr => lr.UserId == userId && lr.ReturnDate == null)
+                .CountAsync();
         }
     }
 }

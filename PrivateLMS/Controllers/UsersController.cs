@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PrivateLMS.Data;
 using PrivateLMS.Models;
+using PrivateLMS.Services;
 using PrivateLMS.ViewModels;
 using System;
 using System.IO;
@@ -17,15 +18,20 @@ namespace PrivateLMS.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole<int>> _roleManager;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IEmailService _emailService;
+
 
         public UsersController(
             UserManager<ApplicationUser> userManager,
             RoleManager<IdentityRole<int>> roleManager,
-            IWebHostEnvironment webHostEnvironment)
+            IWebHostEnvironment webHostEnvironment,
+            IEmailService emailService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _webHostEnvironment = webHostEnvironment;
+            _emailService = emailService;
+
         }
 
         [Authorize(Roles = "Admin")]
@@ -451,6 +457,10 @@ namespace PrivateLMS.Controllers
 
             user.IsApproved = true;
             await _userManager.UpdateAsync(user);
+
+            // Send approval notification
+            var emailBody = $"Your account has been approved. You can now log in at <a href='{Url.Action("Index", "Login", null, Request.Scheme)}'>Warathatul Ambiya</a>.";
+            await _emailService.SendEmailAsync(user.Email, "Account Approved", emailBody);
 
             TempData["SuccessMessage"] = $"{user.UserName} approved.";
             return RedirectToAction(nameof(Index));

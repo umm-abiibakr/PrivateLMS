@@ -3,60 +3,60 @@
     ViewData["Title"] = "Step 3: Contact Information";
 }
 
-<div class="container mt-5">
+<div class="container mt-5" style="font-family: 'Cormorant Garamond', serif;">
     <h2 class="text-center mb-4">Step 3: Contact Information</h2>
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <form asp-action="Step3" method="post">
+            <div class="card shadow-sm border-0 rounded-4" style="background-color: #fffaf3;">
+                <div class="card-body p-4">
+                    <form asp-action="Step3" method="post" novalidate>
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
                         <div class="mb-3">
-                            <label asp-for="PhoneNumber" class="form-label">Phone Number</label>
-                            <input asp-for="PhoneNumber" class="form-control" />
-                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                            <label asp-for="PhoneNumber" class="form-label">Phone Number <span class="text-danger">*</span></label>
+                            <input asp-for="PhoneNumber" class="form-control rounded-3" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="Email" class="form-label">Email</label>
-                            <input asp-for="Email" type="email" class="form-control" />
-                            <span asp-validation-for="Email" class="text-danger"></span>
+                            <label asp-for="Email" class="form-label">Email <span class="text-danger">*</span></label>
+                            <input asp-for="Email" type="email" class="form-control rounded-3" />
+                            <span asp-validation-for="Email" class="text-danger small"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="Address" class="form-label">Address</label>
-                            <input asp-for="Address" class="form-control" />
-                            <span asp-validation-for="Address" class="text-danger"></span>
+                            <label asp-for="Address" class="form-label">Address <span class="text-danger">*</span></label>
+                            <input asp-for="Address" class="form-control rounded-3" />
+                            <span asp-validation-for="Address" class="text-danger small"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="City" class="form-label">City</label>
-                            <input asp-for="City" class="form-control" />
-                            <span asp-validation-for="City" class="text-danger"></span>
+                            <label asp-for="City" class="form-label">City <span class="text-danger">*</span></label>
+                            <input asp-for="City" class="form-control rounded-3" />
+                            <span asp-validation-for="City" class="text-danger small"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="State" class="form-label">State</label>
-                            <input asp-for="State" class="form-control" />
-                            <span asp-validation-for="State" class="text-danger"></span>
+                            <label asp-for="State" class="form-label">State <span class="text-danger">*</span></label>
+                            <input asp-for="State" class="form-control rounded-3" />
+                            <span asp-validation-for="State" class="text-danger small"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="PostalCode" class="form-label">Postal Code</label>
-                            <input asp-for="PostalCode" class="form-control" />
-                            <span asp-validation-for="PostalCode" class="text-danger"></span>
+                            <label asp-for="PostalCode" class="form-label">Postal Code <span class="text-danger">*</span></label>
+                            <input asp-for="PostalCode" class="form-control rounded-3" />
+                            <span asp-validation-for="PostalCode" class="text-danger small"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="Country" class="form-label">Country</label>
-                            <input asp-for="Country" class="form-control" />
-                            <span asp-validation-for="Country" class="text-danger"></span>
+                            <label asp-for="Country" class="form-label">Country <span class="text-danger">*</span></label>
+                            <input asp-for="Country" class="form-control rounded-3" />
+                            <span asp-validation-for="Country" class="text-danger small"></span>
                         </div>
 
-                        <div class="text-end">
-                            <a asp-action="Step2" class="btn btn-secondary me-2">Back</a>
-                            <button type="submit" class="btn btn-primary">Next</button>
+                        <div class="text-end mt-4">
+                            <a asp-action="Step2" class="btn btn-outline-secondary rounded-3 me-2">Back</a>
+                            <button type="submit" class="btn btn-primary rounded-3">Next</button>
                         </div>
                     </form>
                 </div>

@@ -16,5 +16,6 @@ namespace PrivateLMS.Services
         Task<List<LoanViewModel>> GetAllUserLoansAsync(string? username);
         Task<List<LoanViewModel>> GetOverdueLoansAsync(string? username);
         Task<List<LoanViewModel>> GetUserActiveLoansAsync(string? username);
+        Task<int> GetActiveLoanCountAsync(int userId);
     }
 }

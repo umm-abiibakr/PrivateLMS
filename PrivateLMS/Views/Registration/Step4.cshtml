@@ -3,29 +3,63 @@
     ViewData["Title"] = "Step 4: Confirmation";
 }
 
-<div class="container mt-5">
+<div class="container mt-5" style="font-family: 'Cormorant Garamond', serif;">
     <h2 class="text-center mb-4">Step 4: Confirmation & Agreement</h2>
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <form asp-action="Step4" method="post">
+            <div class="card shadow-sm border-0 rounded-4" style="background-color: #fffaf3;">
+                <div class="card-body p-4">
+                    <form asp-action="Step4" method="post" novalidate>
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
                         <div class="form-check mb-4">
-                            <input asp-for="TermsAccepted" class="form-check-input" type="checkbox" />
-                            <label asp-for="TermsAccepted" class="form-check-label">
-                                I accept the terms and conditions
+                            <input asp-for="TermsAccepted" class="form-check-input" type="checkbox" id="TermsAccepted" />
+                            <label asp-for="TermsAccepted" class="form-check-label" for="TermsAccepted">
+                                I understand and accept the
+                                <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">terms and conditions</a>.
                             </label>
-                            <span asp-validation-for="TermsAccepted" class="text-danger d-block"></span>
+                            <span asp-validation-for="TermsAccepted" class="text-danger d-block small"></span>
                         </div>
 
-                        <div class="text-end">
-                            <a asp-action="Step3" class="btn btn-secondary me-2">Back</a>
-                            <button type="submit" class="btn btn-success">Complete Registration</button>
+                        <div class="text-end mt-3">
+                            <a asp-action="Step3" class="btn btn-outline-secondary rounded-3 me-2">Back</a>
+                            <button type="submit" class="btn btn-success rounded-3">Complete Registration</button>
                         </div>
                     </form>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Terms Modal -->
+<div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content rounded-4">
+            <div class="modal-header">
+                <h5 class="modal-title" id="termsModalLabel">Terms & Conditions</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="font-family: 'Cormorant Garamond', serif; line-height: 1.7;">
+                <p><strong>1. Respect and Etiquette</strong></p>
+                <p>Please treat all users of the Warathatul Ambiya Library with respect. Refrain from offensive, disruptive, or inappropriate behavior while using our services.</p>
+
+                <p><strong>2. Intellectual Property</strong></p>
+                <p>All content is shared solely for educational purposes. Redistribution of digital or printed material without proper consent is not allowed.</p>
+
+                <p><strong>3. Loan Usage</strong></p>
+                <p>Borrowed books must be returned on time and in good condition. Late returns may incur limitations or bans on borrowing privileges.</p>
+
+                <p><strong>4. Privacy</strong></p>
+                <p>We value your privacy. Your personal information will not be shared with third parties without your consent, in line with GDPR policies.</p>
+
+                <p><strong>5. System Abuse</strong></p>
+                <p>Do not attempt to exploit or misuse the library system. Violations may lead to suspension or permanent deactivation.</p>
+
+                <p class="mt-4"><em>By checking the box above, you confirm that you understand and agree to these terms.</em></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary rounded-3" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
