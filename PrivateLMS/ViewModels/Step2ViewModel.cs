@@ -17,6 +17,8 @@ namespace PrivateLMS.ViewModels
         [DataType(DataType.Password)]
         [Compare("Password", ErrorMessage = "Passwords do not match")]
         [Display(Name = "Confirm Password")]
+        [RegularExpression(@"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{6,}$", ErrorMessage = "Password must contain at least one letter and one number.")]
+
         public string ConfirmPassword { get; set; } = string.Empty;
     }
 }

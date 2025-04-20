@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using PrivateLMS.Data;
 using PrivateLMS.Models;
+using PrivateLMS.Services;
 using PrivateLMS.ViewModels;
 using System;
 using System.Threading.Tasks;
@@ -14,11 +15,13 @@ namespace PrivateLMS.Controllers
     {
         private readonly LibraryDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IEmailService _emailService;
 
-        public RegistrationController(LibraryDbContext context, UserManager<ApplicationUser> userManager)
+        public RegistrationController(LibraryDbContext context, UserManager<ApplicationUser> userManager, IEmailService emailService)
         {
             _context = context;
             _userManager = userManager;
+            _emailService = emailService;
         }
 
         public IActionResult Step1()
@@ -105,7 +108,7 @@ namespace PrivateLMS.Controllers
                     var user = new ApplicationUser
                     {
                         UserName = TempData["Username"]?.ToString() ?? throw new Exception("Username is missing."),
-                        Email = TempData["Email"]?.ToString(),
+                        Email = TempData["Email"]?.ToString() ?? throw new Exception("Email is missing."),
                         PhoneNumber = TempData["PhoneNumber"]?.ToString(),
                         FirstName = TempData["FirstName"]?.ToString() ?? throw new Exception("FirstName is missing."),
                         LastName = TempData["LastName"]?.ToString() ?? throw new Exception("LastName is missing."),
@@ -117,7 +120,8 @@ namespace PrivateLMS.Controllers
                         PostalCode = TempData["PostalCode"]?.ToString(),
                         Country = TempData["Country"]?.ToString(),
                         TermsAccepted = true,
-                        IsApproved = false
+                        IsApproved = false,
+                        EmailConfirmed = false // Ensure email is not confirmed initially
                     };
 
                     var password = TempData["Password"]?.ToString() ?? throw new Exception("Password is missing.");
@@ -133,7 +137,16 @@ namespace PrivateLMS.Controllers
                     if (result.Succeeded)
                     {
                         await _userManager.AddToRoleAsync(user, "User");
-                        TempData["SuccessMessage"] = "Registration successful!";
+
+                        // Generate email verification token
+                        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                        var callbackUrl = Url.Action("ConfirmEmail", "Registration", new { userId = user.Id, token }, protocol: Request.Scheme);
+
+                        // Send verification email
+                        var emailBody = $"Please confirm your email by clicking <a href='{callbackUrl}'>here</a>.";
+                        await _emailService.SendEmailAsync(user.Email, "Confirm Your Email", emailBody);
+
+                        TempData["SuccessMessage"] = "Registration successful! Please check your email to verify your account.";
                         return RedirectToAction("Success");
                     }
 
@@ -151,9 +164,61 @@ namespace PrivateLMS.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> ConfirmEmail(int userId, string token)
+        {
+            if (userId == 0 || string.IsNullOrEmpty(token))
+            {
+                return View("Error");
+            }
+
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null)
+            {
+                return View("Error");
+            }
+
+            var result = await _userManager.ConfirmEmailAsync(user, token);
+            if (result.Succeeded)
+            {
+                return View("ConfirmEmail");
+            }
+
+            return View("Error");
+        }
+
         public IActionResult Success()
         {
             return View();
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult ResendVerificationEmail()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResendVerificationEmail(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null || user.EmailConfirmed)
+            {
+                TempData["ErrorMessage"] = "Invalid email or email already verified.";
+                return View();
+            }
+
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var callbackUrl = Url.Action("ConfirmEmail", "Registration", new { userId = user.Id, token }, protocol: Request.Scheme);
+            var emailBody = $"Please confirm your email by clicking <a href='{callbackUrl}'>here</a>.";
+            await _emailService.SendEmailAsync(user.Email, "Confirm Your Email", emailBody);
+
+            TempData["SuccessMessage"] = "Verification email resent. Please check your inbox.";
+            return RedirectToAction("Success");
         }
     }
 }

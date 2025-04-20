@@ -42,6 +42,30 @@
                 </div>
             </div>
         </div>
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="card text-white" style="background-color: #4A7C59;">
+                <div class="card-body">
+                    <h5 class="card-title">Total Users</h5>
+                    <p class="display-6">@Model.TotalUsers</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="card text-dark" style="background-color: #E8DDB5;">
+                <div class="card-body">
+                    <h5 class="card-title">Unapproved Users</h5>
+                    <p class="display-6">@Model.UnapprovedUsers</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="card text-white" style="background-color: #8B5E34;">
+                <div class="card-body">
+                    <h5 class="card-title">Banned Users</h5>
+                    <p class="display-6">@Model.BannedUsers</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Charts -->
@@ -66,7 +90,7 @@
     <!-- Recent Loans Table -->
     <div class="card mt-5 shadow-sm rounded-4">
         <div class="card-header bg-light">
-            <h5 class="mb-0">📚 Recent Loans</h5>
+            <h5 class="mb-0">Recent Loans</h5>
         </div>
         <div class="card-body table-responsive">
             @if (Model.RecentLoans.Any())
@@ -116,7 +140,7 @@
     <!-- Top Borrowed Books List -->
     <div class="card mt-4 shadow-sm rounded-4">
         <div class="card-header bg-light">
-            <h5 class="mb-0">🔥 Most Borrowed Books</h5>
+            <h5 class="mb-0">Most Borrowed Books</h5>
         </div>
         <div class="card-body">
             @if (Model.TopBorrowedBooks.Any())
