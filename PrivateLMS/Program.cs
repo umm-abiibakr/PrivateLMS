@@ -3,42 +3,85 @@ using Microsoft.EntityFrameworkCore;
 using PrivateLMS.Data;
 using PrivateLMS.Models;
 using PrivateLMS.Services;
+using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Antiforgery;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
 builder.Services.AddControllersWithViews();
 
+// Configure logging
+builder.Services.AddLogging(logging =>
+{
+    logging.AddConsole();
+    logging.AddDebug();
+    logging.SetMinimumLevel(LogLevel.Information);
+});
+builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
+{
+    options.TokenLifespan = TimeSpan.FromHours(1);
+});
+
 // Configure DbContext
 builder.Services.AddDbContext<LibraryDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+           .EnableSensitiveDataLogging(builder.Environment.IsDevelopment()));
 
 // Configure Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole<int>>(options =>
 {
+    // Strengthened password requirements to match RegistrationController
     options.Password.RequireDigit = true;
-    options.Password.RequiredLength = 6;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireUppercase = false;
-    options.Password.RequireLowercase = false;
+    options.Password.RequiredLength = 8;
+    options.Password.RequireNonAlphanumeric = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireLowercase = true;
+
+    // Lockout settings
+    options.Lockout.AllowedForNewUsers = true;
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15); // Reasonable lockout duration
+    options.Lockout.MaxFailedAccessAttempts = 5;
+
+    // Sign-in requirements
+    options.SignIn.RequireConfirmedAccount = true;
+    options.SignIn.RequireConfirmedEmail = true;
+
+    // Token lifespan for email confirmation
+    options.Tokens.EmailConfirmationTokenProvider = TokenOptions.DefaultProvider;
 })
 .AddEntityFrameworkStores<LibraryDbContext>()
 .AddDefaultTokenProviders();
 
-builder.Services.Configure<IdentityOptions>(options =>
-{
-    options.Lockout.AllowedForNewUsers = true;
-    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromDays(36500);
-    options.Lockout.MaxFailedAccessAttempts = 5;
-    options.SignIn.RequireConfirmedAccount = false;
-});
-
-// Configure authentication
+// Configure authentication cookies
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Login/Index";
     options.AccessDeniedPath = "/Home/Error";
+    options.ExpireTimeSpan = TimeSpan.FromHours(12);
+    options.SlidingExpiration = true;
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.Strict;
 });
+
+// Configure session
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.Strict;
+    options.Cookie.IsEssential = true;
+});
+
+// Configure Mailjet settings with validation
+var mailjetSection = builder.Configuration.GetSection("Mailjet");
+if (!mailjetSection.Exists())
+{
+    throw new InvalidOperationException("Mailjet configuration section is missing.");
+}
+builder.Services.Configure<MailjetSettings>(mailjetSection);
 
 // Register services
 builder.Services.AddScoped<ILoanService, LoanService>();
@@ -47,12 +90,17 @@ builder.Services.AddScoped<IPublisherService, PublisherService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IAuthorService, AuthorService>();
 builder.Services.AddScoped<IFineService, FineService>();
-builder.Services.AddScoped<IBookRatingService, BookRatingService>(); 
+builder.Services.AddScoped<IBookRatingService, BookRatingService>();
+builder.Services.AddSingleton<IEmailService, EmailService>();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
+else
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
@@ -61,8 +109,20 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+app.UseSession(); // Must be before UseAuthentication/UseAuthorization
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Add global antiforgery token validation
+app.Use(async (context, next) =>
+{
+    if (context.Request.Method == "POST")
+    {
+        var antiforgery = context.RequestServices.GetService<IAntiforgery>();
+        await antiforgery.ValidateRequestAsync(context);
+    }
+    await next(context);
+});
 
 app.MapControllerRoute(
     name: "default",

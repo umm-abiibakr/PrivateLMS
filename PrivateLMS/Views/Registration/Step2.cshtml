@@ -1,48 +1,54 @@
 ﻿@model PrivateLMS.ViewModels.Step2ViewModel
 @{
-    ViewData["Title"] = "Registration - Step 2";
+    ViewData["Title"] = "Step 2: Login Credentials";
 }
 
-<div class="container mt-5">
+<div class="container mt-5" style="font-family: 'Cormorant Garamond', serif;">
     <h2 class="text-center mb-4">Step 2: Login Credentials</h2>
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <form asp-action="Step2" method="post">
+            <div class="card shadow-sm border-0 rounded-4" style="background-color: #fffaf3;">
+                <div class="card-body p-4">
+                    <form asp-action="Step2" method="post" novalidate>
                         <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
                         <div class="mb-3">
-                            <label asp-for="Username" class="form-label">Username</label>
-                            <input asp-for="Username" class="form-control" />
-                            <span asp-validation-for="Username" class="text-danger"></span>
+                            <label asp-for="Username" class="form-label">
+                                Username <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Username" class="form-control rounded-3" />
+                            <span asp-validation-for="Username" class="text-danger small"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="Password" class="form-label">Password</label>
+                            <label asp-for="Password" class="form-label">
+                                Password <span class="text-danger">*</span>
+                            </label>
                             <div class="input-group">
-                                <input asp-for="Password" class="form-control" id="passwordInput" type="password" />
-                                <button type="button" class="btn btn-outline-secondary" id="togglePassword">
-                                    <i class="bi bi-eye-slash" id="togglePasswordIcon"></i>
+                                <input asp-for="Password" class="form-control rounded-start-3" id="passwordInput" type="password" />
+                                <button type="button" class="btn btn-outline-secondary rounded-end-3" id="togglePassword" aria-label="Toggle password visibility">
+                                    <i class="bi bi-eye-slash" id="togglePasswordIcon" role="img"></i>
                                 </button>
                             </div>
-                            <span asp-validation-for="Password" class="text-danger"></span>
+                            <span asp-validation-for="Password" class="text-danger small"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="ConfirmPassword" class="form-label">Confirm Password</label>
+                            <label asp-for="ConfirmPassword" class="form-label">
+                                Confirm Password <span class="text-danger">*</span>
+                            </label>
                             <div class="input-group">
-                                <input asp-for="ConfirmPassword" class="form-control" id="confirmPasswordInput" type="password" />
-                                <button type="button" class="btn btn-outline-secondary" id="toggleConfirmPassword">
-                                    <i class="bi bi-eye-slash" id="toggleConfirmPasswordIcon"></i>
+                                <input asp-for="ConfirmPassword" class="form-control rounded-start-3" id="confirmPasswordInput" type="password" />
+                                <button type="button" class="btn btn-outline-secondary rounded-end-3" id="toggleConfirmPassword" aria-label="Toggle confirm password visibility">
+                                    <i class="bi bi-eye-slash" id="toggleConfirmPasswordIcon" role="img"></i>
                                 </button>
                             </div>
-                            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                            <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
                         </div>
 
-                        <div class="text-end">
-                            <a asp-action="Step1" class="btn btn-secondary me-2">Back</a>
-                            <button type="submit" class="btn btn-primary">Next</button>
+                        <div class="text-end mt-4">
+                            <a asp-action="Step1" class="btn btn-outline-secondary me-2 rounded-3">Back</a>
+                            <button type="submit" class="btn btn-primary rounded-3">Next</button>
                         </div>
                     </form>
                 </div>
@@ -52,15 +58,19 @@
 </div>
 
 @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
     <script>
         const toggleVisibility = (inputId, iconId) => {
             const input = document.getElementById(inputId);
             const icon = document.getElementById(iconId);
-            icon.parentElement.addEventListener('click', () => {
-                const show = input.type === 'password';
-                input.type = show ? 'text' : 'password';
-                icon.classList.toggle('bi-eye', show);
-                icon.classList.toggle('bi-eye-slash', !show);
+            const button = icon.closest('button');
+
+            button.addEventListener('click', () => {
+                const isPassword = input.type === 'password';
+                input.type = isPassword ? 'text' : 'password';
+                icon.classList.toggle('bi-eye', isPassword);
+                icon.classList.toggle('bi-eye-slash', !isPassword);
             });
         };
 

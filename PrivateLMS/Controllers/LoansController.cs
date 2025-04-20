@@ -18,17 +18,20 @@ namespace PrivateLMS.Controllers
         private readonly ILoanService _loanService;
         private readonly IFineService _fineService;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IEmailService _emailService;
 
         public LoansController(
             LibraryDbContext context,
             ILoanService loanService,
             IFineService fineService,
-            UserManager<ApplicationUser> userManager)
+            UserManager<ApplicationUser> userManager,
+            IEmailService emailService)
         {
             _context = context;
             _loanService = loanService;
             _fineService = fineService;
             _userManager = userManager;
+            _emailService = emailService;
         }
 
         [Authorize(Roles = "Admin")]
@@ -85,6 +88,14 @@ namespace PrivateLMS.Controllers
                     return RedirectToAction("Index", "Login");
                 }
 
+                // Check active loan count
+                var activeLoanCount = await _loanService.GetActiveLoanCountAsync(user.Id);
+                if (activeLoanCount >= 3)
+                {
+                    TempData["ErrorMessage"] = "You cannot borrow more than three books at a time.";
+                    return RedirectToAction("MyLoans");
+                }
+
                 var loanViewModel = await _loanService.GetLoanFormAsync(bookId.Value);
                 if (loanViewModel == null)
                 {
@@ -129,6 +140,14 @@ namespace PrivateLMS.Controllers
                     return RedirectToAction("Index", "Login");
                 }
 
+                // Check active loan count
+                var activeLoanCount = await _loanService.GetActiveLoanCountAsync(user.Id);
+                if (activeLoanCount >= 3)
+                {
+                    TempData["ErrorMessage"] = "You cannot borrow more than three books at a time.";
+                    return RedirectToAction("MyLoans");
+                }
+
                 var success = await _loanService.CreateLoanAsync(model);
                 if (!success)
                 {
@@ -136,7 +155,21 @@ namespace PrivateLMS.Controllers
                     return View("NotAvailable");
                 }
 
-                TempData["SuccessMessage"] = $"Successfully loaned the book: {model.BookTitle}.";
+                // Send email notification
+                var emailBody = $@"
+                    <h2>Book Loan Confirmation</h2>
+                    <p>Dear {user.FirstName} {user.LastName},</p>
+                    <p>You have successfully loaned the following book:</p>
+                    <ul>
+                        <li><strong>Book Title:</strong> {model.BookTitle}</li>
+                        <li><strong>Loan Date:</strong> {DateTime.UtcNow.ToString("MMMM dd, yyyy")}</li>
+                        <li><strong>Due Date:</strong> {model.DueDate.ToString()}</li>
+                    </ul>
+                    <p>Please return the book by the due date to avoid fines.</p>
+                    <p>Baarakallaahu Feekum,<br/>Admin@WarathatulAmbiya</p>";
+                await _emailService.SendEmailAsync(user.Email, "Book Loan Confirmation", emailBody);
+
+                TempData["SuccessMessage"] = $"Successfully loaned the book: {model.BookTitle}. A confirmation email has been sent.";
                 return RedirectToAction("MyLoans");
             }
             catch (Exception ex)
@@ -331,8 +364,7 @@ namespace PrivateLMS.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index)); // back to loan list
+            return RedirectToAction(nameof(Index));
         }
-
     }
 }
