@@ -1,45 +1,43 @@
-﻿@model IEnumerable<PrivateLMS.Models.UserActivity>
-@{
-    ViewData["Title"] = "User Activity Log";
-    int? userId = ViewBag.UserId;
-    string actionType = ViewBag.ActionType;
-    string[] actionTypes = ViewBag.ActionTypes;
-}
+﻿@model PagedResultViewModel<UserActivity>
 
 <div class="container mt-5">
-    <h2 class="text-center mb-4">User Activity Log @(userId.HasValue ? $"for User ID {userId}" : "")</h2>
+    <h2 class="text-center mb-4">User Activity Log</h2>
 
-    <div class="card mb-4">
+    <!-- Filter Panel -->
+    <div class="card shadow-sm mb-4">
         <div class="card-body">
-            <form asp-action="Index" method="get" class="row g-3 align-items-end">
-                <div class="col-md-4">
-                    <label for="userId" class="form-label">User ID (optional)</label>
-                    <input type="number" name="userId" id="userId" class="form-control" value="@(userId?.ToString() ?? "")" />
-                </div>
-                <div class="col-md-4">
-                    <label for="actionType" class="form-label">Action Type</label>
-                    <select name="actionType" id="actionType" class="form-select">
-                        <option value="">All</option>
-                        @foreach (var type in actionTypes)
-                        {
-                            <option value="@type" selected="@(actionType == type)">@type</option>
-                        }
-                    </select>
-                </div>
-                <div class="col-md-4 text-end">
-                    <button type="submit" class="btn btn-primary w-100">Filter</button>
+            <form asp-action="Index" method="get">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label for="userId" class="form-label">User ID</label>
+                        <input type="number" name="userId" id="userId" value="@ViewBag.UserId" class="form-control" placeholder="e.g. 102" />
+                    </div>
+                    <div class="col-md-4">
+                        <label for="actionType" class="form-label">Action Type</label>
+                        <select name="actionType" id="actionType" class="form-select">
+                            <option value="">All</option>
+                            @if (ViewBag.ActionTypes is IEnumerable<string> types)
+                            {
+                                foreach (var type in types)
+                                {
+                                    <option value="@type" selected="@(type == (string)ViewBag.ActionType ? "selected" : null)">
+                                        @type
+                                    </option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-4 align-self-end text-end">
+                        <button type="submit" class="btn btn-primary">Apply Filter</button>
+                    </div>
                 </div>
             </form>
         </div>
     </div>
 
-    @if (!Model.Any())
-    {
-        <div class="alert alert-info text-center">No activities found.</div>
-    }
-    else
-    {
-        <div class="table-responsive">
+    <!-- Activity Log Table -->
+    <div class="card shadow-sm">
+        <div class="card-body">
             <table class="table table-striped table-hover align-middle">
                 <thead class="table-light">
                     <tr>
@@ -47,24 +45,64 @@
                         <th>Action</th>
                         <th>Timestamp</th>
                         <th>Details</th>
+                        <th>IP Address</th>
+                        <th>Entity</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var activity in Model)
+                    @if (Model.Items.Any())
+                    {
+                        foreach (var activity in Model.Items)
+                        {
+                            <tr>
+                                <td>@(activity.User != null ? $"{activity.User.FirstName} {activity.User.LastName}" : "Unknown")</td>
+                                <td>@activity.Action</td>
+                                <td>@activity.Timestamp.ToString("MMMM dd, yyyy • HH:mm")</td>
+                                <td>@activity.Details</td>
+                                <td>@(activity.IPAddress ?? "N/A")</td>
+                                <td>@(activity.EntityType != null ? $"{activity.EntityType} ID: {activity.EntityId}" : "N/A")</td>
+                                <td>@(activity.Status ?? "N/A")</td>
+                            </tr>
+                        }
+                    }
+                    else
                     {
                         <tr>
-                            <td>@activity.User.UserName</td>
-                            <td>@activity.Action</td>
-                            <td>@activity.Timestamp.ToString("g")</td>
-                            <td>@activity.Details</td>
+                            <td colspan="7" class="text-center text-muted">No recorded activities found.</td>
                         </tr>
                     }
                 </tbody>
             </table>
         </div>
-    }
-
-    <div class="text-end mt-3">
-        <a asp-controller="Users" asp-action="Index" class="btn btn-outline-secondary">Back to Users</a>
     </div>
+
+    <!-- Pagination -->
+    <nav aria-label="Activity navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+                <a class="page-link" asp-action="Index"
+                   asp-route-pageNumber="@(Model.CurrentPage - 1)"
+                   asp-route-userId="@ViewBag.UserId"
+                   asp-route-actionType="@ViewBag.ActionType">Previous</a>
+            </li>
+
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                    <a class="page-link" asp-action="Index"
+                       asp-route-pageNumber="@i"
+                       asp-route-userId="@ViewBag.UserId"
+                       asp-route-actionType="@ViewBag.ActionType">@i</a>
+                </li>
+            }
+
+            <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+                <a class="page-link" asp-action="Index"
+                   asp-route-pageNumber="@(Model.CurrentPage + 1)"
+                   asp-route-userId="@ViewBag.UserId"
+                   asp-route-actionType="@ViewBag.ActionType">Next</a>
+            </li>
+        </ul>
+    </nav>
 </div>

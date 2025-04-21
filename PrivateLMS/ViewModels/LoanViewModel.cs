@@ -9,7 +9,7 @@ namespace PrivateLMS.ViewModels
 
         public int BookId { get; set; }
 
-        [Display(Name = "Book Title")]
+        [Display(Name = "Book Title")] 
         public string? BookTitle { get; set; }
 
         public int UserId { get; set; }
