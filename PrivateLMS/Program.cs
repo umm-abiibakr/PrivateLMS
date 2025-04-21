@@ -5,6 +5,7 @@ using PrivateLMS.Models;
 using PrivateLMS.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Antiforgery;
+using PrivateLMS.HostedServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -92,6 +93,8 @@ builder.Services.AddScoped<IAuthorService, AuthorService>();
 builder.Services.AddScoped<IFineService, FineService>();
 builder.Services.AddScoped<IBookRatingService, BookRatingService>();
 builder.Services.AddSingleton<IEmailService, EmailService>();
+builder.Services.AddHostedService<DueDateReminderService>();
+builder.Services.AddHostedService<OverdueReminderAndFineService>();
 
 var app = builder.Build();
 

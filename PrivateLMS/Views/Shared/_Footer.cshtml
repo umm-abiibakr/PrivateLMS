@@ -1,38 +1,20 @@
-﻿<style>
-    footer {
-        font-family: 'Noto Sans Arabic', sans-serif;
-        background-color: #f8f9fa;
-        border-top: 1px solid #dee2e6;
-        padding-top: 1.5rem;
-        padding-bottom: 1.5rem;
-    }
-
-        footer p,
-        footer a {
-            margin-bottom: 0.5rem;
-            color: #6c757d;
-            text-decoration: none;
-            font-size: 0.95rem;
-        }
-
-            footer a:hover {
-                color: #343a40;
-                text-decoration: underline;
-            }
-
-        footer .branding {
-            font-weight: 600;
-            font-size: 1rem;
-        }
-</style>
-
-<footer class="text-center">
+﻿<footer class="text-center">
     <div class="container">
-        <p class="branding mb-1">Warathatul Ambiya</p>
-        <a asp-controller="Home" asp-action="Index">Back to Home</a>
+        <p class="branding">Warathatul Ambiya</p>
         <p>
-            © @DateTime.Now.Year - PrivateLMS -
-            <a asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <i class="bi bi-house icon"></i>
+            <a asp-controller="Home" asp-action="Index">Back to Home</a>
+        </p>
+        <p>
+            <i class="bi bi-shield-lock icon"></i>
+            <a asp-controller="StaticPages" asp-action="Privacy">Privacy Policy</a>
+        </p>
+        <p>
+            <i class="bi bi-envelope icon"></i>
+            <a href="mailto:admin@warathatulambiya.com">admin@warathatulambiya.com</a>
+        </p>
+        <p>
+            © @DateTime.Now.Year - PrivateLMS
         </p>
     </div>
 </footer>

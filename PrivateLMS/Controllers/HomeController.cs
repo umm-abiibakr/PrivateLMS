@@ -118,12 +118,22 @@ namespace PrivateLMS.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
+        public IActionResult About()
+        {
+            return View();
+        }
+
+        public IActionResult Terms()
+        {
+            return View();
+        }
+
         public IActionResult Privacy()
         {
             return View();
         }
 
-        public IActionResult About()
+        public IActionResult Faq()
         {
             return View();
         }

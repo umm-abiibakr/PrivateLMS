@@ -90,9 +90,9 @@ namespace PrivateLMS.Controllers
 
                 // Check active loan count
                 var activeLoanCount = await _loanService.GetActiveLoanCountAsync(user.Id);
-                if (activeLoanCount >= 3)
+                if (activeLoanCount >= 2)
                 {
-                    TempData["ErrorMessage"] = "You cannot borrow more than three books at a time.";
+                    TempData["ErrorMessage"] = "You cannot borrow more than two books at a time.";
                     return RedirectToAction("MyLoans");
                 }
 
@@ -148,6 +148,17 @@ namespace PrivateLMS.Controllers
                     return RedirectToAction("MyLoans");
                 }
 
+                // Fetch the book title from the database to ensure it's not null
+                var book = await _context.Books.FindAsync(model.BookId);
+                if (book != null)
+                {
+                    model.BookTitle = book.Title;
+                }
+                else
+                {
+                    model.BookTitle = "Unknown Book"; // Fallback in case book is not found
+                }
+
                 var success = await _loanService.CreateLoanAsync(model);
                 if (!success)
                 {
@@ -155,7 +166,7 @@ namespace PrivateLMS.Controllers
                     return View("NotAvailable");
                 }
 
-                // Send email notification
+                // Send email notification to user
                 var emailBody = $@"
                     <h2>Book Loan Confirmation</h2>
                     <p>Dear {user.FirstName} {user.LastName},</p>
@@ -168,6 +179,22 @@ namespace PrivateLMS.Controllers
                     <p>Please return the book by the due date to avoid fines.</p>
                     <p>Baarakallaahu Feekum,<br/>Admin@WarathatulAmbiya</p>";
                 await _emailService.SendEmailAsync(user.Email, "Book Loan Confirmation", emailBody);
+
+                // Send email notification to admin
+                var adminEmailBody = $@"
+                    <h2>New Loan Request Notification</h2>
+                    <p>A new book loan request has been submitted.</p>
+                    <p><strong>Details:</strong></p>
+                    <ul>
+                    <li><strong>Member Name:</strong> {user.FirstName} {user.LastName}</li>
+                    <li><strong>Member Email:</strong> {user.Email}</li>
+                    <li><strong>Book Title:</strong> {model.BookTitle}</li>
+                    <li><strong>Loan Date:</strong> {DateTime.UtcNow.ToString("MMMM dd, yyyy")}</li>
+                    <li><strong>Due Date:</strong> {model.DueDate.ToString()}</li>
+                    </ul>
+                    <p>Please review the request in the Library Management System.</p>
+                    <p>Baarakallaahu Feekum,<br/>Warathatul Ambiya Library System</p>";
+                await _emailService.SendEmailAsync("admin@warathatulambiya.com", "New Loan Request", adminEmailBody);
 
                 TempData["SuccessMessage"] = $"Successfully loaned the book: {model.BookTitle}. A confirmation email has been sent.";
                 return RedirectToAction("MyLoans");
@@ -238,6 +265,32 @@ namespace PrivateLMS.Controllers
                     TempData["ErrorMessage"] = "The loan record does not exist or has already been returned.";
                     return View("AlreadyReturned");
                 }
+
+                // Fetch loan details to get user and book information
+                var loan = await _context.LoanRecords
+                    .Include(lr => lr.User)
+                    .Include(lr => lr.Book)
+                    .FirstOrDefaultAsync(lr => lr.LoanRecordId == model.LoanRecordId);
+
+                if (loan == null)
+                {
+                    TempData["ErrorMessage"] = "Loan record not found.";
+                    return View("AlreadyReturned");
+                }
+
+                // Send confirmation email to user
+                var userEmailBody = $@"
+                    <h2>Book Return Confirmation</h2>
+                    <p>Dear {loan.User.FirstName} {loan.User.LastName},</p>
+                    <p>You have successfully returned the following book:</p>
+                    <ul>
+                    <li><strong>Book Title:</strong> {loan.Book.Title}</li>
+                    <li><strong>Return Date:</strong> {DateTime.UtcNow.ToString("MMMM dd, yyyy")}</li>
+                    </ul>
+                    <p>Please check your account for any applicable fines if the book was returned late.</p>
+                    <p>Baarakallaahu Feekum,<br/>Admin@WarathatulAmbiya</p>";
+
+                await _emailService.SendEmailAsync(loan.User.Email, "Book Return Confirmation", userEmailBody);
 
                 TempData["SuccessMessage"] = "Successfully returned the book.";
                 return RedirectToAction("Index");
