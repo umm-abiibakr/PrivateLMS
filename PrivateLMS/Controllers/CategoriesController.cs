@@ -19,12 +19,12 @@ namespace PrivateLMS.Controllers
             _categoryService = categoryService;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 10)
         {
             try
             {
-                var categories = await _categoryService.GetAllCategoriesAsync();
-                return View(categories);
+                var pagedCategories = await _categoryService.GetPagedCategoriesAsync(page, pageSize);
+                return View(pagedCategories);
             }
             catch (Exception ex)
             {
@@ -186,7 +186,7 @@ namespace PrivateLMS.Controllers
                 {
                     TempData["ErrorMessage"] = "Category not found or cannot be deleted due to associated books.";
                     return PartialView("_NotFound");
-                }
+                } 
 
                 TempData["SuccessMessage"] = "Category deleted successfully.";
                 return RedirectToAction(nameof(Index));

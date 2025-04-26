@@ -304,7 +304,7 @@ namespace PrivateLMS.Migrations
                             AccessFailedCount = 0,
                             Address = "123 Admin St.",
                             City = "Admin City",
-                            ConcurrencyStamp = "3875a368-0b63-42aa-b389-347861741ce2",
+                            ConcurrencyStamp = "495fa2ce-9dc4-47e3-9853-040522b12e12",
                             Country = "Admin Country",
                             DateOfBirth = new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin@privatelms.com",
@@ -332,7 +332,7 @@ namespace PrivateLMS.Migrations
                             AccessFailedCount = 0,
                             Address = "456 User Rd.",
                             City = "User City",
-                            ConcurrencyStamp = "d76b9774-35c0-49ec-9c0d-5a00e464d66f",
+                            ConcurrencyStamp = "9d3c6498-d97c-4daf-84ec-8b19a3c93f48",
                             Country = "User Country",
                             DateOfBirth = new DateTime(1995, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "john.doe@example.com",
@@ -360,7 +360,7 @@ namespace PrivateLMS.Migrations
                             AccessFailedCount = 0,
                             Address = "456 Admin Ave",
                             City = "Admin City",
-                            ConcurrencyStamp = "16a8e8bd-930c-465c-a37a-b00bc49a240b",
+                            ConcurrencyStamp = "e577f4dd-9930-4ea6-81d6-66e707a1f3f5",
                             Country = "Admin Country",
                             DateOfBirth = new DateTime(1985, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin2@privatelms.com",
@@ -645,6 +645,66 @@ namespace PrivateLMS.Migrations
                         });
                 });
 
+            modelBuilder.Entity("PrivateLMS.Models.ChatbotUser", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ChatbotUsers");
+                });
+
+            modelBuilder.Entity("PrivateLMS.Models.Feedback", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ChatbotUserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Comments")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("SubmittedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChatbotUserId");
+
+                    b.ToTable("Feedbacks");
+                });
+
             modelBuilder.Entity("PrivateLMS.Models.Fine", b =>
                 {
                     b.Property<int>("Id")
@@ -823,19 +883,15 @@ namespace PrivateLMS.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("EntityType")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("IPAddress")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SessionId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Status")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("Timestamp")
@@ -956,6 +1012,17 @@ namespace PrivateLMS.Migrations
                         .IsRequired();
 
                     b.Navigation("Book");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("PrivateLMS.Models.Feedback", b =>
+                {
+                    b.HasOne("PrivateLMS.Models.ChatbotUser", "User")
+                        .WithMany()
+                        .HasForeignKey("ChatbotUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });

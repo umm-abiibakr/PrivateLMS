@@ -1,8 +1,11 @@
-@model IEnumerable<PrivateLMS.ViewModels.BookViewModel>
+@model PrivateLMS.Models.PagedResultViewModel<PrivateLMS.ViewModels.BookViewModel>
 @{
     ViewData["Title"] = "Books";
     var authors = ViewBag.Authors as IEnumerable<PrivateLMS.Models.Author>;
     var categories = ViewBag.Categories as IEnumerable<PrivateLMS.Models.Category>;
+    var searchTerm = ViewBag.SearchTerm as string;
+    var categoryId = ViewBag.CategoryId as int?;
+    var authorId = ViewBag.AuthorId as int?;
 }
 
 <div class="container mt-5">
@@ -11,14 +14,14 @@
     <!-- Search and Filter Form -->
     <form asp-action="Index" method="get" class="row g-3 justify-content-center mb-4">
         <div class="col-md-4">
-            <input type="text" name="searchTerm" class="form-control" placeholder="Search by title or description..." value="@ViewBag.SearchTerm" />
+            <input type="text" name="searchTerm" class="form-control" placeholder="Search by title or description..." value="@searchTerm" />
         </div>
         <div class="col-md-3">
             <select name="categoryId" class="form-select">
                 <option value="">All Categories</option>
                 @foreach (var category in categories)
                 {
-                    <option value="@category.CategoryId" selected="@(ViewBag.CategoryId == category.CategoryId)">
+                    <option value="@category.CategoryId" selected="@(categoryId == category.CategoryId)">
                         @category.CategoryName
                     </option>
                 }
@@ -29,7 +32,7 @@
                 <option value="">All Authors</option>
                 @foreach (var author in authors)
                 {
-                    <option value="@author.AuthorId" selected="@(ViewBag.AuthorId == author.AuthorId)">
+                    <option value="@author.AuthorId" selected="@(authorId == author.AuthorId)">
                         @author.Name
                     </option>
                 }
@@ -47,14 +50,14 @@
         </div>
     }
 
-    @if (!Model.Any())
+    @if (!Model.Items.Any())
     {
         <p class="text-center text-muted">No books found matching your criteria.</p>
     }
     else
     {
         <div class="row row-cols-1 row-cols-md-3 g-4">
-            @foreach (var book in Model)
+            @foreach (var book in Model.Items)
             {
                 <div class="col">
                     <div class="card h-100 shadow-sm">
@@ -109,5 +112,43 @@
                 </div>
             }
         </div>
+
+        <!-- Pagination Controls -->
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                @if (Model.HasPreviousPage)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Index" asp-route-page="@(Model.CurrentPage - 1)" asp-route-pageSize="@Model.PageSize" asp-route-searchTerm="@searchTerm" asp-route-categoryId="@categoryId" asp-route-authorId="@authorId">Previous</a>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item disabled">
+                        <span class="page-link">Previous</span>
+                    </li>
+                }
+
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-pageSize="@Model.PageSize" asp-route-searchTerm="@searchTerm" asp-route-categoryId="@categoryId" asp-route-authorId="@authorId">@i</a>
+                    </li>
+                }
+
+                @if (Model.HasNextPage)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Index" asp-route-page="@(Model.CurrentPage + 1)" asp-route-pageSize="@Model.PageSize" asp-route-searchTerm="@searchTerm" asp-route-categoryId="@categoryId" asp-route-authorId="@authorId">Next</a>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item disabled">
+                        <span class="page-link">Next</span>
+                    </li>
+                }
+            </ul>
+        </nav>
     }
 </div>

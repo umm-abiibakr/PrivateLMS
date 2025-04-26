@@ -19,12 +19,12 @@ namespace PrivateLMS.Controllers
         }
 
         [AllowAnonymous]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 10)
         {
             try
             {
-                var authors = await _authorService.GetAllAuthorsAsync();
-                var viewModels = authors.Select(a => new AuthorViewModel
+                var pagedAuthors = await _authorService.GetPagedAuthorsAsync(page, pageSize);
+                var viewModels = pagedAuthors.Items.Select(a => new AuthorViewModel
                 {
                     AuthorId = a.AuthorId,
                     Name = a.Name,
@@ -33,7 +33,17 @@ namespace PrivateLMS.Controllers
                     DeathDate = a.DeathDate,
                     BookCount = a.Books.Count
                 }).ToList();
-                return View(viewModels);
+
+                var pagedViewModel = new PagedResultViewModel<AuthorViewModel>
+                {
+                    Items = viewModels,
+                    CurrentPage = pagedAuthors.CurrentPage,
+                    PageSize = pagedAuthors.PageSize,
+                    TotalItems = pagedAuthors.TotalItems,
+                    TotalPages = pagedAuthors.TotalPages
+                };
+
+                return View(pagedViewModel);
             }
             catch (Exception ex)
             {

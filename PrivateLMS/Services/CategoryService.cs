@@ -98,5 +98,34 @@ namespace PrivateLMS.Services
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<PagedResultViewModel<CategoryViewModel>> GetPagedCategoriesAsync(int page, int pageSize)
+        {
+            var query = _context.Categories
+                .Include(c => c.BookCategories)
+                .AsNoTracking();
+
+            var totalItems = await query.CountAsync();
+            var categories = await query
+                .OrderBy(c => c.CategoryName)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(c => new CategoryViewModel
+                {
+                    CategoryId = c.CategoryId,
+                    CategoryName = c.CategoryName,
+                    BookCount = c.BookCategories.Count
+                })
+                .ToListAsync();
+
+            return new PagedResultViewModel<CategoryViewModel>
+            {
+                Items = categories,
+                CurrentPage = page,
+                PageSize = pageSize,
+                TotalItems = totalItems,
+                TotalPages = (int)Math.Ceiling((double)totalItems / pageSize)
+            };
+        }
     }
 }

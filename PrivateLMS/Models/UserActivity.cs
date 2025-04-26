@@ -13,11 +13,11 @@ namespace PrivateLMS.Models
         [Required]
         public DateTime Timestamp { get; set; }
         public string Details { get; set; }
-        public string IPAddress { get; set; }
-        public string SessionId { get; set; }
+        public string? IPAddress { get; set; }
+        public string? SessionId { get; set; }
         public int? EntityId { get; set; }
-        public string EntityType { get; set; }
-        public string Status { get; set; }
+        public string? EntityType { get; set; }
+        public string? Status { get; set; }
         public ApplicationUser User { get; set; }
     }
 }

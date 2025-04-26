@@ -1,4 +1,6 @@
-/* Base Layout */
+/* ================================
+   Base Layout
+================================== */
 body {
     font-family: 'Cormorant Garamond', serif;
     background-color: #fdfbf7;
@@ -9,7 +11,9 @@ body {
     padding: 0;
 }
 
-/* Headings */
+/* ================================
+   Headings
+================================== */
 h1, h2, h3, h4, h5 {
     font-family: 'Cormorant Garamond', serif;
     color: #4a3c2e;
@@ -17,7 +21,9 @@ h1, h2, h3, h4, h5 {
     margin-bottom: 0.5rem;
 }
 
-/* Navbar */
+/* ================================
+   Navbar
+================================== */
 .navbar {
     font-family: 'Poppins', sans-serif;
     background-color: #3b2f2f;
@@ -38,7 +44,9 @@ h1, h2, h3, h4, h5 {
         color: #fff !important;
     }
 
-/* Buttons */
+/* ================================
+   Buttons
+================================== */
 .btn {
     font-family: 'Cormorant Garamond', serif;
     font-size: 16px;
@@ -88,7 +96,9 @@ h1, h2, h3, h4, h5 {
         border-color: #cfa464;
     }
 
-/* Forms */
+/* ================================
+   Forms
+================================== */
 .form-label {
     font-weight: 500;
     color: #4a3c2e;
@@ -100,7 +110,9 @@ h1, h2, h3, h4, h5 {
     color: #3b2f2f;
 }
 
-/* Cards */
+/* ================================
+   Cards
+================================== */
 .card {
     background-color: #fdfbf7;
     border: 1px solid #e5d8c9;
@@ -126,7 +138,9 @@ h1, h2, h3, h4, h5 {
     border-top: none;
 }
 
-/* Utilities */
+/* ================================
+   Utilities
+================================== */
 .text-center {
     text-align: center;
 }
@@ -156,13 +170,15 @@ h1, h2, h3, h4, h5 {
     font-size: 16px;
 }
 
-/* Footer */
+/* ================================
+   Footer
+================================== */
 footer {
     background-color: #f3e6d4;
     color: #4a3c2e;
     font-size: 14px;
     font-family: 'Cormorant Garamond', serif;
-    padding: 20px 0;
+    padding: 15px 0;
     text-align: center;
 }
 
@@ -171,11 +187,33 @@ footer {
         text-decoration: underline;
     }
 
+    footer p,
+    footer a {
+        margin-bottom: 0.5rem;
+        color: #4a3c2e;
+        font-size: 0.95rem;
+        font-weight: bold;
+        text-decoration: none;
+    }
+
         footer a:hover {
-            text-decoration: none;
+            text-decoration: underline;
         }
 
-/* Poetic Elements */
+    footer .branding {
+        font-weight: 600;
+        font-size: 1.1rem;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.2rem;
+    }
+
+    footer .icon {
+        margin-right: 6px;
+    }
+
+/* ================================
+   Custom Poetic Elements
+================================== */
 .hadith-banner {
     background-color: #f3e6d4;
     border-left: 5px solid #a67c52;
@@ -217,8 +255,11 @@ footer {
     margin: 24px 0;
 }
 
-/* Mobile / Responsive */
-@media (min-width: 300px) {
+/* ================================
+   Responsive & Poetic Dashboard
+================================ */
+
+@media (max-width: 576px) {
     .card-body p.display-6 {
         font-size: 1.25rem !important;
     }
@@ -248,7 +289,7 @@ footer {
     }
 }
 
-/* Badges */
+/* Status Badge Styling */
 .badge-returned {
     background-color: #A8D5BA;
     color: #3b2f2f;
@@ -267,35 +308,4 @@ footer {
 .badge-renewed {
     background-color: #8E9AAF;
     color: #fff;
-}
-
-footer {
-    font-family: 'Cormorant Garamond', serif;
-    background-color: #f3e6d4;
-    color: #4a3c2e;
-    padding: 2rem 0;
-    border-top: 1px solid #d8c9b4;
-}
-
-footer p,
-footer a {
-    margin-bottom: 0.5rem;
-    color: #4a3c2e;
-    font-size: 0.95rem;
-    text-decoration: none;
-}
-
-    footer a:hover {
-        text-decoration: underline;
-    }
-
-footer .branding {
-    font-weight: 600;
-    font-size: 1.1rem;
-    letter-spacing: 0.5px;
-    margin-bottom: 0.2rem;
-}
-
-footer .icon {
-    margin-right: 6px;
 }
