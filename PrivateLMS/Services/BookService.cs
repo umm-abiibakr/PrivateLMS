@@ -321,5 +321,82 @@ namespace PrivateLMS.Services
                 })
                 .ToListAsync();
         }
+
+        public async Task<PagedResultViewModel<BookViewModel>> GetPagedBooksAsync(string? searchTerm, int? categoryId, int? authorId, int page, int pageSize)
+        {
+            var query = _context.Books
+                .Include(b => b.Author)
+                .Include(b => b.Publisher)
+                .Include(b => b.BookCategories)
+                .ThenInclude(bc => bc.Category)
+                .Include(b => b.LoanRecords)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                searchTerm = searchTerm.Trim().ToLower();
+                query = query.Where(b => b.Title.ToLower().Contains(searchTerm) ||
+                                        (b.Description != null && b.Description.ToLower().Contains(searchTerm)));
+            }
+
+            if (categoryId.HasValue)
+            {
+                query = query.Where(b => b.BookCategories.Any(bc => bc.CategoryId == categoryId.Value));
+            }
+
+            if (authorId.HasValue)
+            {
+                query = query.Where(b => b.AuthorId == authorId.Value);
+            }
+
+            var totalItems = await query.CountAsync();
+            var books = await query
+                .OrderBy(b => b.Title)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(b => new BookViewModel
+                {
+                    BookId = b.BookId,
+                    Title = b.Title,
+                    Description = b.Description,
+                    AuthorId = b.AuthorId,
+                    PublisherId = b.PublisherId,
+                    ISBN = b.ISBN,
+                    Language = b.Language,
+                    PublishedDate = b.PublishedDate,
+                    AvailableCopies = b.AvailableCopies,
+                    IsAvailable = b.IsAvailable,
+                    CoverImagePath = b.CoverImagePath,
+                    SelectedCategoryIds = b.BookCategories.Select(bc => bc.CategoryId).ToList(),
+                    AvailableCategories = b.BookCategories.Select(bc => new Category
+                    {
+                        CategoryId = bc.CategoryId,
+                        CategoryName = bc.Category.CategoryName
+                    }).ToList()
+                })
+                .ToListAsync();
+
+            // Populate AvailableAuthors, AvailablePublishers, and AvailableCategories for each view model
+            var availableAuthors = await _context.Authors.ToListAsync();
+            var availablePublishers = await _context.Publishers.ToListAsync();
+            var availableCategories = await _context.Categories.ToListAsync();
+
+            foreach (var book in books)
+            {
+                book.AvailableAuthors = availableAuthors;
+                book.AvailablePublishers = availablePublishers;
+                book.AvailableCategories = availableCategories;
+            }
+
+            return new PagedResultViewModel<BookViewModel>
+            {
+                Items = books,
+                CurrentPage = page,
+                PageSize = pageSize,
+                TotalItems = totalItems,
+                TotalPages = (int)Math.Ceiling((double)totalItems / pageSize)
+            };
+        }
     }
+
 }

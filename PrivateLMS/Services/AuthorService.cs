@@ -72,5 +72,25 @@ namespace PrivateLMS.Services
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<PagedResultViewModel<Author>> GetPagedAuthorsAsync(int page, int pageSize)
+        {
+            var totalItems = await _context.Authors.CountAsync();
+            var authors = await _context.Authors
+                .Include(a => a.Books) // Include books if needed for BookCount
+                .OrderBy(a => a.Name)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PagedResultViewModel<Author>
+            {
+                Items = authors,
+                CurrentPage = page,
+                PageSize = pageSize,
+                TotalItems = totalItems,
+                TotalPages = (int)Math.Ceiling((double)totalItems / pageSize)
+            };
+        }
     }
 }

@@ -11,5 +11,6 @@ namespace PrivateLMS.Services
         Task<bool> CreateAuthorAsync(Author author);
         Task<bool> UpdateAuthorAsync(int id, Author author);
         Task<bool> DeleteAuthorAsync(int id);
+        Task<PagedResultViewModel<Author>> GetPagedAuthorsAsync(int page, int pageSize);
     }
 }

@@ -1,13 +1,12 @@
 ﻿<footer class="text-center">
     <div class="container">
         <p class="branding">Warathatul Ambiya</p>
+       
         <p>
-            <i class="bi bi-house icon"></i>
-            <a asp-controller="Home" asp-action="Index">Back to Home</a>
-        </p>
-        <p>
-            <i class="bi bi-shield-lock icon"></i>
-            <a asp-controller="StaticPages" asp-action="Privacy">Privacy Policy</a>
+            <a asp-controller="Home" asp-action="About">About Us  </a>  |
+            <a asp-controller="Home" asp-action="Faq">FAQ  </a>   |
+            <a asp-controller="Home" asp-action="Privacy">Privacy Policy  </a>   |
+            <a asp-controller="Home" asp-action="Terms">Terms and Conditions</a>
         </p>
         <p>
             <i class="bi bi-envelope icon"></i>
@@ -15,6 +14,9 @@
         </p>
         <p>
             © @DateTime.Now.Year - PrivateLMS
+        </p> 
+        <p>
+            <a asp-controller="Home" asp-action="Index">Back to Home</a>
         </p>
     </div>
 </footer>

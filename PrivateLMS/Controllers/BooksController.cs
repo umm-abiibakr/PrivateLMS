@@ -40,26 +40,19 @@ namespace PrivateLMS.Controllers
         }
 
         [AllowAnonymous]
-        public async Task<IActionResult> Index(string? searchTerm = "", int? categoryId = null, int? authorId = null)
+        public async Task<IActionResult> Index(string? searchTerm = "", int? categoryId = null, int? authorId = null, int page = 1, int pageSize = 12)
         {
             try
             {
-                var books = await _bookService.SearchBooksAsync(searchTerm);
-                if (categoryId.HasValue)
-                {
-                    books = books.Where(b => b.SelectedCategoryIds.Contains(categoryId.Value)).ToList();
-                }
-                if (authorId.HasValue)
-                {
-                    books = books.Where(b => b.AuthorId == authorId.Value).ToList();
-                }
+                var pagedBooks = await _bookService.GetPagedBooksAsync(searchTerm, categoryId, authorId, page, pageSize);
 
                 ViewBag.SearchTerm = searchTerm;
                 ViewBag.CategoryId = categoryId;
                 ViewBag.AuthorId = authorId;
                 ViewBag.Categories = await _bookService.GetAllCategoriesAsync();
                 ViewBag.Authors = await _authorService.GetAllAuthorsAsync();
-                return View(books ?? new List<BookViewModel>());
+
+                return View(pagedBooks);
             }
             catch (Exception ex)
             {

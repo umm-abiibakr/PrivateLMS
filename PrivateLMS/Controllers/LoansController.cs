@@ -84,7 +84,7 @@ namespace PrivateLMS.Controllers
                 var user = await _userManager.GetUserAsync(User);
                 if (user == null)
                 {
-                    TempData["ErrorMessage"] = "You must be logged in to loan a book.";
+                    TempData["ErrorMessage"] = "You must be logged in to request a loan.";
                     return RedirectToAction("Index", "Login");
                 }
 
@@ -144,7 +144,7 @@ namespace PrivateLMS.Controllers
                 var activeLoanCount = await _loanService.GetActiveLoanCountAsync(user.Id);
                 if (activeLoanCount >= 3)
                 {
-                    TempData["ErrorMessage"] = "You cannot borrow more than three books at a time.";
+                    TempData["ErrorMessage"] = "You cannot borrow more than two books at a time.";
                     return RedirectToAction("MyLoans");
                 }
 
@@ -169,14 +169,15 @@ namespace PrivateLMS.Controllers
                 // Send email notification to user
                 var emailBody = $@"
                     <h2>Book Loan Confirmation</h2>
-                    <p>Dear {user.FirstName} {user.LastName},</p>
-                    <p>You have successfully loaned the following book:</p>
+                    <p>Assalamu Alaykum {user.FirstName} {user.LastName},</p>
+                    <p>You have requested to loan the following book:</p>
                     <ul>
                         <li><strong>Book Title:</strong> {model.BookTitle}</li>
                         <li><strong>Loan Date:</strong> {DateTime.UtcNow.ToString("MMMM dd, yyyy")}</li>
                         <li><strong>Due Date:</strong> {model.DueDate.ToString()}</li>
                     </ul>
-                    <p>Please return the book by the due date to avoid fines.</p>
+                    <p>You will soon be contactted by the Admin team bi idhnillaah.</p>
+                    <p>Ensure to preserve the book and return it by the due date to avoid fines.</p>
                     <p>Baarakallaahu Feekum,<br/>Admin@WarathatulAmbiya</p>";
                 await _emailService.SendEmailAsync(user.Email, "Book Loan Confirmation", emailBody);
 
@@ -196,7 +197,7 @@ namespace PrivateLMS.Controllers
                     <p>Baarakallaahu Feekum,<br/>Warathatul Ambiya Library System</p>";
                 await _emailService.SendEmailAsync("admin@warathatulambiya.com", "New Loan Request", adminEmailBody);
 
-                TempData["SuccessMessage"] = $"Successfully loaned the book: {model.BookTitle}. A confirmation email has been sent.";
+                TempData["SuccessMessage"] = $"Successfully requested a loan: {model.BookTitle}. A confirmation email has been sent, and an admin will get back to you shortly bi idhnillaah.";
                 return RedirectToAction("MyLoans");
             }
             catch (Exception ex)
