@@ -12,11 +12,20 @@
             <i class="bi bi-envelope icon"></i>
             <a href="mailto:admin@warathatulambiya.com">admin@warathatulambiya.com</a>
         </p>
+
         <p>
-            © @DateTime.Now.Year - PrivateLMS
-        </p> 
-        <p>
-            <a asp-controller="Home" asp-action="Index">Back to Home</a>
+            © @DateTime.Now.Year - The Private Library
         </p>
+
+        <a onclick="scrollToTop()" style="cursor: pointer;">
+            ↑ Back to Top
+        </a>
     </div>
 </footer>
+
+
+<script>
+    function scrollToTop() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+</script>
