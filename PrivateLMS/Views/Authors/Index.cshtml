@@ -3,102 +3,106 @@
     ViewData["Title"] = "Authors";
 }
 
-<div class="container mt-5">
+<div class="container mt-5 mb-5">
     <h2 class="text-center mb-4">Authors</h2>
 
-    @if (User.IsInRole("Admin"))
-    {
-        <div class="text-end mb-3">
-            <a asp-action="Create" class="btn btn-success">Add Author</a>
-        </div>
-    }
+    <div class="card shadow-sm p-4 rounded-4">
+        @if (User.IsInRole("Admin"))
+        {
+            <div class="text-end mb-3">
+                <a asp-action="Create" class="btn btn-primary btn-lg rounded-3" aria-label="Add new author">
+                    <i class="bi bi-plus-circle me-1"></i> Add Author
+                </a>
+            </div>
+        }
 
-    @if (!Model.Items.Any())
-    {
-        <p class="text-center text-muted">No authors available.</p>
-    }
-    else
-    {
-        <div class="table-responsive">
-            <table class="table table-bordered table-striped table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>Name</th>
-                        @if (User.Identity.IsAuthenticated)
-                        {
-                            <th>Number of Books</th>
-                        }
-                        <th style="width: 200px;">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var author in Model.Items)
-                    {
+        @if (!Model.Items.Any())
+        {
+            <p class="text-center text-muted">No authors available.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle">
+                    <thead class="table-light">
                         <tr>
-                            <td>@author.Name</td>
+                            <th scope="col">Name</th>
                             @if (User.Identity.IsAuthenticated)
                             {
-                                <td>@author.BookCount</td>
+                                <th scope="col" class="text-center">Number of Books</th>
                             }
-                            <td>
-                                <div class="btn-group" role="group">
-                                    <a asp-action="Details" asp-route-id="@author.AuthorId"
-                                       class="btn btn-sm btn-outline-info">Details</a>
-                                    @if (User.IsInRole("Admin"))
-                                    {
-                                        <a asp-action="Edit" asp-route-id="@author.AuthorId"
-                                           class="btn btn-sm btn-outline-warning">Edit</a>
-                                        <a asp-action="Delete" asp-route-id="@author.AuthorId"
-                                           class="btn btn-sm btn-outline-danger">Delete</a>
-                                    }
-                                </div>
-                            </td>
+                            <th scope="col" class="text-center">Actions</th>
                         </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var author in Model.Items)
+                        {
+                            <tr>
+                                <td>@author.Name</td>
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    <td class="text-center">@author.BookCount</td>
+                                }
+                                <td class="text-center">
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a asp-action="Details" asp-route-id="@author.AuthorId" class="btn btn-outline-info btn-sm me-1" aria-label="View details for @author.Name">
+                                            Details
+                                        </a>
+                                        @if (User.IsInRole("Admin"))
+                                        {
+                                            <a asp-action="Edit" asp-route-id="@author.AuthorId" class="btn btn-outline-warning btn-sm me-1" aria-label="Edit @author.Name">
+                                                Edit
+                                            </a>
+                                            <a asp-action="Delete" asp-route-id="@author.AuthorId" class="btn btn-outline-danger btn-sm" aria-label="Delete @author.Name">
+                                                Delete
+                                            </a>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Controls -->
+            <nav aria-label="Authors navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    @if (Model.HasPreviousPage)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-route-page="@(Model.CurrentPage - 1)" asp-route-pageSize="@Model.PageSize" aria-label="Previous page">Previous</a>
+                        </li>
                     }
-                </tbody>
-            </table>
-        </div>
+                    else
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">Previous</span>
+                        </li>
+                    }
 
-        <!-- Pagination Controls -->
-        <nav aria-label="Page navigation" class="mt-4">
-            <ul class="pagination justify-content-center">
-                @if (Model.HasPreviousPage)
-                {
-                    <li class="page-item">
-                        <a class="page-link" asp-action="Index" asp-route-page="@(Model.CurrentPage - 1)" asp-route-pageSize="@Model.PageSize">Previous</a>
-                    </li>
-                }
-                else
-                {
-                    <li class="page-item disabled">
-                        <span class="page-link">Previous</span>
-                    </li>
-                }
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                            <a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-pageSize="@Model.PageSize" aria-label="Page @i">@i</a>
+                        </li>
+                    }
 
-                @for (int i = 1; i <= Model.TotalPages; i++)
-                {
-                    <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
-                        <a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-pageSize="@Model.PageSize">@i</a>
-                    </li>
-                }
+                    @if (Model.HasNextPage)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-route-page="@(Model.CurrentPage + 1)" asp-route-pageSize="@Model.PageSize" aria-label="Next page">Next</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">Next</span>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        }
 
-                @if (Model.HasNextPage)
-                {
-                    <li class="page-item">
-                        <a class="page-link" asp-action="Index" asp-route-page="@(Model.CurrentPage + 1)" asp-route-pageSize="@Model.PageSize">Next</a>
-                    </li>
-                }
-                else
-                {
-                    <li class="page-item disabled">
-                        <span class="page-link">Next</span>
-                    </li>
-                }
-            </ul>
-        </nav>
-    }
-
-    <div class="text-end mt-3">
-        <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Back to Books</a>
     </div>
 </div>

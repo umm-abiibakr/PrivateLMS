@@ -4,63 +4,63 @@
     ViewData["Title"] = "Admin Dashboard";
 }
 
-<div class="container-fluid px-3 py-3">
-    <h2 class="mb-4 text-center display-5">Welcome, Admin</h2>
+<div class="container mt-5 mb-5">
+    <h2 class="text-center mb-4">Welcome, Admin</h2>
     <p class="text-center text-muted mb-5">Here is a summary of your library activity and insights.</p>
 
     <!-- Overview Cards -->
     <div class="row g-3 mb-4">
         <div class="col-12 col-sm-6 col-md-3">
-            <div class="card text-white" style="background-color: #5C5470;">
-                <div class="card-body">
+            <div class="card shadow-sm p-3 rounded-4 dashboard-card dashboard-card-total-books">
+                <div class="card-body text-center">
                     <h5 class="card-title">Total Books</h5>
                     <p class="display-6">@Model.TotalBooks</p>
                 </div>
             </div>
         </div>
         <div class="col-12 col-sm-6 col-md-3">
-            <div class="card text-white" style="background-color: #7D9D9C;">
-                <div class="card-body">
+            <div class="card shadow-sm p-3 rounded-4 dashboard-card dashboard-card-loaned-out">
+                <div class="card-body text-center">
                     <h5 class="card-title">Books Loaned Out</h5>
                     <p class="display-6">@Model.BooksLoanedOut</p>
                 </div>
             </div>
         </div>
         <div class="col-12 col-sm-6 col-md-3">
-            <div class="card text-dark" style="background-color: #F7EFE5;">
-                <div class="card-body">
+            <div class="card shadow-sm p-3 rounded-4 dashboard-card dashboard-card-pending-returns">
+                <div class="card-body text-center">
                     <h5 class="card-title">Pending Returns</h5>
                     <p class="display-6">@Model.PendingReturns</p>
                 </div>
             </div>
         </div>
         <div class="col-12 col-sm-6 col-md-3">
-            <div class="card text-white" style="background-color: #B46060;">
-                <div class="card-body">
+            <div class="card shadow-sm p-3 rounded-4 dashboard-card dashboard-card-overdue-loans">
+                <div class="card-body text-center">
                     <h5 class="card-title">Overdue Loans</h5>
                     <p class="display-6">@Model.OverdueLoans</p>
                 </div>
             </div>
         </div>
         <div class="col-12 col-sm-6 col-md-3">
-            <div class="card text-white" style="background-color: #4A7C59;">
-                <div class="card-body">
+            <div class="card shadow-sm p-3 rounded-4 dashboard-card dashboard-card-total-users">
+                <div class="card-body text-center">
                     <h5 class="card-title">Total Users</h5>
                     <p class="display-6">@Model.TotalUsers</p>
                 </div>
             </div>
         </div>
         <div class="col-12 col-sm-6 col-md-3">
-            <div class="card text-dark" style="background-color: #E8DDB5;">
-                <div class="card-body">
+            <div class="card shadow-sm p-3 rounded-4 dashboard-card dashboard-card-unapproved-users">
+                <div class="card-body text-center">
                     <h5 class="card-title">Unapproved Users</h5>
                     <p class="display-6">@Model.UnapprovedUsers</p>
                 </div>
             </div>
         </div>
         <div class="col-12 col-sm-6 col-md-3">
-            <div class="card text-white" style="background-color: #8B5E34;">
-                <div class="card-body">
+            <div class="card shadow-sm p-3 rounded-4 dashboard-card dashboard-card-banned-users">
+                <div class="card-body text-center">
                     <h5 class="card-title">Banned Users</h5>
                     <p class="display-6">@Model.BannedUsers</p>
                 </div>
@@ -71,24 +71,25 @@
     <!-- Charts -->
     <div class="row mt-5">
         <div class="col-md-6 mb-4">
-            <h5 class="text-center">Loan Status Overview</h5>
-            <canvas id="loanStatusChart" class="w-100"></canvas>
+            <div class="card shadow-sm p-4 rounded-4">
+                <h5 class="text-center mb-3">Loan Status Overview</h5>
+                <figure>
+                    <canvas id="loanStatusChart" class="w-100" aria-label="Loan status overview chart"></canvas>
+                </figure>
+            </div>
         </div>
         <div class="col-md-6 mb-4">
-            <h5 class="text-center">User Status Breakdown</h5>
-            <canvas id="userStatusChart" class="w-100"></canvas>
-        </div>
-    </div>
-
-    <div class="row mt-5">
-        <div class="col-12">
-            <h5 class="text-center">Top Borrowed Books</h5>
-            <canvas id="topBooksChart" class="w-100"></canvas>
+            <div class="card shadow-sm p-4 rounded-4">
+                <h5 class="text-center mb-3">User Status Breakdown</h5>
+                <figure>
+                    <canvas id="userStatusChart" class="w-100" aria-label="User status breakdown chart"></canvas>
+                </figure>
+            </div>
         </div>
     </div>
 
     <!-- Recent Loans Table -->
-    <div class="card mt-5 shadow-sm rounded-4">
+    <div class="card mt-5 shadow-sm p-4 rounded-4">
         <div class="card-header bg-light">
             <h5 class="mb-0">Recent Loans</h5>
         </div>
@@ -98,11 +99,11 @@
                 <table class="table table-hover">
                     <thead>
                         <tr>
-                            <th>Book</th>
-                            <th>User</th>
-                            <th>Loan Date</th>
-                            <th>Due</th>
-                            <th>Status</th>
+                            <th scope="col">Book</th>
+                            <th scope="col">User</th>
+                            <th scope="col">Loan Date</th>
+                            <th scope="col">Due</th>
+                            <th scope="col">Status</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -124,7 +125,7 @@
                                 <td>@loan.LoanerName</td>
                                 <td>@loan.LoanDate.ToShortDateString()</td>
                                 <td>@(loan.DueDate?.ToShortDateString() ?? "N/A")</td>
-                                <td><span class="badge @badgeClass">@status</span></td>
+                                <td><span class="badge @badgeClass" aria-label="@status loan status">@status</span></td>
                             </tr>
                         }
                     </tbody>
@@ -132,25 +133,25 @@
             }
             else
             {
-                <p class="text-muted">No recent loans.</p>
+                <p class="text-muted text-center">No recent loans.</p>
             }
         </div>
     </div>
 
     <!-- Top Borrowed Books List -->
-    <div class="card mt-4 shadow-sm rounded-4">
+    <div class="card mt-4 shadow-sm p-4 rounded-4">
         <div class="card-header bg-light">
             <h5 class="mb-0">Most Borrowed Books</h5>
         </div>
         <div class="card-body">
             @if (Model.TopBorrowedBooks.Any())
             {
-                <ul class="list-group">
+                <ul class="list-group list-group-flush">
                     @foreach (var book in Model.TopBorrowedBooks)
                     {
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             @book.Title
-                            <span class="badge rounded-pill" style="background-color: #7D9D9C; color: white;">
+                            <span class="badge badge-loan-count rounded-pill" aria-label="@book.TotalLoans loans">
                                 @book.TotalLoans loans
                             </span>
                         </li>
@@ -159,55 +160,60 @@
             }
             else
             {
-                <p class="text-muted">No borrowing data yet.</p>
+                <p class="text-muted text-center">No borrowing data yet.</p>
             }
         </div>
     </div>
+
+    <div class="text-center mt-4">
+        <a asp-controller="UserActivities" asp-action="Index" class="btn btn-primary btn-sm me-2 rounded-3" aria-label="View user activity log">User Activity Log</a>
+        <a asp-controller="Books" asp-action="Index" class="btn btn-primary btn-sm me-2 rounded-3" aria-label="View books">Books</a>
+        <a asp-controller="Users" asp-action="Index" class="btn btn-primary btn-sm me-2 rounded-3" aria-label="View users">Users</a>
+        <a asp-controller="Loans" asp-action="Index" class="btn btn-primary btn-sm me-2 rounded-3" aria-label="View loans">Loans</a>
+    </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    const loanStatusCtx = document.getElementById('loanStatusChart').getContext('2d');
-    new Chart(loanStatusCtx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Returned', 'Pending', 'Overdue'],
-            datasets: [{
-                data: [@ViewBag.LoanStats.Returned, @ViewBag.LoanStats.Pending, @ViewBag.LoanStats.Overdue],
-                backgroundColor: ['#A8D5BA', '#F7C59F', '#EF767A']
-            }]
-        }
-    });
-
-    const userStatusCtx = document.getElementById('userStatusChart').getContext('2d');
-    new Chart(userStatusCtx, {
-        type: 'pie',
-        data: {
-            labels: ['Approved', 'Unapproved', 'Banned'],
-            datasets: [{
-                data: [@ViewBag.UserStats.Approved, @ViewBag.UserStats.Unapproved, @ViewBag.UserStats.Banned],
-                backgroundColor: ['#8E9AAF', '#EFD3D7', '#C9ADA7']
-            }]
-        }
-    });
-
-    const topBooksCtx = document.getElementById('topBooksChart').getContext('2d');
-    new Chart(topBooksCtx, {
-        type: 'bar',
-        data: {
-            labels: @Html.Raw(JsonSerializer.Serialize(ViewBag.TopBookLabels)),
-            datasets: [{
-                label: 'Loans',
-                data: @Html.Raw(JsonSerializer.Serialize(ViewBag.TopBookData)),
-                backgroundColor: '#84A59D'
-            }]
-        },
-        options: {
-            indexAxis: 'y',
-            responsive: true,
-            scales: {
-                x: { beginAtZero: true }
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const loanStatusCtx = document.getElementById('loanStatusChart').getContext('2d');
+        new Chart(loanStatusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Returned', 'Pending', 'Overdue'],
+                datasets: [{
+                    data: [@Model.LoanStats.Returned, @Model.LoanStats.Pending, @Model.LoanStats.Overdue],
+                    backgroundColor: ['#A8D5BA', '#F7C59F', '#EF767A']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
             }
-        }
-    });
-</script>
+        });
+
+        const userStatusCtx = document.getElementById('userStatusChart').getContext('2d');
+        new Chart(userStatusCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Approved', 'Unapproved', 'Banned'],
+                datasets: [{
+                    data: [@Model.UserStats.Approved, @Model.UserStats.Unapproved, @Model.UserStats.Banned],
+                    backgroundColor: ['#8E9AAF', '#EFD3D7', '#C9ADA7']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    </script>
+}

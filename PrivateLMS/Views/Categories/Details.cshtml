@@ -3,42 +3,46 @@
     ViewData["Title"] = "Category Details";
 }
 
-<div class="container mt-5">
+<div class="container mt-5 mb-5">
     <h2 class="text-center mb-4">Category Details</h2>
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <dl class="row">
-                        <dt class="col-sm-4 text-end">Category Name</dt>
-                        <dd class="col-sm-8">@Model.CategoryName</dd>
 
-                        <dt class="col-sm-4 text-end">Number of Books</dt>
-                        <dd class="col-sm-8">@Model.BookCount</dd>
+    <div class="card shadow-sm p-4 rounded-4">
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-4 text-end fw-semibold">Category Name</dt>
+                <dd class="col-sm-8">@Model.CategoryName</dd>
 
-                        <dt class="col-sm-4 text-end">Books</dt>
-                        <dd class="col-sm-8">
-                            @if (Model.Books != null && Model.Books.Any())
+                <dt class="col-sm-4 text-end fw-semibold">Number of Books</dt>
+                <dd class="col-sm-8">@Model.BookCount</dd>
+
+                <dt class="col-sm-4 text-end fw-semibold">Books</dt>
+                <dd class="col-sm-8">
+                    @if (Model.Books != null && Model.Books.Any())
+                    {
+                        <ul class="list-unstyled mb-0">
+                            @foreach (var book in Model.Books)
                             {
-                                <ul class="list-unstyled mb-0">
-                                    @foreach (var book in Model.Books)
-                                    {
-                                        <li>@book</li>
-                                    }
-                                </ul>
+                                <li>@book</li>
                             }
-                            else
-                            {
-                                <span class="text-muted">No books in this category.</span>
-                            }
-                        </dd>
-                    </dl>
+                        </ul>
+                    }
+                    else
+                    {
+                        <span class="text-muted">No books in this category.</span>
+                    }
+                </dd>
+            </dl>
 
-                    <div class="text-center mt-4">
-                        <a asp-action="Edit" asp-route-id="@Model.CategoryId" class="btn btn-warning me-2">Edit</a>
-                        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
-                    </div>
-                </div>
+            <div class="text-center mt-4">
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-action="Edit" asp-route-id="@Model.CategoryId" class="btn btn-warning btn-sm me-2 rounded-3" aria-label="Edit category @Model.CategoryName">
+                        Edit
+                    </a>
+                }
+                <a asp-action="Index" class="btn btn-secondary btn-sm rounded-3" aria-label="Back to categories list">
+                    Back to List
+                </a>
             </div>
         </div>
     </div>

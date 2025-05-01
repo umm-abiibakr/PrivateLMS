@@ -3,24 +3,24 @@
 }
 
 <div class="container mt-5 mb-5">
-    <h2 class="text-center mb-3">About Us</h2>
-    <div class="card shadow-sm p-4">
+    <h2 class="text-center mb-4">About Us</h2>
+    <div class="card shadow-sm p-4 rounded-4">
         <h4 class="text-center mb-4">Warathatul Ambiya</h4>
         <div class="text-center mb-4">
-            <img src="~/images/lib-logo/WarathatulAmbiya-Logo.jpg" alt="Warathatul Ambiya Logo" style="height: 100px;" />
+            <img src="~/images/lib-logo/WarathatulAmbiya-Logo.jpg" alt="Warathatul Ambiya Library Logo" class="img-fluid" style="max-height: 120px; width: auto;">
         </div>
 
         <p>
-            Founded in <strong>1446 AH / 2025 CE</strong> in Abuja, Nigeria, <em>Warathatul Ambiya</em>, meaning
+            Founded in <strong>1447 AH / @DateTime.Now.ToString("yyyy") CE</strong> in Abuja, Nigeria, <em class="arabic-phrase">Warathatul Ambiya</em>, meaning
             <strong>“Inheritors of the Prophets”</strong>, is a private library dedicated to preserving authentic
             Islamic literature. Our collection is meticulously curated, featuring books endorsed by esteemed
             <strong>Salafi scholars</strong>, ensuring strict adherence to the <strong>Qur’an</strong>,
-            <strong>Sunnah</strong>, and the methodology of the <em>Salaf-us-Sālih</em> (righteous predecessors).
+            <strong>Sunnah</strong>, and the methodology of the <em class="arabic-phrase">Salaf-us-Sālih</em> (righteous predecessors).
         </p>
         <p>
             Primarily offering reliable English translations—with select works in Arabic and a few in Hausa—
             our library addresses the scarcity of trustworthy translated texts. We aim to serve sincere seekers
-            of knowledge by providing access to these rare resources, <em>bi idhnillāh</em>, fostering a deeper
+            of knowledge by providing access to these rare resources, <em class="arabic-phrase">bi idhnillāh</em>, fostering a deeper
             engagement with Islamic scholarship.
         </p>
 
@@ -33,7 +33,7 @@
         </p>
         <p>
             As a private institution, we are committed to preserving our collection for future generations,
-            <em>bi idhnillāh</em>.
+            <em class="arabic-phrase">bi idhnillāh</em>.
         </p>
 
         <h5 class="mt-4">Membership</h5>
@@ -55,12 +55,13 @@
         <p>
             <strong>Authenticity. Preservation. Accessibility.</strong> These values guide us in serving our
             local community with care. We invite devoted individuals to apply for membership and join us in
-            honoring the prophetic legacy, <em>bi idhnillāh</em>.
+            honoring the prophetic legacy, <em class="arabic-phrase">bi idhnillāh</em>.
         </p>
 
         <div class="text-center mt-4">
-            <a asp-controller="Registration" asp-action="Step1" class="btn btn-primary me-2">Apply for Membership</a>
-            <a href="mailto:admin@warathatulambiya.com" class="btn btn-outline-secondary">Contact Us</a>
+            <a asp-controller="Registration" asp-action="Step1" class="btn btn-primary btn-lg me-2" aria-label="Apply for membership">Apply for Membership</a>
+            <a href="mailto:admin@warathatulambiya.com" class="btn btn-outline-secondary btn-lg" aria-label="Contact admin via email">Contact Us</a>
         </div>
+
     </div>
 </div>

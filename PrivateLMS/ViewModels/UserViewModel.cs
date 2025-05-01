@@ -64,5 +64,7 @@ namespace PrivateLMS.ViewModels
         [DataType(DataType.Password)]
         [Compare("Password", ErrorMessage = "Passwords do not match.")]
         public string? ConfirmPassword { get; set; }
+        public int ActiveLoanCount { get; set; }
+        public int UnpaidFineCount { get; set; }
     }
 }

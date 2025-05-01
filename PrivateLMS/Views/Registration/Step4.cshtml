@@ -3,26 +3,28 @@
     ViewData["Title"] = "Step 4: Confirmation";
 }
 
-<div class="container mt-5" style="font-family: 'Cormorant Garamond', serif;">
+<div class="container mt-5">
     <h2 class="text-center mb-4">Step 4: Confirmation & Agreement</h2>
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <div class="card shadow-sm border-0 rounded-4" style="background-color: #fffaf3;">
+            <div class="card shadow-sm border-0 rounded-4">
                 <div class="card-body p-4">
-                    <form asp-action="Step4" method="post" novalidate>
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <form asp-action="Step4" asp-controller="Registration" method="post" novalidate>
+                        <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
                         <div class="form-check mb-4">
-                            <input asp-for="TermsAccepted" class="form-check-input" type="checkbox" id="TermsAccepted" />
+                            <input asp-for="TermsAccepted" class="form-check-input" type="checkbox" id="TermsAccepted" aria-label="Accept terms and conditions" />
                             <label asp-for="TermsAccepted" class="form-check-label" for="TermsAccepted">
                                 I understand and accept the
-                                <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">terms and conditions</a>.
+                                <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">terms and conditions</a>
+                                and <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">privacy policy</a>.
+                            </label>
                             </label>
                             <span asp-validation-for="TermsAccepted" class="text-danger d-block small"></span>
                         </div>
 
                         <div class="text-end mt-3">
-                            <a asp-action="Step3" class="btn btn-outline-secondary rounded-3 me-2">Back</a>
+                            <a asp-action="Step3" asp-controller="Registration" class="btn btn-outline-secondary rounded-3 me-2">Back</a>
                             <button type="submit" class="btn btn-success rounded-3">Complete Registration</button>
                         </div>
                     </form>
@@ -37,26 +39,80 @@
     <div class="modal-dialog modal-dialog-scrollable modal-lg">
         <div class="modal-content rounded-4">
             <div class="modal-header">
-                <h5 class="modal-title" id="termsModalLabel">Terms & Conditions</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title" id="termsModalLabel">Terms and Conditions</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" aria-label="Close terms modal"></button>
             </div>
-            <div class="modal-body" style="font-family: 'Cormorant Garamond', serif; line-height: 1.7;">
-                <p><strong>1. Respect and Etiquette</strong></p>
-                <p>Please treat all users of the Warathatul Ambiya Library with respect. Refrain from offensive, disruptive, or inappropriate behavior while using our services.</p>
+            <div class="modal-body">
+                <h4 class="mb-3">Warathatul Ambiya Library</h4>
+                <p><strong>Effective Date:</strong> 1/1447 AH &nbsp; | &nbsp; ≈ @DateTime.Now.ToString("MMMM yyyy") CE</p>
+                <p>
+                    By applying for membership or accessing the resources of <strong>Warathatul Ambiya</strong>,
+                    a private library located in Abuja, Nigeria, you agree and promise to abide by the following
+                    Terms and Conditions. These terms protect the integrity of our collection and support our mission
+                    to serve sincere seekers of knowledge, <em class="arabic-phrase">bi idhnillāh</em>.
+                </p>
 
-                <p><strong>2. Intellectual Property</strong></p>
-                <p>All content is shared solely for educational purposes. Redistribution of digital or printed material without proper consent is not allowed.</p>
+                <h5 class="mt-4">1. Membership Eligibility</h5>
+                <ul>
+                    <li>Membership is exclusive to individuals residing in the Abuja area with a commitment to Islamic knowledge.</li>
+                    <li>Applicants must submit a formal application with accurate personal information (name, address, contact details).</li>
+                    <li>Applications are reviewed by our team. Approval is at the sole discretion of Warathatul Ambiya.</li>
+                    <li>Incomplete or false information will result in rejection.</li>
+                    <li>Membership is non-transferable and limited to the approved individual.</li>
+                </ul>
 
-                <p><strong>3. Loan Usage</strong></p>
-                <p>Borrowed books must be returned on time and in good condition. Late returns may incur limitations or bans on borrowing privileges.</p>
+                <h5 class="mt-4">2. Borrowing Privileges</h5>
+                <ul>
+                    <li>Borrowing is limited to approved Abuja-based members to ensure preservation.</li>
+                    <li>Each loan is an <em class="arabic-phrase">amaanah</em> (a trust); members must fear Allah in handling the books.</li>
+                    <li>Books may be borrowed for 3 weeks, with a one-week extension upon request.</li>
+                    <li>Members may not lend books on behalf of others or pass them to non-members.</li>
+                    <li>Books must be returned in their original condition and may not leave the Abuja area.</li>
+                </ul>
 
-                <p><strong>4. Privacy</strong></p>
-                <p>We value your privacy. Your personal information will not be shared with third parties without your consent, in line with GDPR policies.</p>
+                <h5 class="mt-4">3. Use of Library Resources</h5>
+                <ul>
+                    <li>The collection is for personal study and research only.</li>
+                    <li>Books must be treated with care—no marking, defacing, or altering.</li>
+                    <li>A recommendation system is provided to assist members in selecting relevant texts.</li>
+                </ul>
 
-                <p><strong>5. System Abuse</strong></p>
-                <p>Do not attempt to exploit or misuse the library system. Violations may lead to suspension or permanent deactivation.</p>
+                <h5 class="mt-4">4. Code of Conduct</h5>
+                <ul>
+                    <li>Members must observe Islamic etiquette and show respect to the staff, resources, and fellow members.</li>
+                    <li>Disruptive or harmful behavior may result in membership termination.</li>
+                    <li>Each member is accountable for safeguarding any material borrowed, as an <em class="arabic-phrase">amaanah</em>.</li>
+                </ul>
 
-                <p class="mt-4"><em>By checking the box above, you confirm that you understand and agree to these terms.</em></p>
+                <h5 class="mt-4">5. Termination of Membership</h5>
+                <ul>
+                    <li>Membership may be revoked for late returns, damage, dishonesty, or misconduct.</li>
+                    <li>Terminated members must immediately return all materials and may be charged for damages or losses.</li>
+                </ul>
+
+                <h5 class="mt-4">6. Limitation of Liability</h5>
+                <ul>
+                    <li>The library is not liable for any loss, damage, or injury related to its resources or premises.</li>
+                    <li>Recommendations are provided in good faith and may not meet every user’s specific needs.</li>
+                </ul>
+
+                <h5 class="mt-4">7. Amendments</h5>
+                <ul>
+                    <li>Terms may be updated as needed. Members will be notified via email or library announcements.</li>
+                    <li>Continued membership implies acceptance of the revised terms.</li>
+                </ul>
+
+                <h5 class="mt-4">8. Contact Information</h5>
+                <ul>
+                    <li>For inquiries or issues, email us at <a href="mailto:admin@warathatulambiya.com">admin@warathatulambiya.com</a>.</li>
+                    <li>Include your full name and contact details for verification.</li>
+                </ul>
+
+                <p class="mt-4">
+                    By applying for or maintaining membership, you acknowledge that you have read, understood,
+                    and agree to these Terms and Conditions. Warathatul Ambiya is committed to preserving its
+                    scholarly legacy and serving its community, <em class="arabic-phrase">bi idhnillāh</em>.
+                </p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary rounded-3" data-bs-dismiss="modal">Close</button>
@@ -65,6 +121,93 @@
     </div>
 </div>
 
+<!-- Privacy Policy Modal -->
+<div class="modal fade" id="privacyModal" tabindex="-1" aria-labelledby="privacyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content rounded-4">
+            <div class="modal-header">
+                <h5 class="modal-title" id="privacyModalLabel">Privacy Policy</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" aria-label="Close privacy policy modal"></button>
+            </div>
+            <div class="modal-body">
+                <h4 class="mb-3">Warathatul Ambiya Library</h4>
+                <p><strong>Effective Date:</strong> 1/1447 AH | ≈ @DateTime.Now.ToString("MMMM yyyy") CE</p>
+
+                <p>
+                    Warathatul Ambiya, a private library located in Abuja, Nigeria, is committed to protecting the privacy of its members
+                    in accordance with Islamic principles of trust and responsibility. This Privacy Policy outlines how we collect, use,
+                    store, and protect personal information provided by members—ensuring transparency and safeguarding your data,
+                    <em class="arabic-phrase">bi idhnillāh</em>.
+                </p>
+
+                <h5 class="mt-4">1. Information We Collect</h5>
+                <ul>
+                    <li><strong>Membership Applications:</strong> Full name, address, contact info, and other details submitted during application.</li>
+                    <li><strong>Borrowing Records:</strong> Book loans, return status, and dates.</li>
+                    <li><strong>Recommendation System:</strong> Feedback and preferences to improve guidance.</li>
+                    <li><strong>Communications:</strong> Inquiries via <a href="mailto:admin@warathatulambiya.com" aria-label="Email admin">admin@warathatulambiya.com</a>.</li>
+                </ul>
+
+                <h5 class="mt-4">2. How We Use Your Information</h5>
+                <ul>
+                    <li><strong>Membership Processing:</strong> Review and manage applications and status updates.</li>
+                    <li><strong>Library Operations:</strong> Monitor loans, enforce policies, and preserve the collection.</li>
+                    <li><strong>Recommendations:</strong> Offer relevant book suggestions based on user history or input.</li>
+                    <li><strong>Communication:</strong> Notify about due dates, changes, or inquiries.</li>
+                    <li><strong>Preservation:</strong> Ensure responsible borrowing as an <em class="arabic-phrase">amaanah</em>.</li>
+                </ul>
+
+                <h5 class="mt-4">3. Data Sharing and Disclosure</h5>
+                <ul>
+                    <li>No sharing with third parties unless required by law or to recover damaged/lost books.</li>
+                    <li>Only admin staff access your data—strictly for library operations and under confidentiality.</li>
+                    <li>Sharing books or data with non-members violates trust and our policies.</li>
+                </ul>
+
+                <h5 class="mt-4">4. Data Security</h5>
+                <ul>
+                    <li>Data is securely stored using encryption and access restrictions.</li>
+                    <li>Members should protect their own contact info.</li>
+                    <li>In case of a breach, we will inform affected members via email.</li>
+                </ul>
+
+                <h5 class="mt-4">5. Data Retention</h5>
+                <ul>
+                    <li>We keep records as long as needed for operations or legal obligations.</li>
+                    <li>Former members’ data may be retained briefly to settle pending matters (e.g., late returns).</li>
+                </ul>
+
+                <h5 class="mt-4">6. Member Rights</h5>
+                <ul>
+                    <li>You can request to view or correct your personal information by contacting <a href="mailto:admin@warathatulambiya.com" aria-label="Email admin">admin@warathatulambiya.com</a>.</li>
+                    <li>Include your full name and contact info for identity verification.</li>
+                    <li>We aim to respond within a reasonable timeframe.</li>
+                </ul>
+
+                <h5 class="mt-4">7. Updates to This Policy</h5>
+                <ul>
+                    <li>We may amend this policy to reflect legal or operational updates.</li>
+                    <li>You will be notified via email or on our website.</li>
+                    <li>Continued use implies acceptance of the changes.</li>
+                </ul>
+
+                <h5 class="mt-4">8. Contact Information</h5>
+                <ul>
+                    <li>Questions or requests? Reach us at <a href="mailto:admin@warathatulambiya.com" aria-label="Email admin">admin@warathatulambiya.com</a>.</li>
+                    <li>Please include your full name and contact info in your message.</li>
+                </ul>
+
+                <p class="mt-4">
+                    Warathatul Ambiya is dedicated to upholding the trust placed in us by our members, protecting your privacy,
+                    and preserving our scholarly legacy, <em class="arabic-phrase">bi idhnillāh</em>.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary rounded-3" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }

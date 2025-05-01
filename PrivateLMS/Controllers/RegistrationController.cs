@@ -16,17 +16,27 @@ namespace PrivateLMS.Controllers
         private readonly LibraryDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IEmailService _emailService;
-
-        public RegistrationController(LibraryDbContext context, UserManager<ApplicationUser> userManager, IEmailService emailService)
+        private readonly IConfiguration _configuration;
+        public RegistrationController(LibraryDbContext context, UserManager<ApplicationUser> userManager, IEmailService emailService, IConfiguration configuration)
         {
             _context = context;
             _userManager = userManager;
             _emailService = emailService;
+            _configuration = configuration;
         }
 
         public IActionResult Step1()
         {
-            return View(new Step1ViewModel());
+            Console.WriteLine($"Step1 GET: TempData[FirstName]={TempData["FirstName"]}, TempData[LastName]={TempData["LastName"]}");
+            var model = new Step1ViewModel
+            {
+                FirstName = TempData["FirstName"]?.ToString() ?? string.Empty,
+                LastName = TempData["LastName"]?.ToString() ?? string.Empty,
+                Gender = TempData["Gender"]?.ToString() ?? string.Empty,
+                DateOfBirth = TempData["DateOfBirth"] != null ? DateTime.Parse(TempData["DateOfBirth"].ToString()) : DateTime.Now
+            };
+            TempData.Keep();
+            return View(model);
         }
 
         [HttpPost]
@@ -35,37 +45,115 @@ namespace PrivateLMS.Controllers
         {
             if (ModelState.IsValid)
             {
-                TempData["FirstName"] = model.FirstName;
-                TempData["LastName"] = model.LastName;
-                TempData["Gender"] = model.Gender;
-                TempData["DateOfBirth"] = model.DateOfBirth.ToString("yyyy-MM-dd");
-                return RedirectToAction("Step2");
+                try
+                {
+                    TempData["FirstName"] = model.FirstName;
+                    TempData["LastName"] = model.LastName;
+                    TempData["Gender"] = model.Gender;
+                    TempData["DateOfBirth"] = model.DateOfBirth.ToString("yyyy-MM-dd");
+                    TempData.Keep();
+                    return RedirectToAction("Step2");
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", $"An error occurred: {ex.Message}");
+                    return View(model);
+                }
             }
             return View(model);
         }
 
         public IActionResult Step2()
         {
-            return View(new Step2ViewModel());
+            var model = new Step2ViewModel
+            {
+                Username = TempData["Username"]?.ToString() ?? string.Empty,
+                Email = TempData["Email"]?.ToString() ?? string.Empty,
+                Password = TempData["Password"]?.ToString() ?? string.Empty,
+                ConfirmPassword = TempData["ConfirmPassword"]?.ToString() ?? string.Empty
+            };
+            TempData.Keep();
+            return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Step2(Step2ViewModel model)
+        public async Task<IActionResult> Step2(Step2ViewModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
+                return View(model);
+            }
+
+            try
+            {
+                // Validate Username
+                var existingUserByUsername = await _userManager.FindByNameAsync(model.Username);
+                if (existingUserByUsername != null)
+                {
+                    ModelState.AddModelError("Username", "This username is already taken.");
+                    return View(model);
+                }
+
+                // Validate Email
+                var existingUserByEmail = await _userManager.FindByEmailAsync(model.Email);
+                if (existingUserByEmail != null)
+                {
+                    ModelState.AddModelError("Email", "This email is already registered.");
+                    return View(model);
+                }
+
+                // Validate Password with all validators
+                var passwordErrors = new List<string>();
+                foreach (var validator in _userManager.PasswordValidators)
+                {
+                    var passwordResult = await validator.ValidateAsync(_userManager, null, model.Password);
+                    if (!passwordResult.Succeeded)
+                    {
+                        passwordErrors.AddRange(passwordResult.Errors.Select(e => e.Description));
+                    }
+                }
+
+                if (passwordErrors.Any())
+                {
+                    foreach (var error in passwordErrors)
+                    {
+                        ModelState.AddModelError("Password", error);
+                    }
+                    return View(model);
+                }
+
+                // Store validated data in TempData
                 TempData["Username"] = model.Username;
                 TempData["Password"] = model.Password;
                 TempData["ConfirmPassword"] = model.ConfirmPassword;
+                TempData["Email"] = model.Email;
+                TempData.Keep();
                 return RedirectToAction("Step3");
             }
-            return View(model);
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"An error occurred: {ex.Message}");
+                return View(model);
+            }
         }
 
         public IActionResult Step3()
         {
-            return View(new Step3ViewModel());
+            var model = new Step3ViewModel
+            {
+                PhoneNumber = TempData["PhoneNumber"]?.ToString() ?? string.Empty,
+                Address = TempData["Address"]?.ToString() ?? string.Empty,
+                City = TempData["City"]?.ToString() ?? string.Empty,
+                State = TempData["State"]?.ToString() ?? string.Empty,
+                PostalCode = TempData["PostalCode"]?.ToString() ?? string.Empty,
+                Country = TempData["Country"]?.ToString() ?? string.Empty,
+                // Populate dropdown lists
+                Countries = new List<string> { "Nigeria"},
+                States = new List<string> { "Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayelsa", "Benue", "Borno", "Cross River", "Delta", "Ebonyi", "Edo", "Ekiti", "Enugu", "Gombe", "Imo", "Jigawa", "Kaduna", "Kano", "Katsina", "Kebbi", "Kogi", "Kwara", "Lagos", "Nasarawa", "Niger", "Ogun", "Ondo", "Osun", "Oyo", "Plateau", "Rivers", "Sokoto", "Taraba", "Yobe", "Zamfara", "FCT" } // Nigerian states
+            };
+            TempData.Keep();
+            return View(model);
         }
 
         [HttpPost]
@@ -75,12 +163,12 @@ namespace PrivateLMS.Controllers
             if (ModelState.IsValid)
             {
                 TempData["PhoneNumber"] = model.PhoneNumber;
-                TempData["Email"] = model.Email;
                 TempData["Address"] = model.Address;
                 TempData["City"] = model.City;
                 TempData["State"] = model.State;
                 TempData["PostalCode"] = model.PostalCode;
                 TempData["Country"] = model.Country;
+                TempData.Keep();
                 return RedirectToAction("Step4");
             }
             return View(model);
@@ -88,6 +176,7 @@ namespace PrivateLMS.Controllers
 
         public IActionResult Step4()
         {
+            TempData.Keep();
             return View(new Step4ViewModel());
         }
 
@@ -105,27 +194,36 @@ namespace PrivateLMS.Controllers
             {
                 try
                 {
+                    // Validate required TempData values
+                    if (TempData["Username"] == null || TempData["Email"] == null || TempData["Password"] == null ||
+                        TempData["FirstName"] == null || TempData["LastName"] == null || TempData["Gender"] == null ||
+                        TempData["DateOfBirth"] == null || TempData["PhoneNumber"] == null || TempData["Address"] == null)
+                    {
+                        ModelState.AddModelError("", "Required registration data is missing. Please start over.");
+                        return View(model);
+                    }
+
                     var user = new ApplicationUser
                     {
-                        UserName = TempData["Username"]?.ToString() ?? throw new Exception("Username is missing."),
-                        Email = TempData["Email"]?.ToString() ?? throw new Exception("Email is missing."),
-                        PhoneNumber = TempData["PhoneNumber"]?.ToString(),
-                        FirstName = TempData["FirstName"]?.ToString() ?? throw new Exception("FirstName is missing."),
-                        LastName = TempData["LastName"]?.ToString() ?? throw new Exception("LastName is missing."),
-                        Gender = TempData["Gender"]?.ToString() ?? throw new Exception("Gender is missing."),
-                        DateOfBirth = DateTime.Parse(TempData["DateOfBirth"]?.ToString() ?? throw new Exception("DateOfBirth is missing.")),
-                        Address = TempData["Address"]?.ToString() ?? throw new Exception("Address is missing."),
+                        UserName = TempData["Username"].ToString(),
+                        Email = TempData["Email"].ToString(),
+                        PhoneNumber = TempData["PhoneNumber"].ToString(),
+                        FirstName = TempData["FirstName"].ToString(),
+                        LastName = TempData["LastName"].ToString(),
+                        Gender = TempData["Gender"].ToString(),
+                        DateOfBirth = DateTime.Parse(TempData["DateOfBirth"].ToString()),
+                        Address = TempData["Address"].ToString(),
                         City = TempData["City"]?.ToString(),
                         State = TempData["State"]?.ToString(),
                         PostalCode = TempData["PostalCode"]?.ToString(),
                         Country = TempData["Country"]?.ToString(),
                         TermsAccepted = true,
                         IsApproved = false,
-                        EmailConfirmed = false // Ensure email is not confirmed initially
+                        EmailConfirmed = false
                     };
 
-                    var password = TempData["Password"]?.ToString() ?? throw new Exception("Password is missing.");
-                    var confirmPassword = TempData["ConfirmPassword"]?.ToString() ?? throw new Exception("ConfirmPassword is missing.");
+                    var password = TempData["Password"].ToString();
+                    var confirmPassword = TempData["ConfirmPassword"].ToString();
 
                     if (password != confirmPassword)
                     {
@@ -138,13 +236,30 @@ namespace PrivateLMS.Controllers
                     {
                         await _userManager.AddToRoleAsync(user, "User");
 
-                        // Generate email verification token
+                        // Generate email verification token for user
                         var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                         var callbackUrl = Url.Action("ConfirmEmail", "Registration", new { userId = user.Id, token }, protocol: Request.Scheme);
 
-                        // Send verification email
-                        var emailBody = $"Please confirm your email by clicking <a href='{callbackUrl}'>here</a>.";
-                        await _emailService.SendEmailAsync(user.Email, "Confirm Your Email", emailBody);
+                        // Send verification email to user
+                        var userEmailBody = $"Please confirm your email by clicking <a href='{callbackUrl}'>here</a>.";
+                        await _emailService.SendEmailAsync(user.Email, "Confirm Your Email", userEmailBody);
+
+                        // Send notification email to admin
+                        var adminEmailBody = $@"
+                    <h2>New User Registration</h2>
+                    <p>A new user has registered with the following details:</p>
+                    <ul>
+                        <li><strong>Username:</strong> {user.UserName}</li>
+                        <li><strong>Email:</strong> {user.Email}</li>
+                        <li><strong>Full Name:</strong> {user.FirstName} {user.LastName}</li>
+                        <li><strong>Registration Date:</strong> {DateTime.UtcNow:MMMM dd, yyyy HH:mm}</li>
+                    </ul>
+                    <p>Please review the user in the admin panel and approve their account if necessary.</p>
+                    <p>Best regards,<br/>Warathatul Ambiya Library System</p>";
+                        await _emailService.SendEmailAsync("admin@warathatulambiya.com", "New User Registration", adminEmailBody);
+
+                        // Clear TempData after successful registration
+                        TempData.Clear();
 
                         TempData["SuccessMessage"] = "Registration successful! Please check your email to verify your account.";
                         return RedirectToAction("Success");
@@ -161,6 +276,7 @@ namespace PrivateLMS.Controllers
                 }
             }
 
+            TempData.Keep(); // Preserve TempData if validation fails
             return View(model);
         }
 

@@ -20,12 +20,12 @@ namespace PrivateLMS.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 10)
         {
             try
             {
-                var publishers = await _publisherService.GetAllPublishersAsync();
-                return View(publishers);
+                var pagedPublishers = await _publisherService.GetPagedPublishersAsync(page, pageSize);
+                return View(pagedPublishers);
             }
             catch (Exception ex)
             {

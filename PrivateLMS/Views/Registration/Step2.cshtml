@@ -21,6 +21,14 @@
                         </div>
 
                         <div class="mb-3">
+                            <label asp-for="Email" class="form-label">
+                                Email <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Email" type="email" class="form-control rounded-3" />
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
                             <label asp-for="Password" class="form-label">
                                 Password <span class="text-danger">*</span>
                             </label>
@@ -30,6 +38,9 @@
                                     <i class="bi bi-eye-slash" id="togglePasswordIcon" role="img"></i>
                                 </button>
                             </div>
+                            <small class="form-text text-muted">
+                                Password must be at least 8 characters, a letter, a number and a non alphanumeric character (Example123#).
+                            </small>
                             <span asp-validation-for="Password" class="text-danger small"></span>
                         </div>
 

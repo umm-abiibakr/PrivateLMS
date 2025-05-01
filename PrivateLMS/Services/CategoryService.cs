@@ -36,6 +36,7 @@ namespace PrivateLMS.Services
         {
             var category = await _context.Categories
                 .Include(c => c.BookCategories)
+                .ThenInclude(bc => bc.Book)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(c => c.CategoryId == categoryId);
 
@@ -48,7 +49,8 @@ namespace PrivateLMS.Services
             {
                 CategoryId = category.CategoryId,
                 CategoryName = category.CategoryName,
-                BookCount = category.BookCategories.Count
+                BookCount = category.BookCategories.Count,
+                Books = category.BookCategories.Select(bc => bc.Book.Title).ToList()
             };
         }
 

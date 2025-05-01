@@ -1,6 +1,5 @@
-﻿using PrivateLMS.ViewModels;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using PrivateLMS.Models;
+using PrivateLMS.ViewModels;
 
 namespace PrivateLMS.Services
 {
@@ -17,5 +16,8 @@ namespace PrivateLMS.Services
         Task<List<LoanViewModel>> GetOverdueLoansAsync(string? username);
         Task<List<LoanViewModel>> GetUserActiveLoansAsync(string? username);
         Task<int> GetActiveLoanCountAsync(int userId);
+        Task<PagedResultViewModel<LoanViewModel>> GetPagedUserActiveLoansAsync(string userName, int page, int pageSize);
+        Task<PagedResultViewModel<LoanViewModel>> GetPagedAllLoansAsync(int page, int pageSize);
+        Task<PagedResultViewModel<LoanViewModel>> GetPagedAllUserLoansAsync(string userName, int page, int pageSize);
     }
 }

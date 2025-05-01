@@ -29,12 +29,12 @@ namespace PrivateLMS.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 10)
         {
             try
             {
-                var fines = await _fineService.GetAllFinesAsync();
-                return View(fines);
+                var pagedFines = await _fineService.GetPagedAllFinesAsync(page, pageSize);
+                return View(pagedFines);
             }
             catch (Exception ex)
             {
@@ -43,7 +43,8 @@ namespace PrivateLMS.Controllers
             }
         }
 
-        public async Task<IActionResult> MyFines()
+        [Authorize(Roles = "User")]
+        public async Task<IActionResult> MyFines(int page = 1, int pageSize = 10)
         {
             try
             {
@@ -54,8 +55,8 @@ namespace PrivateLMS.Controllers
                     return RedirectToAction("Index", "Login");
                 }
 
-                var fines = await _fineService.GetUserFinesAsync(user.UserName);
-                return View(fines);
+                var pagedFines = await _fineService.GetPagedUserFinesAsync(user.UserName, page, pageSize);
+                return View(pagedFines);
             }
             catch (Exception ex)
             {
@@ -64,6 +65,7 @@ namespace PrivateLMS.Controllers
             }
         }
 
+        [Authorize(Roles = "User")]
         public async Task<IActionResult> Pay(int? id)
         {
             if (!id.HasValue)

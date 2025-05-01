@@ -1,81 +1,115 @@
-﻿@model IEnumerable<PrivateLMS.ViewModels.LoanViewModel>
+﻿@model PrivateLMS.Models.PagedResultViewModel<PrivateLMS.ViewModels.LoanViewModel>
 @{
     ViewData["Title"] = "Loan Records";
 }
 
-<div class="container mt-5">
+<div class="container mt-5 mb-5">
     <h2 class="text-center mb-4">Loan Records</h2>
 
-    @if (!Model.Any())
-    {
-        <p class="text-center text-muted">No loan records found.</p>
-    }
-    else
-    {
-        <div class="table-responsive">
-            <table class="table table-striped table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>Loan ID</th>
-                        <th>Book Title</th>
-                        <th>User ID</th>
-                        <th>Loaner Name</th>
-                        <th>Loan Date</th>
-                        <th>Due Date</th>
-                        <th>Return Date</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var loan in Model)
-                    {
-                        var isOverdue = loan.DueDate.HasValue && loan.DueDate < DateTime.Now && !loan.ReturnDate.HasValue;
-                        var statusText = loan.ReturnDate.HasValue ? "Returned"
-                        : isOverdue ? "Overdue"
-                        : loan.IsRenewed ? "Renewed"
-                        : "Pending Return";
-
-                        var statusClass = loan.ReturnDate.HasValue ? "bg-success"
-                        : isOverdue ? "bg-danger"
-                        : loan.IsRenewed ? "bg-primary"
-                        : "bg-warning text-dark";
+    <div class="card shadow-sm p-4 rounded-4">
+        @if (!Model.Items.Any())
+        {
+            <p class="text-center text-muted">No loan records found.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle">
+                    <thead class="table-light">
                         <tr>
-                            <td>@loan.LoanRecordId</td>
-                            <td>@loan.BookTitle</td>
-                            <td>@loan.UserId</td>
-                            <td>@loan.LoanerName</td>
-                            <td>@loan.LoanDate.ToShortDateString()</td>
-                            <td>
-                                @(loan.DueDate?.ToShortDateString() ?? "N/A")
-                            </td>
-                            <td>@(loan.ReturnDate?.ToShortDateString() ?? "Not Returned")</td>
-                            <td>
-                                <span class="badge @statusClass">@statusText</span>
-                            </td>
-                            <td>
-                                @if (loan.ReturnDate.HasValue)
-                                {
-                                    <!-- Undo Return Form -->
-                                    <form asp-action="ToggleReturnStatus" asp-route-loanRecordId="@loan.LoanRecordId" method="post" class="d-inline">
-                                        <button type="submit" class="btn btn-outline-secondary btn-sm">Undo</button>
-                                    </form>
-                                }
-                                else
-                                {
-                                    <!-- Redirect to Return Page -->
-                                    <a asp-action="Return" asp-route-loanRecordId="@loan.LoanRecordId" class="btn btn-success btn-sm">Return</a>
-                                }
-                            </td>
-
+                            <th scope="col">Loan ID</th>
+                            <th scope="col">Book Title</th>
+                            <th scope="col">User ID</th>
+                            <th scope="col">Loaner Name</th>
+                            <th scope="col">Loan Date</th>
+                            <th scope="col">Due Date</th>
+                            <th scope="col">Return Date</th>
+                            <th scope="col">Status</th>
+                            <th scope="col" class="text-center">Action</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    }
+                    </thead>
+                    <tbody>
+                        @foreach (var loan in Model.Items)
+                        {
+                            var isOverdue = loan.DueDate.HasValue && loan.DueDate < DateTime.Now && !loan.ReturnDate.HasValue;
+                            var statusText = loan.ReturnDate.HasValue ? "Returned"
+                            : isOverdue ? "Overdue"
+                            : loan.IsRenewed ? "Renewed"
+                            : "Pending Return";
 
-    <div class="text-end mt-4">
-        <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Back to Books</a>
+                            var statusClass = loan.ReturnDate.HasValue ? "badge-returned"
+                            : isOverdue ? "badge-overdue"
+                            : loan.IsRenewed ? "badge-renewed"
+                            : "badge-pending";
+
+                            <tr>
+                                <td>@loan.LoanRecordId</td>
+                                <td>@loan.BookTitle</td>
+                                <td>@loan.UserId</td>
+                                <td>@loan.LoanerName</td>
+                                <td>@loan.LoanDate.ToShortDateString()</td>
+                                <td>@(loan.DueDate?.ToShortDateString() ?? "N/A")</td>
+                                <td>@(loan.ReturnDate?.ToShortDateString() ?? "Not Returned")</td>
+                                <td>
+                                    <span class="badge @statusClass">@statusText</span>
+                                </td>
+                                <td class="text-center">
+                                    @if (loan.ReturnDate.HasValue)
+                                    {
+                                        <form asp-action="ToggleReturnStatus" asp-route-loanRecordId="@loan.LoanRecordId" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-outline-secondary btn-sm" aria-label="Undo return for loan @loan.LoanRecordId">Undo</button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <a asp-action="Return" asp-route-loanRecordId="@loan.LoanRecordId" class="btn btn-success btn-sm" aria-label="Return loan @loan.LoanRecordId">Return</a>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Controls -->
+            <nav aria-label="Loan Records navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    @if (Model.HasPreviousPage)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-route-page="@(Model.CurrentPage - 1)" asp-route-pageSize="@Model.PageSize" aria-label="Previous page">Previous</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">Previous</span>
+                        </li>
+                    }
+
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                            <a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-pageSize="@Model.PageSize" aria-label="Page @i">@i</a>
+                        </li>
+                    }
+
+                    @if (Model.HasNextPage)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-route-page="@(Model.CurrentPage + 1)" asp-route-pageSize="@Model.PageSize" aria-label="Next page">Next</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">Next</span>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        }
+
     </div>
 </div>

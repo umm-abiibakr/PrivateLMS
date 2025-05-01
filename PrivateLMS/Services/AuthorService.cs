@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PrivateLMS.Data;
 using PrivateLMS.Models;
+using PrivateLMS.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -24,12 +25,32 @@ namespace PrivateLMS.Services
                 .ToListAsync() ?? new List<Author>();
         }
 
-        public async Task<Author?> GetAuthorByIdAsync(int authorId)
+        public async Task<AuthorViewModel?> GetAuthorByIdAsync(int authorId)
         {
-            return await _context.Authors
-                .Include(a => a.Books)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(a => a.AuthorId == authorId);
+            var author = await _context.Authors
+        .AsNoTracking()
+        .FirstOrDefaultAsync(a => a.AuthorId == authorId);
+
+            if (author == null)
+            {
+                return null;
+            }
+
+            var books = await _context.Books
+                .Where(b => b.AuthorId == authorId)
+                .Select(b => b.Title)
+                .ToListAsync();
+
+            return new AuthorViewModel
+            {
+                AuthorId = author.AuthorId,
+                Name = author.Name,
+                Biography = author.Biography,
+                BirthDate = author.BirthDate,
+                DeathDate = author.DeathDate,
+                BookCount = books.Count,
+                Books = books
+            };
         }
 
         public async Task<bool> CreateAuthorAsync(Author author)

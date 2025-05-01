@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using PrivateLMS.Data;
 using PrivateLMS.Models;
+using PrivateLMS.ViewModels;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -18,14 +19,13 @@ namespace PrivateLMS.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index(int? userId, string actionType, int pageNumber = 1)
+        public async Task<IActionResult> Index(int? userId = null, string actionType = null, int pageNumber = 1, int pageSize = 10)
         {
-            const int pageSize = 10;
-
             var query = _context.UserActivities
                 .Include(ua => ua.User)
-                .AsQueryable();
+                .AsNoTracking();
 
+            // Apply filters
             if (userId.HasValue)
             {
                 query = query.Where(ua => ua.UserId == userId.Value);
@@ -36,35 +36,42 @@ namespace PrivateLMS.Controllers
                 query = query.Where(ua => ua.Action == actionType);
             }
 
-            int totalItems = await query.CountAsync();
-            int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+            // Get action types for filter dropdown
+            ViewBag.ActionTypes = await _context.UserActivities
+                .Select(ua => ua.Action)
+                .Distinct()
+                .OrderBy(a => a)
+                .ToListAsync();
+            ViewBag.UserId = userId;
+            ViewBag.ActionType = actionType;
 
+            // Pagination
+            var totalItems = await query.CountAsync();
             var activities = await query
                 .OrderByDescending(ua => ua.Timestamp)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
+                .Select(ua => new UserActivityViewModel
+                {
+                    Id = ua.Id,
+                    UserId = ua.UserId,
+                    UserName = ua.User != null ? ua.User.UserName : "Unknown",
+                    Action = ua.Action,
+                    Timestamp = ua.Timestamp,
+                    Details = ua.Details
+                })
                 .ToListAsync();
 
-            var viewModel = new PagedResultViewModel<UserActivity>
+            var model = new PagedResultViewModel<UserActivityViewModel>
             {
                 Items = activities,
                 CurrentPage = pageNumber,
                 PageSize = pageSize,
                 TotalItems = totalItems,
-                TotalPages = totalPages
+                TotalPages = (int)Math.Ceiling((double)totalItems / pageSize)
             };
 
-            ViewBag.UserId = userId;
-            ViewBag.ActionType = actionType;
-            ViewBag.ActionTypes = new[] {
-                "Login", "Logout", "FailedLogin", "Ban", "Unban",
-                "LoanBook", "ReturnBook", "RenewLoan", "RequestLoan",
-                "RateBook", "Register", "ApproveMembership", "RejectMembership",
-                "TerminateMembership", "IncurFine", "PayFine", "WaiveFine",
-                "AddBook", "UpdateBook", "RemoveBook", "SubmitRecommendationFeedback"
-            };
-
-            return View(viewModel);
+            return View(model);
         }
     }
 }

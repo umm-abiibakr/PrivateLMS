@@ -1,8 +1,6 @@
-﻿@model IEnumerable<PrivateLMS.ViewModels.LoanViewModel>
+﻿@model PrivateLMS.ViewModels.MyLoansViewModel
 @{
     ViewData["Title"] = "My Loans";
-    var activeLoans = Model.Where(lr => lr.ReturnDate == null).ToList();
-    var pastLoans = Model.Where(lr => lr.ReturnDate != null).ToList();
 }
 
 <div class="container mt-5">
@@ -11,7 +9,7 @@
     <!-- Active Loans -->
     <section class="mb-5">
         <h3 class="text-center mb-4">Active Loans</h3>
-        @if (!activeLoans.Any())
+        @if (!Model.ActiveLoans.Items.Any())
         {
             <p class="text-center text-muted">You have no active loans.</p>
         }
@@ -29,7 +27,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var loan in activeLoans)
+                        @foreach (var loan in Model.ActiveLoans.Items)
                         {
                             <tr>
                                 <td>@loan.BookTitle</td>
@@ -49,19 +47,56 @@
                                     <a asp-action="Renew" asp-route-id="@loan.LoanRecordId" class="btn btn-outline-primary btn-sm me-1">Renew</a>
                                     <a asp-action="Return" asp-route-loanRecordId="@loan.LoanRecordId" class="btn btn-outline-success btn-sm">Return</a>
                                 </td>
-                                
                             </tr>
                         }
                     </tbody>
                 </table>
             </div>
+
+            <!-- Pagination for Active Loans -->
+            <nav aria-label="Active Loans navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    @if (Model.ActiveLoans.HasPreviousPage)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="MyLoans" asp-route-activePage="@(Model.ActiveLoans.CurrentPage - 1)" asp-route-pastPage="@Model.PastLoans.CurrentPage">Previous</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">Previous</span>
+                        </li>
+                    }
+
+                    @for (int i = 1; i <= Model.ActiveLoans.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.ActiveLoans.CurrentPage ? "active" : "")">
+                            <a class="page-link" asp-action="MyLoans" asp-route-activePage="@i" asp-route-pastPage="@Model.PastLoans.CurrentPage">@i</a>
+                        </li>
+                    }
+
+                    @if (Model.ActiveLoans.HasNextPage)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="MyLoans" asp-route-activePage="@(Model.ActiveLoans.CurrentPage + 1)" asp-route-pastPage="@Model.PastLoans.CurrentPage">Next</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">Next</span>
+                        </li>
+                    }
+                </ul>
+            </nav>
         }
     </section>
 
     <!-- Past Loans -->
     <section class="mb-5">
         <h3 class="text-center mb-4">Past Loans</h3>
-        @if (!pastLoans.Any())
+        @if (!Model.PastLoans.Items.Any())
         {
             <p class="text-center text-muted">You have no past loans.</p>
         }
@@ -79,7 +114,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var loan in pastLoans)
+                        @foreach (var loan in Model.PastLoans.Items)
                         {
                             <tr>
                                 <td>@loan.BookTitle</td>
@@ -102,6 +137,44 @@
                     </tbody>
                 </table>
             </div>
+
+            <!-- Pagination for Past Loans -->
+            <nav aria-label="Past Loans navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    @if (Model.PastLoans.HasPreviousPage)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="MyLoans" asp-route-activePage="@Model.ActiveLoans.CurrentPage" asp-route-pastPage="@(Model.PastLoans.CurrentPage - 1)">Previous</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">Previous</span>
+                        </li>
+                    }
+
+                    @for (int i = 1; i <= Model.PastLoans.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.PastLoans.CurrentPage ? "active" : "")">
+                            <a class="page-link" asp-action="MyLoans" asp-route-activePage="@Model.ActiveLoans.CurrentPage" asp-route-pastPage="@i">@i</a>
+                        </li>
+                    }
+
+                    @if (Model.PastLoans.HasNextPage)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="MyLoans" asp-route-activePage="@Model.ActiveLoans.CurrentPage" asp-route-pastPage="@(Model.PastLoans.CurrentPage + 1)">Next</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">Next</span>
+                        </li>
+                    }
+                </ul>
+            </nav>
         }
     </section>
 

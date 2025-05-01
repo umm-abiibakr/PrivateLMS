@@ -72,25 +72,20 @@ namespace PrivateLMS.Controllers
                 UnapprovedUsers = unapprovedUsers,
                 BannedUsers = bannedUsers,
                 RecentLoans = recentLoans,
-                TopBorrowedBooks = topBorrowedBooks
+                TopBorrowedBooks = topBorrowedBooks,
+                LoanStats = new LoanStatsViewModel
+                {
+                    Returned = await _context.LoanRecords.CountAsync(l => l.ReturnDate != null),
+                    Pending = await _context.LoanRecords.CountAsync(l => l.ReturnDate == null && l.DueDate >= DateTime.Now),
+                    Overdue = await _context.LoanRecords.CountAsync(l => l.DueDate < DateTime.Now && l.ReturnDate == null)
+                },
+                UserStats = new UserStatsViewModel
+                {
+                    Approved = await _context.Users.CountAsync(u => u.IsApproved && (!u.LockoutEnd.HasValue || u.LockoutEnd <= DateTimeOffset.UtcNow)),
+                    Unapproved = await _context.Users.CountAsync(u => !u.IsApproved),
+                    Banned = await _context.Users.CountAsync(u => u.LockoutEnd.HasValue && u.LockoutEnd > DateTimeOffset.UtcNow)
+                }
             };
-
-            ViewBag.LoanStats = new
-            {
-                Returned = await _context.LoanRecords.CountAsync(l => l.ReturnDate != null),
-                Pending = await _context.LoanRecords.CountAsync(l => l.ReturnDate == null && l.DueDate >= DateTime.Now),
-                Overdue = await _context.LoanRecords.CountAsync(l => l.DueDate < DateTime.Now && l.ReturnDate == null)
-            };
-
-            ViewBag.UserStats = new
-            {
-                Approved = await _context.Users.CountAsync(u => u.IsApproved && (!u.LockoutEnd.HasValue || u.LockoutEnd <= DateTimeOffset.UtcNow)),
-                Unapproved = await _context.Users.CountAsync(u => !u.IsApproved),
-                Banned = await _context.Users.CountAsync(u => u.LockoutEnd.HasValue && u.LockoutEnd > DateTimeOffset.UtcNow)
-            };
-
-            ViewBag.TopBookLabels = topBorrowedBooks.Select(b => b.Title).ToList();
-            ViewBag.TopBookData = topBorrowedBooks.Select(b => b.TotalLoans).ToList();
 
             return View(model);
         }

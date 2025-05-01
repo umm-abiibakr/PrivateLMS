@@ -1,61 +1,97 @@
-﻿@model IEnumerable<PrivateLMS.ViewModels.FineViewModel>
+﻿@model PrivateLMS.Models.PagedResultViewModel<PrivateLMS.ViewModels.FineViewModel>
 @{
     ViewData["Title"] = "All Fines";
 }
 
-<div class="container mt-5">
+<div class="container mt-5 mb-5">
     <h2 class="text-center mb-4">All Fines</h2>
 
-    @if (!Model.Any())
-    {
-        <p class="text-center text-muted">No fines recorded in the system.</p>
-    }
-    else
-    {
-        <div class="table-responsive">
-            <table class="table table-striped table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>Book Title</th>
-                        <th>Loaner Name</th>
-                        <th>Loan Date</th>
-                        <th>Due Date</th>
-                        <th>Return Date</th>
-                        <th>Issued Date</th>
-                        <th>Fine Amount</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var fine in Model)
-                    {
+    <div class="card shadow-sm p-4 rounded-4">
+        @if (!Model.Items.Any())
+        {
+            <p class="text-center text-muted">No fines recorded in the system.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle">
+                    <thead class="table-light">
                         <tr>
-                            <td>@fine.BookTitle</td>
-                            <td>@fine.LoanerName</td>
-                            <td>@fine.LoanDate.ToShortDateString()</td>
-                            <td>@(fine.DueDate?.ToShortDateString() ?? "N/A")</td>
-                            <td>@(fine.ReturnDate?.ToShortDateString() ?? "Not Returned")</td>
-                            <td>@fine.IssuedDate.ToShortDateString()</td>
-                            <td>@fine.Amount.ToString("C", new System.Globalization.CultureInfo("en-NG"))</td>
-                            <td class="text-center">
-                                <form asp-action="TogglePaidStatus" asp-route-id="@fine.Id" method="post" class="d-inline">
-                                    @Html.AntiForgeryToken()
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" onchange="this.form.submit()" @(fine.IsPaid ? "checked" : "")>
-                                        <label class="form-check-label">
-                                            @(fine.IsPaid ? "Paid" : "Unpaid")
-                                        </label>
-                                    </div>
-                                </form>
-                            </td>
+                            <th scope="col">Book Title</th>
+                            <th scope="col">Loaner Name</th>
+                            <th scope="col">Loan Date</th>
+                            <th scope="col">Due Date</th>
+                            <th scope="col">Return Date</th>
+                            <th scope="col">Issued Date</th>
+                            <th scope="col">Fine Amount</th>
+                            <th scope="col" class="text-center">Status</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    }
+                    </thead>
+                    <tbody>
+                        @foreach (var fine in Model.Items)
+                        {
+                            <tr>
+                                <td>@fine.BookTitle</td>
+                                <td>@fine.LoanerName</td>
+                                <td>@fine.LoanDate.ToShortDateString()</td>
+                                <td>@(fine.DueDate?.ToShortDateString() ?? "N/A")</td>
+                                <td>@(fine.ReturnDate?.ToShortDateString() ?? "Not Returned")</td>
+                                <td>@fine.IssuedDate.ToShortDateString()</td>
+                                <td>@fine.Amount.ToString("C", new System.Globalization.CultureInfo("en-NG"))</td>
+                                <td class="text-center">
+                                    <form asp-action="TogglePaidStatus" asp-route-id="@fine.Id" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="status-@fine.Id" onchange="this.form.submit()" @(fine.IsPaid ? "checked" : "") aria-label="Toggle paid status for fine @fine.Id">
+                                            <label class="form-check-label" for="status-@fine.Id">
+                                                @(fine.IsPaid ? "Paid" : "Unpaid")
+                                            </label>
+                                        </div>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
 
-    <div class="text-end mt-3">
-        <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Back to Home Page</a>
+            <!-- Pagination Controls -->
+            <nav aria-label="Fines navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    @if (Model.HasPreviousPage)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-route-page="@(Model.CurrentPage - 1)" asp-route-pageSize="@Model.PageSize" aria-label="Previous page">Previous</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">Previous</span>
+                        </li>
+                    }
+
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                            <a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-pageSize="@Model.PageSize" aria-label="Page @i">@i</a>
+                        </li>
+                    }
+
+                    @if (Model.HasNextPage)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-route-page="@(Model.CurrentPage + 1)" asp-route-pageSize="@Model.PageSize" aria-label="Next page">Next</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">Next</span>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        }
     </div>
 </div>

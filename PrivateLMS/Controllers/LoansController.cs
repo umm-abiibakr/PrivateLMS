@@ -35,12 +35,12 @@ namespace PrivateLMS.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 10)
         {
             try
             {
-                var loans = await _loanService.GetAllLoansAsync();
-                return View(loans);
+                var pagedLoans = await _loanService.GetPagedAllLoansAsync(page, pageSize);
+                return View(pagedLoans);
             }
             catch (Exception ex)
             {
@@ -50,7 +50,7 @@ namespace PrivateLMS.Controllers
         }
 
         [Authorize(Roles = "User")]
-        public async Task<IActionResult> MyLoans()
+        public async Task<IActionResult> MyLoans(int activePage = 1, int pastPage = 1, int activePageSize = 5, int pastPageSize = 5)
         {
             try
             {
@@ -61,8 +61,28 @@ namespace PrivateLMS.Controllers
                     return RedirectToAction("Index", "Login");
                 }
 
-                var loans = await _loanService.GetAllUserLoansAsync(user.UserName);
-                return View(loans);
+                var activeLoans = await _loanService.GetPagedUserActiveLoansAsync(user.UserName, activePage, activePageSize);
+                var allUserLoans = await _loanService.GetPagedAllUserLoansAsync(user.UserName, pastPage, pastPageSize);
+                var pastLoans = allUserLoans.Items
+                    .Where(lr => lr.ReturnDate != null)
+                    .ToList();
+
+                var pastLoansPaged = new PagedResultViewModel<LoanViewModel>
+                {
+                    Items = pastLoans,
+                    CurrentPage = pastPage,
+                    PageSize = pastPageSize,
+                    TotalItems = allUserLoans.TotalItems - activeLoans.TotalItems, // Approximate count of past loans
+                    TotalPages = (int)Math.Ceiling((double)(allUserLoans.TotalItems - activeLoans.TotalItems) / pastPageSize)
+                };
+
+                var viewModel = new MyLoansViewModel
+                {
+                    ActiveLoans = activeLoans,
+                    PastLoans = pastLoansPaged
+                };
+
+                return View(viewModel);
             }
             catch (Exception ex)
             {
@@ -421,4 +441,4 @@ namespace PrivateLMS.Controllers
             return RedirectToAction(nameof(Index));
         }
     }
-}
+} 

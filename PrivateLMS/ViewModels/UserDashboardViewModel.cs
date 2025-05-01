@@ -1,9 +1,11 @@
-﻿namespace PrivateLMS.ViewModels
+﻿using PrivateLMS.Models;
+
+namespace PrivateLMS.ViewModels
 {
     public class UserDashboardViewModel
     {
-        public List<LoanViewModel> ActiveLoans { get; set; } = new List<LoanViewModel>();
-        public List<FineViewModel> Fines { get; set; } = new List<FineViewModel>();
-        public List<BookReviewViewModel> RecentRatings { get; set; } = new List<BookReviewViewModel>();
+        public PagedResultViewModel<LoanViewModel> ActiveLoans { get; set; } = new PagedResultViewModel<LoanViewModel> { Items = new List<LoanViewModel>() };
+        public PagedResultViewModel<FineViewModel> Fines { get; set; } = new PagedResultViewModel<FineViewModel> { Items = new List<FineViewModel>() };
+        public PagedResultViewModel<BookReviewViewModel> RecentRatings { get; set; } = new PagedResultViewModel<BookReviewViewModel> { Items = new List<BookReviewViewModel>() };
     }
 }
