@@ -69,16 +69,7 @@ namespace PrivateLMS.Controllers
                     TempData["ErrorMessage"] = $"No author found with ID {id}.";
                     return PartialView("_NotFound");
                 }
-                var viewModel = new AuthorViewModel
-                {
-                    AuthorId = author.AuthorId,
-                    Name = author.Name,
-                    Biography = author.Biography,
-                    BirthDate = author.BirthDate,
-                    DeathDate = author.DeathDate,
-                    BookCount = author.Books.Count
-                };
-                return View(viewModel);
+                return View(author);
             }
             catch (Exception ex)
             {
@@ -260,6 +251,6 @@ namespace PrivateLMS.Controllers
                 TempData["ErrorMessage"] = $"An error occurred while deleting the author: {ex.Message}";
                 return RedirectToAction("Error", "Home");
             }
-        }
+        } 
     }
 }

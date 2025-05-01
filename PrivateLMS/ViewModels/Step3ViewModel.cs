@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
 
 namespace PrivateLMS.ViewModels
 {
@@ -9,11 +10,6 @@ namespace PrivateLMS.ViewModels
         [StringLength(20, ErrorMessage = "Phone number cannot exceed 20 characters.")]
         [Display(Name = "Phone Number")]
         public string PhoneNumber { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "The Email field is required.")]
-        [EmailAddress(ErrorMessage = "Please enter a valid email address.")]
-        [StringLength(100, ErrorMessage = "Email cannot exceed 100 characters.")]
-        public string Email { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "The Address field is required.")]
         [StringLength(200, ErrorMessage = "Address cannot exceed 200 characters.")]
@@ -35,5 +31,9 @@ namespace PrivateLMS.ViewModels
         [Required(ErrorMessage = "The Country field is required.")]
         [StringLength(100, ErrorMessage = "Country cannot exceed 100 characters.")]
         public string Country { get; set; } = string.Empty;
+
+        // Lists for dropdowns
+        public List<string> Countries { get; set; } = new List<string>();
+        public List<string> States { get; set; } = new List<string>();
     }
 }

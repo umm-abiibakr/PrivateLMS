@@ -1,70 +1,106 @@
-@model IEnumerable<PrivateLMS.ViewModels.PublisherViewModel>
+@model PrivateLMS.Models.PagedResultViewModel<PrivateLMS.ViewModels.PublisherViewModel>
 @{
     ViewData["Title"] = "Publishers";
 }
 
-<div class="container mt-5">
+<div class="container mt-5 mb-5">
     <h2 class="text-center mb-4">Publishers</h2>
 
-    <div class="text-end mb-3">
-        <a asp-action="Create" class="btn btn-primary btn-sm">
-            <i class="bi bi-plus-circle me-1"></i> Add Publisher
-        </a>
-    </div>
-
-    @if (!Model.Any())
-    {
-        <p class="text-center text-muted">No publishers found.</p>
-    }
-    else
-    {
-        <div class="table-responsive">
-            <table class="table table-striped table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>Logo</th>
-                        <th>Publisher Name</th>
-                        <th>Location</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var publisher in Model)
-                    {
-                        <tr>
-                            <td>
-                                @if (!string.IsNullOrEmpty(publisher.LogoImagePath))
-                                {
-                                    <img src="@publisher.LogoImagePath" alt="@publisher.PublisherName Logo" class="img-thumbnail" style="max-width: 50px;" />
-                                }
-                                else
-                                {
-                                    <span class="text-muted">No Logo</span>
-                                }
-                            </td>
-                            <td>@publisher.PublisherName</td>
-                            <td>@publisher.Location</td>
-                            <td>
-                                <a asp-action="Details" asp-route-id="@publisher.PublisherId" class="btn btn-outline-info btn-sm me-1">
-                                    <i class="bi bi-eye"></i> View
-                                </a>
-                                <a asp-action="Edit" asp-route-id="@publisher.PublisherId" class="btn btn-outline-warning btn-sm me-1">
-                                    <i class="bi bi-pencil-square"></i> Edit
-                                </a>
-                                <a asp-action="Delete" asp-route-id="@publisher.PublisherId" class="btn btn-outline-danger btn-sm">
-                                    <i class="bi bi-trash"></i> Delete
-                                </a>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+    <div class="card shadow-sm p-4 rounded-4">
+        <div class="text-end mb-3">
+            <a asp-action="Create" class="btn btn-primary btn-lg rounded-3" aria-label="Add new publisher">
+                <i class="bi bi-plus-circle me-1"></i> Add Publisher
+            </a>
         </div>
-    }
 
-    <div class="text-end mt-3">
-        <a asp-controller="Books" asp-action="Index" class="btn btn-secondary btn-sm">
-            <i class="bi bi-arrow-left-circle"></i> Back to Books
-        </a>
+        @if (!Model.Items.Any())
+        {
+            <p class="text-center text-muted">No publishers found.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">Logo</th>
+                            <th scope="col">Publisher Name</th>
+                            <th scope="col">Location</th>
+                            <th scope="col" class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var publisher in Model.Items)
+                        {
+                            <tr>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(publisher.LogoImagePath))
+                                    {
+                                        <img src="@publisher.LogoImagePath" alt="@publisher.PublisherName Logo" class="img-fluid publisher-logo" />
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">No Logo</span>
+                                    }
+                                </td>
+                                <td>@publisher.PublisherName</td>
+                                <td>@publisher.Location</td>
+                                <td class="text-center">
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a asp-action="Details" asp-route-id="@publisher.PublisherId" class="btn btn-outline-info btn-sm me-1" aria-label="View details for @publisher.PublisherName">
+                                            Details
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@publisher.PublisherId" class="btn btn-outline-warning btn-sm me-1" aria-label="Edit @publisher.PublisherName">
+                                            Edit
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@publisher.PublisherId" class="btn btn-outline-danger btn-sm" aria-label="Delete @publisher.PublisherName">
+                                            Delete
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Controls -->
+            <nav aria-label="Publishers navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    @if (Model.HasPreviousPage)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-route-page="@(Model.CurrentPage - 1)" asp-route-pageSize="@Model.PageSize" aria-label="Previous page">Previous</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">Previous</span>
+                        </li>
+                    }
+
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                            <a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-pageSize="@Model.PageSize" aria-label="Page @i">@i</a>
+                        </li>
+                    }
+
+                    @if (Model.HasNextPage)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-route-page="@(Model.CurrentPage + 1)" asp-route-pageSize="@Model.PageSize" aria-label="Next page">Next</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">Next</span>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        }
     </div>
 </div>

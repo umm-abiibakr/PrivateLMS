@@ -202,5 +202,5 @@ namespace PrivateLMS.Controllers
                 return RedirectToAction("Error", "Home");
             }
         }
-    }
+    } 
 }

@@ -19,39 +19,69 @@ namespace PrivateLMS.Controllers
         private readonly RoleManager<IdentityRole<int>> _roleManager;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IEmailService _emailService;
+        private readonly LibraryDbContext _context;
 
 
         public UsersController(
             UserManager<ApplicationUser> userManager,
             RoleManager<IdentityRole<int>> roleManager,
             IWebHostEnvironment webHostEnvironment,
-            IEmailService emailService)
+            IEmailService emailService,
+            LibraryDbContext context)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _webHostEnvironment = webHostEnvironment;
             _emailService = emailService;
+            _context = context;
 
         }
 
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 10)
         {
             try
             {
-                var users = await _userManager.Users.ToListAsync();
+                var query = _userManager.Users
+                    .Select(u => new
+                    {
+                        User = u,
+                        ActiveLoanCount = _context.LoanRecords
+                            .Count(lr => lr.UserId == u.Id && lr.ReturnDate == null),
+                        UnpaidFineCount = _context.Fines
+                            .Count(f => f.UserId == u.Id && !f.IsPaid)
+                    });
+
+                var totalItems = await query.CountAsync();
+                var users = await query
+                    .OrderBy(u => u.User.UserName)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+
                 var userViewModels = users.Select(u => new UserViewModel
                 {
-                    Id = u.Id,
-                    UserName = u.UserName,
-                    Email = u.Email,
-                    FirstName = u.FirstName,
-                    LastName = u.LastName,
-                    IsLockedOut = u.LockoutEnd.HasValue && u.LockoutEnd > DateTimeOffset.UtcNow,
-                    IsApproved = u.IsApproved
-
+                    Id = u.User.Id,
+                    UserName = u.User.UserName,
+                    Email = u.User.Email,
+                    FirstName = u.User.FirstName,
+                    LastName = u.User.LastName,
+                    IsLockedOut = u.User.LockoutEnd.HasValue && u.User.LockoutEnd > DateTimeOffset.UtcNow,
+                    IsApproved = u.User.IsApproved,
+                    ActiveLoanCount = u.ActiveLoanCount,
+                    UnpaidFineCount = u.UnpaidFineCount
                 }).ToList();
-                return View(userViewModels);
+
+                var pagedResult = new PagedResultViewModel<UserViewModel>
+                {
+                    Items = userViewModels,
+                    CurrentPage = page,
+                    PageSize = pageSize,
+                    TotalItems = totalItems,
+                    TotalPages = (int)Math.Ceiling((double)totalItems / pageSize)
+                };
+
+                return View(pagedResult);
             }
             catch (Exception ex)
             {
@@ -59,6 +89,7 @@ namespace PrivateLMS.Controllers
                 return RedirectToAction("Error", "Home");
             }
         }
+
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Details(int id)
         {
@@ -321,6 +352,18 @@ namespace PrivateLMS.Controllers
                 {
                     TempData["ErrorMessage"] = "User not found.";
                     return PartialView("_NotFound");
+                }
+
+                var context = HttpContext.RequestServices.GetService<LibraryDbContext>();
+                if (context != null)
+                {
+                    var hasLoans = await context.LoanRecords.AnyAsync(lr => lr.UserId == id);
+                    var hasFines = await context.Fines.AnyAsync(f => f.UserId == id);
+                    if (hasLoans || hasFines)
+                    {
+                        TempData["ErrorMessage"] = "Cannot delete user with active loans or fines.";
+                        return RedirectToAction(nameof(Index));
+                    }
                 }
 
                 var result = await _userManager.DeleteAsync(user);

@@ -32,7 +32,7 @@ namespace PrivateLMS.Controllers
             _userManager = userManager;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int loansPage = 1, int finesPage = 1, int ratingsPage = 1, int loansPageSize = 5, int finesPageSize = 5, int ratingsPageSize = 5)
         {
             try
             {
@@ -43,27 +43,38 @@ namespace PrivateLMS.Controllers
                     return RedirectToAction("Index", "Login");
                 }
 
+                var ratingsQuery = _context.BookRatings
+                    .Include(br => br.Book)
+                    .Where(br => br.UserId == user.Id)
+                    .OrderByDescending(br => br.RatedOn);
+
+                var totalRatings = await ratingsQuery.CountAsync();
+                var recentRatings = await ratingsQuery
+                    .Skip((ratingsPage - 1) * ratingsPageSize)
+                    .Take(ratingsPageSize)
+                    .Select(br => new BookReviewViewModel
+                    {
+                        BookId = br.BookId,
+                        BookTitle = br.Book.Title,
+                        UserName = user.UserName,
+                        Rating = br.Rating,
+                        Review = br.Review ?? string.Empty,
+                        RatedOn = br.RatedOn
+                    })
+                    .ToListAsync();
+
                 var viewModel = new UserDashboardViewModel
                 {
-                    ActiveLoans = await _loanService.GetUserActiveLoansAsync(user.UserName),
-                    Fines = (await _fineService.GetUserFinesAsync(user.UserName))
-                        .Where(f => !f.IsPaid)
-                        .ToList(),
-                    RecentRatings = await _context.BookRatings
-                        .Include(br => br.Book)
-                        .Where(br => br.UserId == user.Id)
-                        .OrderByDescending(br => br.RatedOn)
-                        .Take(5)
-                        .Select(br => new BookReviewViewModel
-                        {
-                            BookId = br.BookId,
-                            BookTitle = br.Book.Title,
-                            UserName = user.UserName,
-                            Rating = br.Rating,
-                            Review = br.Review ?? string.Empty, // Added
-                            RatedOn = br.RatedOn
-                        })
-                        .ToListAsync()
+                    ActiveLoans = await _loanService.GetPagedUserActiveLoansAsync(user.UserName, loansPage, loansPageSize),
+                    Fines = await _fineService.GetPagedUserFinesAsync(user.UserName, finesPage, finesPageSize, unpaidOnly: true),
+                    RecentRatings = new PagedResultViewModel<BookReviewViewModel>
+                    {
+                        Items = recentRatings,
+                        CurrentPage = ratingsPage,
+                        PageSize = ratingsPageSize,
+                        TotalItems = totalRatings,
+                        TotalPages = (int)Math.Ceiling((double)totalRatings / ratingsPageSize)
+                    }
                 };
 
                 return View(viewModel);
@@ -75,5 +86,4 @@ namespace PrivateLMS.Controllers
             }
         }
     }
-
 }

@@ -24,24 +24,14 @@ namespace PrivateLMS.Services
 
         public async Task<List<LoanViewModel>> GetAllLoansAsync()
         {
-            return await _context.LoanRecords
-                .Include(lr => lr.Book)
-                .Include(lr => lr.User)
-                .AsNoTracking()
-                .Select(lr => new LoanViewModel
-                {
-                    LoanRecordId = lr.LoanRecordId,
-                    BookId = lr.BookId,
-                    BookTitle = lr.Book != null ? lr.Book.Title ?? "Unknown" : "Unknown",
-                    UserId = lr.UserId,
-                    LoanerName = lr.User != null ? $"{lr.User.FirstName} {lr.User.LastName}" : "Unknown",
-                    LoanDate = lr.LoanDate,
-                    DueDate = lr.DueDate,
-                    ReturnDate = lr.ReturnDate,
-                    IsRenewed = lr.IsRenewed,
-                    DaysOverdue = lr.DueDate.HasValue && lr.ReturnDate == null && lr.DueDate < DateTime.UtcNow ? (int)(DateTime.UtcNow - lr.DueDate.Value).TotalDays : 0
-                })
-                .ToListAsync();
+            var pagedResult = await GetPagedAllLoansAsync(1, int.MaxValue);
+            return pagedResult.Items;
+        }
+
+        public async Task<List<LoanViewModel>> GetAllUserLoansAsync(string username)
+        {
+            var pagedResult = await GetPagedAllUserLoansAsync(username, 1, int.MaxValue);
+            return pagedResult.Items;
         }
 
         public async Task<LoanViewModel?> GetLoanFormAsync(int bookId)
@@ -69,7 +59,7 @@ namespace PrivateLMS.Services
             try
             {
                 var book = await _context.Books.FindAsync(model.BookId);
-                if (book == null || !book.IsAvailable)
+                if (book == null || !book.IsAvailable || book.AvailableCopies <= 0)
                 {
                     return false;
                 }
@@ -77,7 +67,7 @@ namespace PrivateLMS.Services
                 var activeLoanCount = await _context.LoanRecords
                     .Where(lr => lr.UserId == model.UserId && lr.ReturnDate == null)
                     .CountAsync();
-                if (activeLoanCount >= 3)
+                if (activeLoanCount >= 2) // Adjusted to match LoansController limit
                 {
                     return false;
                 }
@@ -91,7 +81,8 @@ namespace PrivateLMS.Services
                     IsRenewed = false
                 };
 
-                book.IsAvailable = false;
+                book.AvailableCopies--;
+                book.IsAvailable = book.AvailableCopies > 0;
                 _context.LoanRecords.Add(loanRecord);
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
@@ -157,7 +148,7 @@ namespace PrivateLMS.Services
                 UserId = loanRecord.UserId,
                 Action = "ReturnBook",
                 Timestamp = DateTime.UtcNow,
-                Details = $"User returned book ID {loanRecord.BookId} (Title: {loanRecord.Book.Title})"
+                Details = $"User returned book ID {loanRecord.BookId} (Title: {loanRecord.Book?.Title ?? "Unknown"})"
             });
             await _context.SaveChangesAsync();
 
@@ -166,59 +157,8 @@ namespace PrivateLMS.Services
 
         public async Task<List<LoanViewModel>> GetUserLoansAsync(string username)
         {
-            if (string.IsNullOrWhiteSpace(username))
-            {
-                return new List<LoanViewModel>();
-            }
-
-            return await _context.LoanRecords
-                .Include(lr => lr.Book)
-                .Include(lr => lr.User)
-                .Where(lr => lr.User != null && lr.User.UserName == username && lr.ReturnDate == null)
-                .AsNoTracking()
-                .Select(lr => new LoanViewModel
-                {
-                    LoanRecordId = lr.LoanRecordId,
-                    BookId = lr.BookId,
-                    BookTitle = lr.Book != null ? lr.Book.Title ?? "Unknown" : "Unknown",
-                    UserId = lr.UserId,
-                    LoanerName = lr.User != null ? $"{lr.User.FirstName} {lr.User.LastName}" : "Unknown",
-                    LoanDate = lr.LoanDate,
-                    DueDate = lr.DueDate,
-                    ReturnDate = lr.ReturnDate,
-                    IsRenewed = lr.IsRenewed,
-                    DaysOverdue = lr.DueDate.HasValue && lr.ReturnDate == null && lr.DueDate < DateTime.UtcNow ? (int)(DateTime.UtcNow - lr.DueDate.Value).TotalDays : 0
-                })
-                .ToListAsync();
-        }
-
-        public async Task<List<LoanViewModel>> GetAllUserLoansAsync(string username)
-        {
-            if (string.IsNullOrWhiteSpace(username))
-            {
-                return new List<LoanViewModel>();
-            }
-
-            return await _context.LoanRecords
-                .Include(lr => lr.Book)
-                .Include(lr => lr.User)
-                .Where(lr => lr.User != null && lr.User.UserName == username)
-                .OrderByDescending(lr => lr.LoanDate)
-                .AsNoTracking()
-                .Select(lr => new LoanViewModel
-                {
-                    LoanRecordId = lr.LoanRecordId,
-                    BookId = lr.BookId,
-                    BookTitle = lr.Book != null ? lr.Book.Title ?? "Unknown" : "Unknown",
-                    UserId = lr.UserId,
-                    LoanerName = lr.User != null ? $"{lr.User.FirstName} {lr.User.LastName}" : "Unknown",
-                    LoanDate = lr.LoanDate,
-                    DueDate = lr.DueDate,
-                    ReturnDate = lr.ReturnDate,
-                    IsRenewed = lr.IsRenewed,
-                    DaysOverdue = lr.DueDate.HasValue && lr.ReturnDate == null && lr.DueDate < DateTime.UtcNow ? (int)(DateTime.UtcNow - lr.DueDate.Value).TotalDays : 0
-                })
-                .ToListAsync();
+            var pagedResult = await GetPagedUserActiveLoansAsync(username, 1, int.MaxValue);
+            return pagedResult.Items;
         }
 
         public async Task<List<LoanViewModel>> GetOverdueLoansAsync(string username)
@@ -251,30 +191,8 @@ namespace PrivateLMS.Services
 
         public async Task<List<LoanViewModel>> GetUserActiveLoansAsync(string username)
         {
-            if (string.IsNullOrWhiteSpace(username))
-            {
-                return new List<LoanViewModel>();
-            }
-
-            return await _context.LoanRecords
-                .Include(lr => lr.Book)
-                .Include(lr => lr.User)
-                .Where(lr => lr.User != null && lr.User.UserName == username && lr.ReturnDate == null)
-                .AsNoTracking()
-                .Select(lr => new LoanViewModel
-                {
-                    LoanRecordId = lr.LoanRecordId,
-                    BookId = lr.BookId,
-                    BookTitle = lr.Book != null ? lr.Book.Title ?? "Unknown" : "Unknown",
-                    UserId = lr.UserId,
-                    LoanerName = lr.User != null ? $"{lr.User.FirstName} {lr.User.LastName}" : "Unknown",
-                    LoanDate = lr.LoanDate,
-                    DueDate = lr.DueDate,
-                    ReturnDate = lr.ReturnDate,
-                    IsRenewed = lr.IsRenewed,
-                    DaysOverdue = lr.DueDate.HasValue && lr.DueDate < DateTime.UtcNow ? (int)(DateTime.UtcNow - lr.DueDate.Value).TotalDays : 0
-                })
-                .ToListAsync();
+            var pagedResult = await GetPagedUserActiveLoansAsync(username, 1, int.MaxValue);
+            return pagedResult.Items;
         }
 
         public async Task<bool> RenewLoanAsync(int loanRecordId)
@@ -311,6 +229,135 @@ namespace PrivateLMS.Services
             return await _context.LoanRecords
                 .Where(lr => lr.UserId == userId && lr.ReturnDate == null)
                 .CountAsync();
+        }
+
+        public async Task<PagedResultViewModel<LoanViewModel>> GetPagedAllLoansAsync(int page, int pageSize)
+        {
+            var query = _context.LoanRecords
+                .Include(lr => lr.Book)
+                .Include(lr => lr.User)
+                .AsNoTracking();
+
+            var totalItems = await query.CountAsync();
+            var loans = await query
+                .OrderByDescending(lr => lr.LoanDate)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(lr => new LoanViewModel
+                {
+                    LoanRecordId = lr.LoanRecordId,
+                    BookId = lr.BookId,
+                    BookTitle = lr.Book != null ? lr.Book.Title ?? "Unknown" : "Unknown",
+                    UserId = lr.UserId,
+                    LoanerName = lr.User != null ? $"{lr.User.FirstName} {lr.User.LastName}" : "Unknown",
+                    LoanDate = lr.LoanDate,
+                    DueDate = lr.DueDate,
+                    ReturnDate = lr.ReturnDate,
+                    IsRenewed = lr.IsRenewed,
+                    DaysOverdue = lr.DueDate.HasValue && lr.ReturnDate == null && lr.DueDate < DateTime.UtcNow
+                        ? (int)(DateTime.UtcNow - lr.DueDate.Value).TotalDays
+                        : 0
+                })
+                .ToListAsync();
+
+            return new PagedResultViewModel<LoanViewModel>
+            {
+                Items = loans,
+                CurrentPage = page,
+                PageSize = pageSize,
+                TotalItems = totalItems,
+                TotalPages = (int)Math.Ceiling((double)totalItems / pageSize)
+            };
+        }
+
+        public async Task<PagedResultViewModel<LoanViewModel>> GetPagedAllUserLoansAsync(string userName, int page, int pageSize)
+        {
+            if (string.IsNullOrWhiteSpace(userName))
+            {
+                return new PagedResultViewModel<LoanViewModel> { Items = new List<LoanViewModel>() };
+            }
+
+            var query = _context.LoanRecords
+                .Include(lr => lr.Book)
+                .Include(lr => lr.User)
+                .Where(lr => lr.User != null && lr.User.UserName == userName)
+                .AsNoTracking();
+
+            var totalItems = await query.CountAsync();
+            var loans = await query
+                .OrderByDescending(lr => lr.LoanDate)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(lr => new LoanViewModel
+                {
+                    LoanRecordId = lr.LoanRecordId,
+                    BookId = lr.BookId,
+                    BookTitle = lr.Book != null ? lr.Book.Title ?? "Unknown" : "Unknown",
+                    UserId = lr.UserId,
+                    LoanerName = lr.User != null ? $"{lr.User.FirstName} {lr.User.LastName}" : "Unknown",
+                    LoanDate = lr.LoanDate,
+                    DueDate = lr.DueDate,
+                    ReturnDate = lr.ReturnDate,
+                    IsRenewed = lr.IsRenewed,
+                    DaysOverdue = lr.DueDate.HasValue && lr.ReturnDate == null && lr.DueDate < DateTime.UtcNow
+                        ? (int)(DateTime.UtcNow - lr.DueDate.Value).TotalDays
+                        : 0
+                })
+                .ToListAsync();
+
+            return new PagedResultViewModel<LoanViewModel>
+            {
+                Items = loans,
+                CurrentPage = page,
+                PageSize = pageSize,
+                TotalItems = totalItems,
+                TotalPages = (int)Math.Ceiling((double)totalItems / pageSize)
+            };
+        }
+
+        public async Task<PagedResultViewModel<LoanViewModel>> GetPagedUserActiveLoansAsync(string userName, int page, int pageSize)
+        {
+            if (string.IsNullOrWhiteSpace(userName))
+            {
+                return new PagedResultViewModel<LoanViewModel> { Items = new List<LoanViewModel>() };
+            }
+
+            var query = _context.LoanRecords
+                .Include(lr => lr.Book)
+                .Include(lr => lr.User)
+                .Where(lr => lr.User != null && lr.User.UserName == userName && lr.ReturnDate == null)
+                .AsNoTracking();
+
+            var totalItems = await query.CountAsync();
+            var loans = await query
+                .OrderByDescending(lr => lr.LoanDate)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(lr => new LoanViewModel
+                {
+                    LoanRecordId = lr.LoanRecordId,
+                    BookId = lr.BookId,
+                    BookTitle = lr.Book != null ? lr.Book.Title ?? "Unknown" : "Unknown",
+                    UserId = lr.UserId,
+                    LoanerName = lr.User != null ? $"{lr.User.FirstName} {lr.User.LastName}" : "Unknown",
+                    LoanDate = lr.LoanDate,
+                    DueDate = lr.DueDate,
+                    ReturnDate = lr.ReturnDate,
+                    IsRenewed = lr.IsRenewed,
+                    DaysOverdue = lr.DueDate.HasValue && lr.DueDate < DateTime.UtcNow
+                        ? (int)(DateTime.UtcNow - lr.DueDate.Value).TotalDays
+                        : 0
+                })
+                .ToListAsync();
+
+            return new PagedResultViewModel<LoanViewModel>
+            {
+                Items = loans,
+                CurrentPage = page,
+                PageSize = pageSize,
+                TotalItems = totalItems,
+                TotalPages = (int)Math.Ceiling((double)totalItems / pageSize)
+            };
         }
     }
 }

@@ -22,5 +22,6 @@ namespace PrivateLMS.ViewModels
 
         [Display(Name = "Number of Books")]
         public int BookCount { get; set; }
+        public List<string> Books { get; set; }
     }
 }

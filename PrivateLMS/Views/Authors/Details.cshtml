@@ -3,40 +3,55 @@
     ViewData["Title"] = "Author Details";
 }
 
-<div class="container mt-5">
+<div class="container mt-5 mb-5">
     <h2 class="text-center mb-4">Author Details</h2>
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <dl class="row">
-                        <dt class="col-sm-4 text-end">Name</dt>
-                        <dd class="col-sm-8">@Model.Name</dd>
 
-                        <dt class="col-sm-4 text-end">Biography</dt>
-                        <dd class="col-sm-8">@(!string.IsNullOrWhiteSpace(Model.Biography) ? Model.Biography : "No biography available")</dd>
+    <div class="card shadow-sm p-4 rounded-4">
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-4 text-end fw-semibold">Name</dt>
+                <dd class="col-sm-8">@Model.Name</dd>
 
-                        <dt class="col-sm-4 text-end">Birth Date</dt>
-                        <dd class="col-sm-8">@Model.BirthDate?.ToShortDateString() Unknown</dd>
+                <dt class="col-sm-4 text-end fw-semibold">Biography</dt>
+                <dd class="col-sm-8">@(!string.IsNullOrWhiteSpace(Model.Biography) ? Model.Biography : "No biography available")</dd>
 
-                        <dt class="col-sm-4 text-end">Death Date</dt>
-                        <dd class="col-sm-8">@Model.DeathDate?.ToShortDateString() N/A</dd>
+                <dt class="col-sm-4 text-end fw-semibold">Birth Date</dt>
+                <dd class="col-sm-8">@(Model.BirthDate?.ToShortDateString() ?? "Unknown")</dd>
 
-                        @if (User.Identity.IsAuthenticated)
-                        {
-                            <dt class="col-sm-4 text-end">Number of Books</dt>
-                            <dd class="col-sm-8">@Model.BookCount</dd>
-                        }
-                    </dl>
+                <dt class="col-sm-4 text-end fw-semibold">Death Date</dt>
+                <dd class="col-sm-8">@(Model.DeathDate?.ToShortDateString() ?? "N/A")</dd>
 
-                    <div class="text-center mt-4">
-                        @if (User.IsInRole("Admin"))
-                        {
-                            <a asp-action="Edit" asp-route-id="@Model.AuthorId" class="btn btn-warning me-2">Edit</a>
-                        }
-                        <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Back to Books</a>
-                    </div>
-                </div>
+                <dt class="col-sm-4 text-end fw-semibold">Number of Books</dt>
+                <dd class="col-sm-8">@Model.BookCount</dd>
+
+                <dt class="col-sm-4 text-end fw-semibold">Books</dt>
+                <dd class="col-sm-8">
+                    @if (Model.Books != null && Model.Books.Any())
+                    {
+                        <ul class="list-unstyled mb-0">
+                            @foreach (var book in Model.Books)
+                            {
+                                <li>@book</li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <span class="text-muted">No books by this author.</span>
+                    }
+                </dd>
+            </dl>
+
+            <div class="text-center mt-4">
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-action="Edit" asp-route-id="@Model.AuthorId" class="btn btn-warning btn-sm me-2 rounded-3" aria-label="Edit author @Model.Name">
+                        Edit
+                    </a>
+                }
+                <a asp-controller="Authors" asp-action="Index" class="btn btn-secondary btn-sm rounded-3" aria-label="Back to authors list">
+                    Back to List
+                </a>
             </div>
         </div>
     </div>

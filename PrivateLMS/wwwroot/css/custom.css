@@ -2,11 +2,11 @@
    Base Layout
 ================================== */
 body {
-    font-family: 'Cormorant Garamond', serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background-color: #fdfbf7;
     color: #3b2f2f;
-    font-size: 18px;
-    line-height: 1.8;
+    font-size: 16px;
+    line-height: 1.6;
     margin: 0;
     padding: 0;
 }
@@ -15,28 +15,49 @@ body {
    Headings
 ================================== */
 h1, h2, h3, h4, h5 {
-    font-family: 'Cormorant Garamond', serif;
+    font-family: 'Lora', serif;
     color: #4a3c2e;
     font-weight: 600;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+h1 {
+    font-size: 2.5rem;
+}
+
+h2 {
+    font-size: 2rem;
+}
+
+h3 {
+    font-size: 1.75rem;
+}
+
+h4 {
+    font-size: 1.5rem;
+}
+
+h5 {
+    font-size: 1.25rem;
 }
 
 /* ================================
    Navbar
 ================================== */
 .navbar {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Inter', sans-serif;
     background-color: #3b2f2f;
 }
 
 .navbar-brand {
-    font-family: 'Cormorant Garamond', serif;
+    font-family: 'Lora', serif;
     font-size: 1.6rem;
     color: #fdfbf7 !important;
 }
 
 .nav-link {
     color: #e0d8c6 !important;
+    font-size: 1rem;
     transition: color 0.3s ease;
 }
 
@@ -48,7 +69,7 @@ h1, h2, h3, h4, h5 {
    Buttons
 ================================== */
 .btn {
-    font-family: 'Cormorant Garamond', serif;
+    font-family: 'Inter', sans-serif;
     font-size: 16px;
     padding: 10px 22px;
     border-radius: 6px;
@@ -76,47 +97,127 @@ h1, h2, h3, h4, h5 {
         background-color: #f3e6d4;
     }
 
-.btn-danger {
-    background-color: #bb4c4c;
-    border-color: #a84242;
+.btn-outline-secondary {
+    border-color: #d8c9b4;
+    color: #4a3c2e;
 }
 
-    .btn-danger:hover {
-        background-color: #933f3f;
+    .btn-outline-secondary:hover {
+        background-color: #f3e6d4;
+        border-color: #d8c9b4;
+    }
+
+.btn-success {
+    background-color: #A8D5BA;
+    border-color: #A8D5BA;
+    color: #3b2f2f;
+}
+
+    .btn-success:hover {
+        background-color: #8BC4A3;
+        border-color: #8BC4A3;
     }
 
 .btn-warning {
-    background-color: #e1b97d;
-    border-color: #e1b97d;
+    background-color: #F7C59F;
+    border-color: #F7C59F;
     color: #3b2f2f;
 }
 
     .btn-warning:hover {
-        background-color: #cfa464;
-        border-color: #cfa464;
+        background-color: #E0A88E;
+        border-color: #E0A88E;
     }
+
+.btn-outline-info {
+    border-color: #8E9AAF;
+    color: #3b2f2f;
+}
+
+    .btn-outline-info:hover {
+        background-color: #8E9AAF;
+        color: #fff;
+    }
+
+.btn-outline-warning {
+    border-color: #F7C59F;
+    color: #3b2f2f;
+}
+
+    .btn-outline-warning:hover {
+        background-color: #F7C59F;
+        color: #3b2f2f;
+    }
+
+.btn-outline-danger {
+    border-color: #EF767A;
+    color: #3b2f2f;
+}
+
+    .btn-outline-danger:hover {
+        background-color: #EF767A;
+        color: #fff;
+    }
+
+.btn-lg {
+    font-size: 18px;
+    padding: 12px 24px;
+}
+
+.btn-sm {
+    font-size: 14px;
+    padding: 6px 12px;
+}
 
 /* ================================
    Forms
 ================================== */
 .form-label {
+    font-family: 'Inter', sans-serif;
     font-weight: 500;
     color: #4a3c2e;
 }
 
-.form-control {
+.form-control, .form-select {
+    font-family: 'Inter', sans-serif;
     border: 1px solid #d8c9b4;
     background-color: #fffdf9;
     color: #3b2f2f;
+    border-radius: 6px;
+    font-size: 16px;
+    padding: 10px;
+}
+
+    .form-control:focus, .form-select:focus {
+        border-color: #a67c52;
+        box-shadow: 0 0 0 0.2rem rgba(166, 124, 82, 0.25);
+    }
+
+.form-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-check-input {
+    cursor: pointer;
+}
+
+.form-check-label {
+    font-family: 'Inter', sans-serif;
+    color: #3b2f2f;
+    font-size: 14px;
 }
 
 /* ================================
    Cards
 ================================== */
 .card {
+    font-family: 'Inter', sans-serif;
     background-color: #fdfbf7;
     border: 1px solid #e5d8c9;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border-radius: 6px;
     transition: box-shadow 0.3s ease;
 }
 
@@ -125,6 +226,7 @@ h1, h2, h3, h4, h5 {
     }
 
 .card-title {
+    font-family: 'Lora', serif;
     color: #4a3c2e;
     font-weight: 600;
 }
@@ -136,6 +238,151 @@ h1, h2, h3, h4, h5 {
 .card-footer {
     background-color: transparent;
     border-top: none;
+}
+
+.card-header {
+    background-color: #f3e6d4;
+    border-bottom: 1px solid #e5d8c9;
+}
+
+/* ================================
+   Dashboard Cards
+================================== */
+.dashboard-card {
+    color: #3b2f2f;
+    border: none;
+    transition: transform 0.3s ease;
+}
+
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+    }
+
+.dashboard-card-total-books {
+    background-color: #a67c52;
+    color: #fff;
+}
+
+.dashboard-card-loaned-out {
+    background-color: #A8D5BA;
+}
+
+.dashboard-card-pending-returns {
+    background-color: #F7C59F;
+}
+
+.dashboard-card-overdue-loans {
+    background-color: #EF767A;
+    color: #fff;
+}
+
+.dashboard-card-total-users {
+    background-color: #8E9AAF;
+    color: #fff;
+}
+
+.dashboard-card-unapproved-users {
+    background-color: #EFD3D7;
+}
+
+.dashboard-card-banned-users {
+    background-color: #C9ADA7;
+}
+
+/* ================================
+   Description Lists (for Details Views)
+================================== */
+dl.row dt {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    color: #4a3c2e;
+}
+
+dl.row dd {
+    font-family: 'Inter', sans-serif;
+    color: #3b2f2f;
+}
+
+/* ================================
+   Tables
+================================== */
+.table {
+    font-family: 'Inter', sans-serif;
+    color: #3b2f2f;
+}
+
+    .table th {
+        font-family: 'Lora', serif;
+        color: #4a3c2e;
+        font-weight: 600;
+    }
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #fffdf9;
+}
+
+.table-actions {
+    white-space: nowrap; /* Replaces inline text-nowrap for table actions */
+}
+
+/* ================================
+   Images
+================================== */
+.publisher-logo {
+    max-width: 120px;
+    height: auto;
+}
+
+.about-logo {
+    max-height: 120px;
+    width: auto;
+}
+
+/* ================================
+   Badges
+================================== */
+.badge-returned, .badge-approved {
+    background-color: #A8D5BA;
+    color: #3b2f2f;
+}
+
+.badge-pending {
+    background-color: #F7C59F;
+    color: #3b2f2f;
+}
+
+.badge-overdue {
+    background-color: #EF767A;
+    color: #fff;
+}
+
+.badge-renewed {
+    background-color: #8E9AAF;
+    color: #fff;
+}
+
+.badge-loan-count {
+    background-color: #84A59D;
+    color: #fff;
+}
+
+/* ================================
+   List Group
+================================== */
+.list-group-item {
+    background-color: #fdfbf7;
+    border: 1px solid #e5d8c9;
+    font-family: 'Inter', sans-serif;
+    color: #3b2f2f;
+}
+
+/* ================================
+   Alerts
+================================== */
+.alert {
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    border-radius: 6px;
 }
 
 /* ================================
@@ -165,34 +412,20 @@ h1, h2, h3, h4, h5 {
     margin-bottom: 3rem;
 }
 
-.alert {
-    font-family: 'Lato', sans-serif;
-    font-size: 16px;
-}
-
 /* ================================
    Footer
 ================================== */
 footer {
+    font-family: 'Inter', sans-serif;
     background-color: #f3e6d4;
     color: #4a3c2e;
     font-size: 14px;
-    font-family: 'Cormorant Garamond', serif;
     padding: 15px 0;
     text-align: center;
 }
 
     footer a {
         color: #4a3c2e;
-        text-decoration: underline;
-    }
-
-    footer p,
-    footer a {
-        margin-bottom: 0.5rem;
-        color: #4a3c2e;
-        font-size: 0.95rem;
-        font-weight: bold;
         text-decoration: none;
     }
 
@@ -200,7 +433,15 @@ footer {
             text-decoration: underline;
         }
 
+    footer p,
+    footer a {
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+        font-weight: 500;
+    }
+
     footer .branding {
+        font-family: 'Lora', serif;
         font-weight: 600;
         font-size: 1.1rem;
         letter-spacing: 0.5px;
@@ -215,6 +456,7 @@ footer {
    Custom Poetic Elements
 ================================== */
 .hadith-banner {
+    font-family: 'Inter', sans-serif;
     background-color: #f3e6d4;
     border-left: 5px solid #a67c52;
     padding: 30px;
@@ -229,12 +471,14 @@ footer {
 }
 
 .hadith-english {
+    font-family: 'Lora', serif;
     font-style: italic;
     font-size: 18px;
     color: #5c4433;
 }
 
 .hadith-attribution {
+    font-family: 'Inter', sans-serif;
     font-size: 14px;
     color: #7c5e4a;
 }
@@ -248,6 +492,7 @@ footer {
 }
 
 .quote {
+    font-family: 'Lora', serif;
     font-style: italic;
     color: #6d5844;
     border-left: 3px solid #a67c52;
@@ -256,10 +501,231 @@ footer {
 }
 
 /* ================================
-   Responsive & Poetic Dashboard
-================================ */
+   Modal Styling
+================================== */
+.modal-content {
+    background-color: #fdfbf7;
+    border: 1px solid #e5d8c9;
+    border-radius: 6px;
+}
 
+.modal-header {
+    background-color: #f3e6d4;
+    border-bottom: 1px solid #e5d8c9;
+}
+
+.modal-body {
+    font-family: 'Inter', sans-serif;
+    color: #3b2f2f;
+}
+
+    .modal-body h5 {
+        font-family: 'Lora', serif;
+    }
+
+.modal-footer {
+    border-top: 1px solid #e5d8c9;
+}
+
+/* ================================
+   Chatbot-Specific CSS
+================================== */
+.chat-container {
+    max-width: 600px;
+    width: 90%;
+    margin: 20px auto;
+    background-color: #fdfbf7;
+    border: 1px solid #e5d8c9;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    border-radius: 6px;
+    overflow: hidden;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.chat-header {
+    font-family: 'Lora', serif;
+    background-color: #f3e6d4;
+    color: #4a3c2e;
+    padding: 15px;
+    text-align: center;
+    font-size: 1.4rem;
+    font-weight: 600;
+    border-bottom: 1px solid #e5d8c9;
+}
+
+.chat-body {
+    font-family: 'Inter', sans-serif;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 15px;
+    background-color: #fffdf9;
+}
+
+.user-message, .bot-message {
+    margin: 10px 0;
+    padding: 12px;
+    border-radius: 6px;
+    max-width: 80%;
+    word-wrap: break-word;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.user-message {
+    background-color: #f3e6d4;
+    margin-left: auto;
+    text-align: right;
+    color: #4a3c2e;
+}
+
+.bot-message {
+    background-color: #fdfbf7;
+    border: 1px solid #e5d8c9;
+    color: #3b2f2f;
+}
+
+.typing {
+    font-family: 'Inter', sans-serif;
+    font-style: italic;
+    color: #6d5844;
+    border-left: 3px solid #a67c52;
+    padding-left: 16px;
+    margin: 24px 0;
+}
+
+.chat-input {
+    display: flex;
+    padding: 10px;
+    background-color: #fffdf9;
+    border-top: 1px solid #e5d8c9;
+}
+
+    .chat-input input {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #d8c9b4;
+        background-color: #fffdf9;
+        color: #3b2f2f;
+        border-radius: 6px;
+        margin-right: 10px;
+        font-family: 'Inter', sans-serif;
+        font-size: 16px;
+    }
+
+        .chat-input input.error {
+            border: 2px solid #EF767A;
+        }
+
+    .chat-input button {
+        font-family: 'Inter', sans-serif;
+    }
+
+.quick-replies {
+    margin: 10px;
+    text-align: center;
+}
+
+.quick-reply {
+    font-family: 'Inter', sans-serif;
+    margin: 5px;
+}
+
+.restart-button {
+    font-family: 'Inter', sans-serif;
+    margin: 10px auto;
+    display: block;
+    width: fit-content;
+}
+
+/* ================================
+   Chat Button Styles
+================================== */
+#chat-button-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+#open-chat-button {
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    padding: 10px 20px;
+    border-radius: 30px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease-in-out, transform 0.2s ease;
+    background: #a67c52;
+    color: #fff;
+    border: 1px solid #d8c9b4;
+}
+
+    #open-chat-button:hover {
+        background: #7c5e4a;
+        transform: scale(1.05);
+    }
+
+/* ================================
+   Accordion Styling (for FAQ)
+================================== */
+.accordion-button {
+    font-family: 'Lora', serif;
+    color: #4a3c2e;
+    background-color: #fdfbf7;
+}
+
+    .accordion-button:not(.collapsed) {
+        background-color: #f3e6d4;
+        color: #3b2f2f;
+    }
+
+.accordion-body {
+    font-family: 'Inter', sans-serif;
+    color: #3b2f2f;
+}
+
+.accordion-item {
+    border: 1px solid #e5d8c9;
+    border-radius: 6px;
+    margin-bottom: 10px;
+}
+
+/* ================================
+   Responsive Design
+================================== */
 @media (max-width: 576px) {
+    body {
+        font-size: 15px;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    h2 {
+        font-size: 1.75rem;
+    }
+
+    h3 {
+        font-size: 1.5rem;
+    }
+
+    .card {
+        padding: 1.5rem; /* Reduced padding for mobile */
+    }
+
     .card-body p.display-6 {
         font-size: 1.25rem !important;
     }
@@ -278,155 +744,24 @@ footer {
         font-size: 15px;
     }
 
+    .btn-sm {
+        padding: 5px 10px;
+        font-size: 13px;
+    }
+
+    .btn-lg {
+        padding: 10px 20px;
+        font-size: 16px;
+    }
+
     canvas {
         max-width: 100% !important;
         height: auto !important;
     }
 
-    #chatbox {
-        width: 90vw;
-        right: 5vw;
-    }
-}
-
-/* Status Badge Styling */
-.badge-returned {
-    background-color: #A8D5BA;
-    color: #3b2f2f;
-}
-
-.badge-pending {
-    background-color: #F7C59F;
-    color: #3b2f2f;
-}
-
-.badge-overdue {
-    background-color: #EF767A;
-    color: #fff;
-}
-
-.badge-renewed {
-    background-color: #8E9AAF;
-    color: #fff;
-}
-
-/* Chatbot-Specific CSS */
-.chat-container {
-    max-width: 600px;
-    margin: 20px auto;
-    background-color: #fdfbf7;
-    border: 1px solid #e5d8c9;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    transition: box-shadow 0.3s ease;
-    border-radius: 6px;
-}
-
-    .chat-container:hover {
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-    }
-
-.chat-header {
-    background-color: #f3e6d4;
-    color: #4a3c2e;
-    padding: 15px;
-    text-align: center;
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.4rem;
-    font-weight: 600;
-    border-top-left-radius: 6px;
-    border-top-right-radius: 6px;
-    border-bottom: 1px solid #e5d8c9;
-}
-
-.chat-body {
-    max-height: 400px;
-    overflow-y: auto;
-    padding: 15px;
-    background-color: #fffdf9;
-}
-
-
-.user-message, .bot-message {
-    margin: 10px 0;
-    padding: 12px;
-    border-radius: 6px;
-    max-width: 80%;
-    word-wrap: break-word;
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 16px;
-    line-height: 1.6;
-}
-
-.user-message {
-    background-color: #f3e6d4;
-    margin-left: auto;
-    text-align: right;
-    color: #4a3c2e;
-}
-
-.bot-message {
-    background-color: #fdfbf7;
-    border: 1px solid #e5d8c9;
-    color: #3b2f2f;
-}
-
-.typing {
-    font-style: italic;
-    color: #6d5844;
-    border-left: 3px solid #a67c52;
-    padding-left: 16px;
-    margin: 24px 0;
-}
-
-.chat-input {
-    display: flex;
-    padding: 10px;
-    background-color: #fffdf9;
-    border-top: 1px solid #e5d8c9;
-    border-bottom-left-radius: 6px;
-    border-bottom-right-radius: 6px;
-}
-
-    .chat-input input {
-        flex: 1;
-        padding: 10px;
-        border: 1px solid #d8c9b4;
-        background-color: #fffdf9;
-        color: #3b2f2f;
-        border-radius: 6px;
-        margin-right: 10px;
-        font-family: 'Cormorant Garamond', serif;
-        font-size: 16px;
-    }
-
-        .chat-input input.error {
-            border: 2px solid #bb4c4c;
-        }
-
-    .chat-input button {
-        font-family: 'Poppins', sans-serif;
-    }
-
-.quick-replies {
-    margin: 10px;
-    text-align: center;
-}
-
-.quick-reply {
-    font-family: 'Poppins', sans-serif;
-    margin: 5px;
-}
-
-.restart-button {
-    font-family: 'Poppins', sans-serif;
-    margin: 10px auto;
-    display: block;
-    width: fit-content;
-}
-
-@media (max-width: 576px) {
     .chat-container {
-        max-width: 90vw;
+        width: 95%;
+        max-height: 80vh;
         margin: 10px;
     }
 
@@ -437,148 +772,7 @@ footer {
     .chat-header {
         font-size: 1.2rem;
     }
-}
 
-/* Chat Button Styles */
-#chat-button-container {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 1000;
-}
-
-#open-chat-button {
-    font-family: 'Poppins', sans-serif;
-    font-size: 16px;
-    padding: 10px 20px;
-    border-radius: 30px; /* Softer, oval shape */
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease-in-out, transform 0.2s ease;
-    background: #a67c52;
-    color: #4a3c2e;
-    border: 1px solid #d8c9b4;
-}
-
-
-
-.chat-container {
-    max-width: 600px;
-    width: 90%;
-    background-color: #fdfbf7;
-    border: 1px solid #e5d8c9;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-    border-radius: 6px;
-    overflow: hidden;
-    animation: slideIn 0.3s ease;
-}
-
-@@keyframes slideIn {
-    from {
-        transform: translateY(50px);
-        opacity: 0;
-    }
-
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
-.chat-header {
-    background-color: #f3e6d4;
-    color: #4a3c2e;
-    padding: 15px;
-    text-align: center;
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.4rem;
-    font-weight: 600;
-    border-bottom: 1px solid #e5d8c9;
-}
-
-.chat-body {
-    max-height: 400px;
-    overflow-y: auto;
-    padding: 15px;
-    background-color: #fffdf9;
-}
-
-.user-message, .bot-message {
-    margin: 10px 0;
-    padding: 12px;
-    border-radius: 6px;
-    max-width: 80%;
-    word-wrap: break-word;
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 16px;
-    line-height: 1.6;
-}
-
-.user-message {
-    background-color: #f3e6d4;
-    margin-left: auto;
-    text-align: right;
-    color: #4a3c2e;
-}
-
-.bot-message {
-    background-color: #fdfbf7;
-    border: 1px solid #e5d8c9;
-    color: #3b2f2f;
-}
-
-.typing {
-    font-style: italic;
-    color: #6d5844;
-    border-left: 3px solid #a67c52;
-    padding-left: 16px;
-    margin: 24px 0;
-}
-
-.chat-input {
-    display: flex;
-    padding: 10px;
-    background-color: #fffdf9;
-    border-top: 1px solid #e5d8c9;
-}
-
-    .chat-input input {
-        flex: 1;
-        padding: 10px;
-        border: 1px solid #d8c9b4;
-        background-color: #fffdf9;
-        color: #3b2f2f;
-        border-radius: 6px;
-        margin-right: 10px;
-        font-family: 'Cormorant Garamond', serif;
-        font-size: 16px;
-    }
-
-        .chat-input input.error {
-            border: 2px solid #bb4c4c;
-        }
-
-    .chat-input button {
-        font-family: 'Poppins', sans-serif;
-    }
-
-.quick-replies {
-    margin: 10px;
-    text-align: center;
-}
-
-.quick-reply {
-    font-family: 'Poppins', sans-serif;
-    margin: 5px;
-}
-
-.restart-button {
-    font-family: 'Poppins', sans-serif;
-    margin: 10px auto;
-    display: block;
-    width: fit-content;
-}
-
-@media (max-width: 576px) {
     #chat-button-container {
         bottom: 15px;
         right: 15px;
@@ -589,8 +783,31 @@ footer {
         font-size: 15px;
     }
 
-    .chat-container {
-        width: 95%;
-        max-height: 80vh;
+    .publisher-logo {
+        max-width: 100px;
+    }
+
+    .about-logo {
+        max-height: 100px;
+    }
+
+    dl.row dt, dl.row dd {
+        font-size: 14px;
+    }
+
+    .dashboard-card .display-6 {
+        font-size: 1.5rem;
+    }
+
+    .modal-dialog {
+        margin: 0.5rem;
+    }
+
+    .modal-body {
+        padding: 1rem;
+    }
+
+    .modal-footer {
+        padding: 0.75rem;
     }
 }

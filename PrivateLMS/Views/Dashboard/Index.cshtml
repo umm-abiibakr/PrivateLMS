@@ -9,7 +9,7 @@
     <!-- Active Loans Section -->
     <section class="mb-5">
         <h3 class="text-center mb-4">Active Loans</h3>
-        @if (!Model.ActiveLoans.Any())
+        @if (!Model.ActiveLoans.Items.Any())
         {
             <p class="text-center text-muted">You have no active loans.</p>
         }
@@ -26,7 +26,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var loan in Model.ActiveLoans)
+                        @foreach (var loan in Model.ActiveLoans.Items)
                         {
                             <tr>
                                 <td>@loan.BookTitle</td>
@@ -50,13 +50,50 @@
                     </tbody>
                 </table>
             </div>
+            <!-- Pagination for Active Loans -->
+            <nav aria-label="Active Loans navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    @if (Model.ActiveLoans.HasPreviousPage)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-route-loansPage="@(Model.ActiveLoans.CurrentPage - 1)" asp-route-finesPage="@Model.Fines.CurrentPage" asp-route-ratingsPage="@Model.RecentRatings.CurrentPage">Previous</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">Previous</span>
+                        </li>
+                    }
+
+                    @for (int i = 1; i <= Model.ActiveLoans.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.ActiveLoans.CurrentPage ? "active" : "")">
+                            <a class="page-link" asp-action="Index" asp-route-loansPage="@i" asp-route-finesPage="@Model.Fines.CurrentPage" asp-route-ratingsPage="@Model.RecentRatings.CurrentPage">@i</a>
+                        </li>
+                    }
+
+                    @if (Model.ActiveLoans.HasNextPage)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-route-loansPage="@(Model.ActiveLoans.CurrentPage + 1)" asp-route-finesPage="@Model.Fines.CurrentPage" asp-route-ratingsPage="@Model.RecentRatings.CurrentPage">Next</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">Next</span>
+                        </li>
+                    }
+                </ul>
+            </nav>
         }
     </section>
 
     <!-- Fines Section -->
     <section class="mb-5">
         <h3 class="text-center mb-4">Unpaid Fines</h3>
-        @if (!Model.Fines.Any())
+        @if (!Model.Fines.Items.Any())
         {
             <p class="text-center text-muted">You have no unpaid fines.</p>
         }
@@ -73,7 +110,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var fine in Model.Fines)
+                        @foreach (var fine in Model.Fines.Items)
                         {
                             <tr>
                                 <td>@fine.BookTitle</td>
@@ -87,13 +124,50 @@
                     </tbody>
                 </table>
             </div>
+            <!-- Pagination for Fines -->
+            <nav aria-label="Fines navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    @if (Model.Fines.HasPreviousPage)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-route-loansPage="@Model.ActiveLoans.CurrentPage" asp-route-finesPage="@(Model.Fines.CurrentPage - 1)" asp-route-ratingsPage="@Model.RecentRatings.CurrentPage">Previous</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">Previous</span>
+                        </li>
+                    }
+
+                    @for (int i = 1; i <= Model.Fines.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.Fines.CurrentPage ? "active" : "")">
+                            <a class="page-link" asp-action="Index" asp-route-loansPage="@Model.ActiveLoans.CurrentPage" asp-route-finesPage="@i" asp-route-ratingsPage="@Model.RecentRatings.CurrentPage">@i</a>
+                        </li>
+                    }
+
+                    @if (Model.Fines.HasNextPage)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-route-loansPage="@Model.ActiveLoans.CurrentPage" asp-route-finesPage="@(Model.Fines.CurrentPage + 1)" asp-route-ratingsPage="@Model.RecentRatings.CurrentPage">Next</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">Next</span>
+                        </li>
+                    }
+                </ul>
+            </nav>
         }
     </section>
 
     <!-- Recent Ratings Section -->
     <section class="mb-5">
         <h3 class="text-center mb-4">Your Recent Ratings</h3>
-        @if (!Model.RecentRatings.Any())
+        @if (!Model.RecentRatings.Items.Any())
         {
             <p class="text-center text-muted">You haven't rated any books yet.</p>
         }
@@ -110,7 +184,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var rating in Model.RecentRatings)
+                        @foreach (var rating in Model.RecentRatings.Items)
                         {
                             <tr>
                                 <td>@rating.BookTitle</td>
@@ -124,6 +198,43 @@
                     </tbody>
                 </table>
             </div>
+            <!-- Pagination for Recent Ratings -->
+            <nav aria-label="Recent Ratings navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    @if (Model.RecentRatings.HasPreviousPage)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-route-loansPage="@Model.ActiveLoans.CurrentPage" asp-route-finesPage="@Model.Fines.CurrentPage" asp-route-ratingsPage="@(Model.RecentRatings.CurrentPage - 1)">Previous</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">Previous</span>
+                        </li>
+                    }
+
+                    @for (int i = 1; i <= Model.RecentRatings.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.RecentRatings.CurrentPage ? "active" : "")">
+                            <a class="page-link" asp-action="Index" asp-route-loansPage="@Model.ActiveLoans.CurrentPage" asp-route-finesPage="@Model.Fines.CurrentPage" asp-route-ratingsPage="@i">@i</a>
+                        </li>
+                    }
+
+                    @if (Model.RecentRatings.HasNextPage)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-route-loansPage="@Model.ActiveLoans.CurrentPage" asp-route-finesPage="@Model.Fines.CurrentPage" asp-route-ratingsPage="@(Model.RecentRatings.CurrentPage + 1)">Next</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">Next</span>
+                        </li>
+                    }
+                </ul>
+            </nav>
         }
     </section>
 

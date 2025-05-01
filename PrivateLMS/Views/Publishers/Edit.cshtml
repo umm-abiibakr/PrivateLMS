@@ -36,14 +36,11 @@
                             <input asp-for="LogoImage" type="file" class="form-control" accept="image/*" />
                             <span asp-validation-for="LogoImage" class="text-danger"></span>
                         </div>
-
                         <div class="text-center mt-4">
                             <button type="submit" class="btn btn-primary btn-sm me-2">
-                                <i class="bi bi-check-circle me-1"></i> Update
+                                Update
                             </button>
-                            <a asp-action="Index" class="btn btn-secondary btn-sm">
-                                <i class="bi bi-arrow-left-circle me-1"></i> Back to List
-                            </a>
+                            <a asp-action="Details" asp-route-id="@Model.PublisherId" class="btn btn-secondary btn-sm">Back</a>
                         </div>
                     </form>
                 </div>
