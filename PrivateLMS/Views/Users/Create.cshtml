@@ -3,147 +3,165 @@
     ViewData["Title"] = "Create User";
 }
 
-<div class="container mt-5">
+<div class="container mt-5 mb-5">
     <h2 class="text-center mb-4">Create User</h2>
+    <p class="text-center text-muted mb-4">Add a new user to the library system.</p>
+
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card shadow-sm border-0">
+            <div class="card shadow-sm p-4 rounded-4">
                 <div class="card-body">
                     <form asp-action="Create" method="post">
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
 
-                        <!-- Personal Info -->
+                        <h5 class="mb-3">Personal Information</h5>
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label asp-for="UserName" class="form-label">Username</label>
-                                <input asp-for="UserName" class="form-control" />
-                                <span asp-validation-for="UserName" class="text-danger"></span>
+                                <input asp-for="UserName" class="form-control" aria-describedby="userNameValidation" />
+                                <span asp-validation-for="UserName" class="text-danger" id="userNameValidation"></span>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label asp-for="Email" class="form-label">Email</label>
-                                <input asp-for="Email" class="form-control" type="email" />
-                                <span asp-validation-for="Email" class="text-danger"></span>
+                                <input asp-for="Email" class="form-control" type="email" aria-describedby="emailValidation" />
+                                <span asp-validation-for="Email" class="text-danger" id="emailValidation"></span>
                             </div>
                         </div>
 
-                        <!-- Passwords -->
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label asp-for="Password" class="form-label">Password</label>
                                 <div class="input-group">
-                                    <input asp-for="Password" id="passwordInput" class="form-control" type="password" />
-                                    <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+                                    <input asp-for="Password" id="passwordInput" class="form-control" type="password" aria-describedby="passwordValidation" />
+                                    <button type="button" class="btn btn-outline-secondary rounded-3" id="togglePassword" aria-label="Toggle password visibility">
                                         <i class="bi bi-eye-slash" id="togglePasswordIcon"></i>
                                     </button>
                                 </div>
-                                <span asp-validation-for="Password" class="text-danger"></span>
+                                <span asp-validation-for="Password" class="text-danger" id="passwordValidation"></span>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label asp-for="ConfirmPassword" class="form-label">Confirm Password</label>
                                 <div class="input-group">
-                                    <input asp-for="ConfirmPassword" id="confirmPasswordInput" class="form-control" type="password" />
-                                    <button type="button" class="btn btn-outline-secondary" id="toggleConfirmPassword">
+                                    <input asp-for="ConfirmPassword" id="confirmPasswordInput" class="form-control" type="password" aria-describedby="confirmPasswordValidation" />
+                                    <button type="button" class="btn btn-outline-secondary rounded-3" id="toggleConfirmPassword" aria-label="Toggle confirm password visibility">
                                         <i class="bi bi-eye-slash" id="toggleConfirmPasswordIcon"></i>
                                     </button>
                                 </div>
-                                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                                <span asp-validation-for="ConfirmPassword" class="text-danger" id="confirmPasswordValidation"></span>
                             </div>
                         </div>
 
-                        <!-- Name & Contact -->
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label asp-for="FirstName" class="form-label">First Name</label>
-                                <input asp-for="FirstName" class="form-control" />
-                                <span asp-validation-for="FirstName" class="text-danger"></span>
+                                <input asp-for="FirstName" class="form-control" aria-describedby="firstNameValidation" />
+                                <span asp-validation-for="FirstName" class="text-danger" id="firstNameValidation"></span>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label asp-for="LastName" class="form-label">Last Name</label>
-                                <input asp-for="LastName" class="form-control" />
-                                <span asp-validation-for="LastName" class="text-danger"></span>
+                                <input asp-for="LastName" class="form-control" aria-describedby="lastNameValidation" />
+                                <span asp-validation-for="LastName" class="text-danger" id="lastNameValidation"></span>
                             </div>
                         </div>
                         <div class="mb-3">
                             <label asp-for="PhoneNumber" class="form-label">Phone Number</label>
-                            <input asp-for="PhoneNumber" class="form-control" />
-                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                            <input asp-for="PhoneNumber" class="form-control" aria-describedby="phoneNumberValidation" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger" id="phoneNumberValidation"></span>
                         </div>
 
-                        <!-- Demographics -->
+                        <h5 class="mb-3">Demographics</h5>
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label asp-for="Gender" class="form-label">Gender</label>
-                                <select asp-for="Gender" class="form-control">
+                                <select asp-for="Gender" class="form-select" aria-describedby="genderValidation">
                                     <option value="">Select Gender</option>
                                     <option value="Male">Male</option>
                                     <option value="Female">Female</option>
                                     <option value="Other">Other</option>
                                 </select>
-                                <span asp-validation-for="Gender" class="text-danger"></span>
+                                <span asp-validation-for="Gender" class="text-danger" id="genderValidation"></span>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label asp-for="DateOfBirth" class="form-label">Date of Birth</label>
-                                <input asp-for="DateOfBirth" class="form-control" type="date" />
-                                <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                                <input asp-for="DateOfBirth" class="form-control" type="date" aria-describedby="dateOfBirthValidation" />
+                                <span asp-validation-for="DateOfBirth" class="text-danger" id="dateOfBirthValidation"></span>
                             </div>
                         </div>
 
-                        <!-- Address -->
+                        <h5 class="mb-3">Address</h5>
                         <div class="mb-3">
                             <label asp-for="Address" class="form-label">Address</label>
-                            <input asp-for="Address" class="form-control" />
-                            <span asp-validation-for="Address" class="text-danger"></span>
+                            <input asp-for="Address" class="form-control" aria-describedby="addressValidation" />
+                            <span asp-validation-for="Address" class="text-danger" id="addressValidation"></span>
                         </div>
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label asp-for="City" class="form-label">City</label>
-                                <input asp-for="City" class="form-control" />
-                                <span asp-validation-for="City" class="text-danger"></span>
+                                <input asp-for="City" class="form-control" aria-describedby="cityValidation" />
+                                <span asp-validation-for="City" class="text-danger" id="cityValidation"></span>
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label asp-for="State" class="form-label">State</label>
-                                <input asp-for="State" class="form-control" />
-                                <span asp-validation-for="State" class="text-danger"></span>
+                                <select asp-for="State" class="form-select" aria-describedby="stateValidation">
+                                    <option value="">Select State</option>
+                                    @foreach (var state in ViewBag.States)
+                                    {
+                                        <option value="@state">@state</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="State" class="text-danger" id="stateValidation"></span>
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label asp-for="PostalCode" class="form-label">Postal Code</label>
-                                <input asp-for="PostalCode" class="form-control" />
-                                <span asp-validation-for="PostalCode" class="text-danger"></span>
+                                <input asp-for="PostalCode" class="form-control" aria-describedby="postalCodeValidation" />
+                                <span asp-validation-for="PostalCode" class="text-danger" id="postalCodeValidation"></span>
                             </div>
                         </div>
                         <div class="mb-3">
                             <label asp-for="Country" class="form-label">Country</label>
-                            <input asp-for="Country" class="form-control" />
-                            <span asp-validation-for="Country" class="text-danger"></span>
+                            <select asp-for="Country" class="form-select" aria-describedby="countryValidation">
+                                <option value="">Select Country</option>
+                                @foreach (var country in ViewBag.Countries)
+                                {
+                                    <option value="@country">@country</option>
+                                }
+                            </select>
+                            <span asp-validation-for="Country" class="text-danger" id="countryValidation"></span>
                         </div>
 
-                        <!-- Options -->
+                        <h5 class="mb-3">Account Options</h5>
                         <div class="form-check mb-2">
-                            <input asp-for="TermsAccepted" class="form-check-input" />
-                            <label asp-for="TermsAccepted" class="form-check-label">Terms Accepted</label>
-                            <span asp-validation-for="TermsAccepted" class="text-danger"></span>
+                            <input asp-for="TermsAccepted" class="form-check-input" id="termsAccepted" aria-describedby="termsAcceptedValidation" />
+                            <label asp-for="TermsAccepted" class="form-check-label">Accept Terms and Conditions</label>
+                            <span asp-validation-for="TermsAccepted" class="text-danger" id="termsAcceptedValidation"></span>
                         </div>
                         <div class="form-check mb-3">
-                            <input asp-for="IsApproved" class="form-check-input" />
-                            <label asp-for="IsApproved" class="form-check-label">Approved</label>
-                            <span asp-validation-for="IsApproved" class="text-danger"></span>
+                            <input asp-for="IsApproved" class="form-check-input" id="isApproved" aria-describedby="isApprovedValidation" />
+                            <label asp-for="IsApproved" class="form-check-label">Approve User Account</label>
+                            <span asp-validation-for="IsApproved" class="text-danger" id="isApprovedValidation"></span>
                         </div>
 
-                        <!-- Roles -->
+                        <h5 class="mb-3">Roles</h5>
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Assign Roles</label>
-                            <select asp-for="Roles" class="form-control" multiple>
+                            <label for="Roles" class="form-label fw-bold">Assign Roles</label>
+                            <select asp-for="Roles" class="form-select" multiple aria-describedby="rolesValidation">
                                 <option value="Admin">Admin</option>
                                 <option value="User">User</option>
                             </select>
                             <small class="text-muted">Hold Ctrl (Windows) or Cmd (Mac) to select multiple roles.</small>
+                            <span asp-validation-for="Roles" class="text-danger" id="rolesValidation"></span>
                         </div>
 
                         <div class="text-center mt-4">
-                            <button type="submit" class="btn btn-success px-4">Create</button>
-                            <a asp-action="Index" class="btn btn-outline-secondary ms-2 px-4">Back</a>
+                            <button type="submit" class="btn btn-primary btn-lg rounded-3" aria-label="Create user">Create</button>
+                            <a asp-action="Index" class="btn btn-secondary btn-lg rounded-3 ms-2" aria-label="Back to users list">
+                                <i class="bi bi-arrow-left-circle me-1"></i> Back to List
+                            </a>
                         </div>
                     </form>
+                </div>
+                <div class="card-footer text-center border-0 bg-transparent">
+                    <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-outline-secondary btn-sm rounded-3" aria-label="Back to admin dashboard">Back to Dashboard</a>
                 </div>
             </div>
         </div>

@@ -93,6 +93,7 @@ builder.Services.AddScoped<IAuthorService, AuthorService>();
 builder.Services.AddScoped<IFineService, FineService>();
 builder.Services.AddScoped<IBookRatingService, BookRatingService>();
 builder.Services.AddSingleton<IEmailService, EmailService>();
+builder.Services.AddSingleton<ILocationService, LocationService>();
 builder.Services.AddHostedService<DueDateReminderService>();
 builder.Services.AddHostedService<OverdueReminderAndFineService>();
 
