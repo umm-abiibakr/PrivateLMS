@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PrivateLMS.Data;
 
@@ -11,9 +12,11 @@ using PrivateLMS.Data;
 namespace PrivateLMS.Migrations
 {
     [DbContext(typeof(LibraryDbContext))]
-    partial class LibraryDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250503053116_AddUniqueNameToAuthors")]
+    partial class AddUniqueNameToAuthors
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -304,7 +307,7 @@ namespace PrivateLMS.Migrations
                             AccessFailedCount = 0,
                             Address = "123 Admin St.",
                             City = "Admin City",
-                            ConcurrencyStamp = "ec435309-39da-40bb-b6fa-77517db89cc2",
+                            ConcurrencyStamp = "967765eb-6a72-463b-9e16-9de7d928a452",
                             Country = "Admin Country",
                             DateOfBirth = new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin@privatelms.com",
@@ -332,7 +335,7 @@ namespace PrivateLMS.Migrations
                             AccessFailedCount = 0,
                             Address = "456 User Rd.",
                             City = "User City",
-                            ConcurrencyStamp = "30047a8b-5334-4dae-986a-ac545bb75215",
+                            ConcurrencyStamp = "3eef6584-08e8-4119-b272-7268d4b0def4",
                             Country = "User Country",
                             DateOfBirth = new DateTime(1995, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "john.doe@example.com",
@@ -360,7 +363,7 @@ namespace PrivateLMS.Migrations
                             AccessFailedCount = 0,
                             Address = "456 Admin Ave",
                             City = "Admin City",
-                            ConcurrencyStamp = "a9a0e8df-e58a-4d2c-b7cc-d64b79d5e19c",
+                            ConcurrencyStamp = "a7ca02b6-db22-4507-9481-a428c5d9276d",
                             Country = "Admin Country",
                             DateOfBirth = new DateTime(1985, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin2@privatelms.com",

@@ -3,47 +3,68 @@
     ViewData["Title"] = "Edit Author";
 }
 
-<div class="container mt-5">
+<div class="container mt-5 mb-5">
     <h2 class="text-center mb-4">Edit Author</h2>
+    <p class="text-center text-muted mb-4">Update the author's information in the library system.</p>
+
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card shadow-sm">
+            <div class="card shadow-sm p-4 rounded-4">
                 <div class="card-body">
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            @TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
                     <form asp-action="Edit" method="post">
                         <input type="hidden" asp-for="AuthorId" />
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
 
                         <div class="mb-3">
                             <label asp-for="Name" class="form-label">Author Name</label>
-                            <input asp-for="Name" class="form-control" />
-                            <span asp-validation-for="Name" class="text-danger"></span>
+                            <input asp-for="Name" class="form-control" placeholder="e.g. Ibn Taymiyyah" aria-describedby="nameValidation" />
+                            <span asp-validation-for="Name" class="text-danger" id="nameValidation"></span>
                         </div>
 
                         <div class="mb-3">
                             <label asp-for="Biography" class="form-label">Biography</label>
-                            <textarea asp-for="Biography" class="form-control" rows="5"></textarea>
-                            <span asp-validation-for="Biography" class="text-danger"></span>
+                            <textarea asp-for="Biography" class="form-control" rows="5" aria-describedby="biographyValidation"></textarea>
+                            <span asp-validation-for="Biography" class="text-danger" id="biographyValidation"></span>
                         </div>
 
-                        <div class="mb-3">
-                            <label asp-for="BirthDate" class="form-label">Birth Date</label>
-                            <input asp-for="BirthDate" type="date" class="form-control" />
-                            <span asp-validation-for="BirthDate" class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="DeathDate" class="form-label">Death Date</label>
-                            <input asp-for="DeathDate" type="date" class="form-control" />
-                            <span asp-validation-for="DeathDate" class="text-danger"></span>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="BirthDate" class="form-label">Birth Date</label>
+                                <input asp-for="BirthDate" type="date" class="form-control" aria-describedby="birthDateValidation" />
+                                <span asp-validation-for="BirthDate" class="text-danger" id="birthDateValidation"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="DeathDate" class="form-label">Death Date (if applicable)</label>
+                                <input asp-for="DeathDate" type="date" class="form-control" aria-describedby="deathDateValidation" />
+                                <span asp-validation-for="DeathDate" class="text-danger" id="deathDateValidation"></span>
+                            </div>
                         </div>
 
                         <div class="text-center mt-4">
-                            <button type="submit" class="btn btn-primary btn-sm me-2">
-                                Update
-                            </button>
-                            <a asp-action="Details" asp-route-id="@Model.AuthorId" class="btn btn-secondary btn-sm">Back</a>
+                            <button type="submit" class="btn btn-primary btn-lg rounded-3" aria-label="Update author">Update</button>
+                            <a asp-action="Index" class="btn btn-secondary btn-lg rounded-3 ms-2" aria-label="Back to authors list">
+                                <i class="bi bi-arrow-left-circle me-1"></i> Back to List
+                            </a>
                         </div>
                     </form>
+                </div>
+                <div class="card-footer text-center border-0 bg-transparent">
+                    <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-outline-secondary btn-sm rounded-3" aria-label="Back to admin dashboard">Back to Dashboard</a>
                 </div>
             </div>
         </div>
@@ -53,20 +74,15 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-        tinymce.init({
-            selector: 'textarea',
-            plugins: [
-                'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'image', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'wordcount',
-                'checklist', 'mediaembed', 'casechange', 'formatpainter', 'pageembed', 'a11ychecker', 'tinymcespellchecker', 'permanentpen', 'powerpaste', 'advtable', 'advcode', 'editimage', 'advtemplate', 'ai', 'mentions', 'tinycomments', 'tableofcontents', 'footnotes', 'mergetags', 'autocorrect', 'typography', 'inlinecss', 'markdown', 'importword', 'exportword', 'exportpdf'
-            ],
-            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
-            tinycomments_mode: 'embedded',
-            tinycomments_author: 'Author name',
-            mergetags_list: [
-                { value: 'First.Name', title: 'First Name' },
-                { value: 'Email', title: 'Email' }
-            ],
-            ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant'))
+        // Debug form submission
+        $(document).ready(function () {
+            $("form").on("submit", function (e) {
+                console.log("Form submitted");
+                if (!$(this).valid()) {
+                    console.log("Form validation failed");
+                    e.preventDefault();
+                }
+            });
         });
     </script>
 }

@@ -22,9 +22,7 @@
 @*     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
  *@    <link rel="stylesheet" href="~/css/custom.css" asp-append-version="true" />
 
-    <!-- TinyMCE Editor -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.tiny.cloud/1/i1mlfgm6u3fgh6hg9a6kpweksadil4bxw6rxmz19gjj4mgga/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
 </head>
 <body>
     <header>
@@ -38,12 +36,6 @@
         </main>
 
     </div>
-    <div>
-        <a asp-controller="Home" asp-action="Index" id="homeButton" class="btn btn-primary" aria-label="Go to homepage"
-           style="display: block; margin: 0 auto; text-align: center; padding: 10px 20px; font-size: 16px; border-radius: 30px; width: fit-content; margin-bottom: 5px;">
-            Home
-        </a>
-    </div>
 
     <partial name="_Footer" />
     <partial name="_ChatButton" />
@@ -55,12 +47,7 @@
     <script src="~/js/custom.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
-    <script>
-        const path = window.location.pathname.toLowerCase();
-        if (path === '/' || path === '/home/index') {
-            document.getElementById('homeButton').style.display = 'none';
-        }
-    </script>
+
 
 </body>
 </html>

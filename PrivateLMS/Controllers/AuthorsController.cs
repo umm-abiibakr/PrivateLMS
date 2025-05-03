@@ -31,7 +31,8 @@ namespace PrivateLMS.Controllers
                     Biography = a.Biography,
                     BirthDate = a.BirthDate,
                     DeathDate = a.DeathDate,
-                    BookCount = a.Books.Count
+                    BookCount = a.Books?.Count ?? 0,
+                    Books = a.Books?.Select(b => b.Title).ToList() ?? new List<string>()
                 }).ToList();
 
                 var pagedViewModel = new PagedResultViewModel<AuthorViewModel>
@@ -55,7 +56,7 @@ namespace PrivateLMS.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {
-            if (!id.HasValue)
+            if (id == null)
             {
                 TempData["ErrorMessage"] = "Author ID was not provided.";
                 return PartialView("_NotFound");
@@ -89,39 +90,45 @@ namespace PrivateLMS.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create(AuthorViewModel viewModel)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    var author = new Author
-                    {
-                        Name = viewModel.Name,
-                        Biography = viewModel.Biography,
-                        BirthDate = viewModel.BirthDate,
-                        DeathDate = viewModel.DeathDate
-                    };
-                    var success = await _authorService.CreateAuthorAsync(author);
-                    if (!success)
-                    {
-                        TempData["ErrorMessage"] = "Failed to create the author.";
-                        return View(viewModel);
-                    }
-
-                    TempData["SuccessMessage"] = $"Successfully added the author: {author.Name}.";
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (Exception ex)
-                {
-                    TempData["ErrorMessage"] = $"An error occurred while adding the author: {ex.Message}";
-                }
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                TempData["ErrorMessage"] = $"Validation errors: {string.Join("; ", errors)}";
+                return View(viewModel);
             }
-            return View(viewModel);
+
+            try
+            {
+                var author = new Author
+                {
+                    Name = viewModel.Name,
+                    Biography = viewModel.Biography,
+                    BirthDate = viewModel.BirthDate,
+                    DeathDate = viewModel.DeathDate,
+                    Books = new List<Book>() // Initialize Books
+                };
+
+                var success = await _authorService.CreateAuthorAsync(author);
+                if (!success)
+                {
+                    TempData["ErrorMessage"] = "Failed to create the author.";
+                    return View(viewModel);
+                }
+
+                TempData["SuccessMessage"] = $"Successfully added the author: {author.Name}.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"An error occurred while adding the author: {ex.Message}";
+                return View(viewModel);
+            }
         }
 
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
-            if (!id.HasValue)
+            if (id == null)
             {
                 TempData["ErrorMessage"] = "Author ID was not provided.";
                 return PartialView("_NotFound");
@@ -135,16 +142,7 @@ namespace PrivateLMS.Controllers
                     TempData["ErrorMessage"] = $"No author found with ID {id}.";
                     return PartialView("_NotFound");
                 }
-                var viewModel = new AuthorViewModel
-                {
-                    AuthorId = author.AuthorId,
-                    Name = author.Name,
-                    Biography = author.Biography,
-                    BirthDate = author.BirthDate,
-                    DeathDate = author.DeathDate,
-                    BookCount = author.Books.Count
-                };
-                return View(viewModel);
+                return View(author);
             }
             catch (Exception ex)
             {
@@ -164,40 +162,46 @@ namespace PrivateLMS.Controllers
                 return PartialView("_NotFound");
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    var author = new Author
-                    {
-                        AuthorId = viewModel.AuthorId,
-                        Name = viewModel.Name,
-                        Biography = viewModel.Biography,
-                        BirthDate = viewModel.BirthDate,
-                        DeathDate = viewModel.DeathDate
-                    };
-                    var success = await _authorService.UpdateAuthorAsync(id, author);
-                    if (!success)
-                    {
-                        TempData["ErrorMessage"] = $"No author found with ID {id}.";
-                        return PartialView("_NotFound");
-                    }
-
-                    TempData["SuccessMessage"] = $"Successfully updated the author: {author.Name}.";
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (Exception ex)
-                {
-                    TempData["ErrorMessage"] = $"An error occurred while updating the author: {ex.Message}";
-                }
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                TempData["ErrorMessage"] = $"Validation errors: {string.Join("; ", errors)}";
+                return View(viewModel);
             }
-            return View(viewModel);
+
+            try
+            {
+                var author = new Author
+                {
+                    AuthorId = viewModel.AuthorId,
+                    Name = viewModel.Name,
+                    Biography = viewModel.Biography,
+                    BirthDate = viewModel.BirthDate,
+                    DeathDate = viewModel.DeathDate,
+                    Books = new List<Book>() // Initialize Books
+                };
+
+                var success = await _authorService.UpdateAuthorAsync(id, author);
+                if (!success)
+                {
+                    TempData["ErrorMessage"] = $"No author found with ID {id}.";
+                    return View(viewModel);
+                }
+
+                TempData["SuccessMessage"] = $"Successfully updated the author: {author.Name}.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"An error occurred while updating the author: {ex.Message}";
+                return View(viewModel);
+            }
         }
 
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
-            if (!id.HasValue)
+            if (id == null)
             {
                 TempData["ErrorMessage"] = "Author ID was not provided for deletion.";
                 return PartialView("_NotFound");
@@ -211,16 +215,7 @@ namespace PrivateLMS.Controllers
                     TempData["ErrorMessage"] = $"No author found with ID {id} for deletion.";
                     return PartialView("_NotFound");
                 }
-                var viewModel = new AuthorViewModel
-                {
-                    AuthorId = author.AuthorId,
-                    Name = author.Name,
-                    Biography = author.Biography,
-                    BirthDate = author.BirthDate,
-                    DeathDate = author.DeathDate,
-                    BookCount = author.Books.Count
-                };
-                return View(viewModel);
+                return View(author);
             }
             catch (Exception ex)
             {
@@ -251,6 +246,6 @@ namespace PrivateLMS.Controllers
                 TempData["ErrorMessage"] = $"An error occurred while deleting the author: {ex.Message}";
                 return RedirectToAction("Error", "Home");
             }
-        } 
+        }
     }
 }

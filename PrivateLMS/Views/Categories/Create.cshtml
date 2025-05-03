@@ -3,26 +3,33 @@
     ViewData["Title"] = "Create Category";
 }
 
-<div class="container mt-5">
+<div class="container mt-5 mb-5">
     <h2 class="text-center mb-4">Create Category</h2>
+    <p class="text-center text-muted mb-4">Add a new category to organize books.</p>
+
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <div class="card shadow-sm">
+            <div class="card shadow-sm p-4 rounded-4">
                 <div class="card-body">
-                    <form asp-action="Create" method="post" novalidate>
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
 
                         <div class="mb-3">
                             <label asp-for="CategoryName" class="form-label">Category Name</label>
-                            <input asp-for="CategoryName" class="form-control" placeholder="Enter category name..." />
-                            <span asp-validation-for="CategoryName" class="text-danger"></span>
+                            <input asp-for="CategoryName" class="form-control" placeholder="e.g. Islamic Studies" aria-describedby="categoryNameValidation" />
+                            <span asp-validation-for="CategoryName" class="text-danger" id="categoryNameValidation"></span>
                         </div>
 
                         <div class="text-center mt-4">
-                            <button type="submit" class="btn btn-success me-2">Save</button>
-                            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                            <button type="submit" class="btn btn-primary btn-lg rounded-3" aria-label="Save category">Save</button>
+                            <a asp-action="Index" class="btn btn-secondary btn-lg rounded-3 ms-2" aria-label="Back to categories list">
+                                <i class="bi bi-arrow-left-circle me-1"></i> Back to List
+                            </a>
                         </div>
                     </form>
+                </div>
+                <div class="card-footer text-center border-0 bg-transparent">
+                    <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-outline-secondary btn-sm rounded-3" aria-label="Back to admin dashboard">Back to Dashboard</a>
                 </div>
             </div>
         </div>

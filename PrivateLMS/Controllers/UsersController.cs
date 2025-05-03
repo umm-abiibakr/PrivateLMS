@@ -20,21 +20,22 @@ namespace PrivateLMS.Controllers
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IEmailService _emailService;
         private readonly LibraryDbContext _context;
-
+        private readonly ILocationService _locationService;
 
         public UsersController(
             UserManager<ApplicationUser> userManager,
             RoleManager<IdentityRole<int>> roleManager,
             IWebHostEnvironment webHostEnvironment,
             IEmailService emailService,
-            LibraryDbContext context)
+            LibraryDbContext context,
+            ILocationService locationService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _webHostEnvironment = webHostEnvironment;
             _emailService = emailService;
             _context = context;
-
+            _locationService = locationService;
         }
 
         [Authorize(Roles = "Admin")]
@@ -134,7 +135,10 @@ namespace PrivateLMS.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
-            return View(new UserViewModel());
+            var viewModel = new UserViewModel();
+            ViewBag.Countries = _locationService.GetCountries();
+            ViewBag.States = _locationService.GetNigerianStates();
+            return View(viewModel);
         }
 
         [HttpPost]
@@ -167,7 +171,7 @@ namespace PrivateLMS.Controllers
                     var result = await _userManager.CreateAsync(user, model.Password);
                     if (result.Succeeded)
                     {
-                        foreach (var role in model.Roles)
+                        foreach (var role in model.Roles ?? new List<string>())
                         {
                             if (!await _roleManager.RoleExistsAsync(role))
                             {
@@ -190,6 +194,10 @@ namespace PrivateLMS.Controllers
                     TempData["ErrorMessage"] = $"An error occurred while creating the user: {ex.Message}";
                 }
             }
+
+            // Repopulate dropdowns on validation failure
+            ViewBag.Countries = _locationService.GetCountries();
+            ViewBag.States = _locationService.GetNigerianStates();
             return View(model);
         }
 
@@ -223,8 +231,11 @@ namespace PrivateLMS.Controllers
                     TermsAccepted = user.TermsAccepted,
                     IsApproved = user.IsApproved,
                     Roles = (await _userManager.GetRolesAsync(user)).ToList(),
-                    IsLockedOut = user.LockoutEnd.HasValue && user.LockoutEnd > DateTimeOffset.UtcNow,
+                    IsLockedOut = user.LockoutEnd.HasValue && user.LockoutEnd > DateTimeOffset.UtcNow
                 };
+
+                ViewBag.Countries = _locationService.GetCountries();
+                ViewBag.States = _locationService.GetNigerianStates();
                 return View(viewModel);
             }
             catch (Exception ex)
@@ -278,12 +289,14 @@ namespace PrivateLMS.Controllers
                         {
                             ModelState.AddModelError("", error.Description);
                         }
+                        ViewBag.Countries = _locationService.GetCountries();
+                        ViewBag.States = _locationService.GetNigerianStates();
                         return View(model);
                     }
 
                     var currentRoles = await _userManager.GetRolesAsync(user);
-                    var rolesToRemove = currentRoles.Except(model.Roles).ToList();
-                    var rolesToAdd = model.Roles.Except(currentRoles).ToList();
+                    var rolesToRemove = currentRoles.Except(model.Roles ?? new List<string>()).ToList();
+                    var rolesToAdd = (model.Roles ?? new List<string>()).Except(currentRoles).ToList();
 
                     if (rolesToRemove.Any())
                     {
@@ -309,6 +322,9 @@ namespace PrivateLMS.Controllers
                     TempData["ErrorMessage"] = $"An error occurred while updating the user: {ex.Message}";
                 }
             }
+
+            ViewBag.Countries = _locationService.GetCountries();
+            ViewBag.States = _locationService.GetNigerianStates();
             return View(model);
         }
 
@@ -523,7 +539,6 @@ namespace PrivateLMS.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-
         public async Task<IActionResult> Profile()
         {
             try
@@ -549,6 +564,9 @@ namespace PrivateLMS.Controllers
                     Country = user.Country,
                     ProfilePicturePath = user.ProfilePicturePath
                 };
+
+                ViewBag.Countries = _locationService.GetCountries();
+                ViewBag.States = _locationService.GetNigerianStates();
                 return View(viewModel);
             }
             catch (Exception ex)
@@ -614,6 +632,8 @@ namespace PrivateLMS.Controllers
                         {
                             ModelState.AddModelError("", error.Description);
                         }
+                        ViewBag.Countries = _locationService.GetCountries();
+                        ViewBag.States = _locationService.GetNigerianStates();
                         return View(model);
                     }
 
@@ -625,6 +645,9 @@ namespace PrivateLMS.Controllers
                     TempData["ErrorMessage"] = $"An error occurred while updating your profile: {ex.Message}";
                 }
             }
+
+            ViewBag.Countries = _locationService.GetCountries();
+            ViewBag.States = _locationService.GetNigerianStates();
             return View(model);
         }
     }
