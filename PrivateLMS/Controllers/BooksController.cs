@@ -127,6 +127,7 @@ namespace PrivateLMS.Controllers
                 {
                     AvailableAuthors = await _authorService.GetAllAuthorsAsync() ?? new List<Author>(),
                     AvailablePublishers = await _bookService.GetAllPublishersAsync() ?? new List<Publisher>(),
+                    AvailableLanguages = await _bookService.GetAllLanguagesAsync() ?? new List<Language>(),
                     AvailableCategories = await _bookService.GetAllCategoriesAsync() ?? new List<Category>()
                 };
                 return View(viewModel);
@@ -339,6 +340,7 @@ namespace PrivateLMS.Controllers
             viewModel.AvailableAuthors = await _authorService.GetAllAuthorsAsync() ?? new List<Author>();
             viewModel.AvailablePublishers = await _bookService.GetAllPublishersAsync() ?? new List<Publisher>();
             viewModel.AvailableCategories = await _bookService.GetAllCategoriesAsync() ?? new List<Category>();
+            viewModel.AvailableLanguages = await _bookService.GetAllLanguagesAsync() ?? new List<Language>(); 
         }
     }
 }

@@ -23,15 +23,15 @@ namespace PrivateLMS.Services
             return await _context.Books
                 .Include(b => b.Author)
                 .Include(b => b.Publisher)
-                .Include(b => b.BookCategories)
-                .ThenInclude(bc => bc.Category)
+                .Include(b => b.Language)
+                .Include(b => b.BookCategories).ThenInclude(bc => bc.Category)
                 .Select(b => new BookViewModel
                 {
                     BookId = b.BookId,
                     Title = b.Title,
                     AuthorId = b.AuthorId,
                     ISBN = b.ISBN,
-                    Language = b.Language,
+                    LanguageId = b.LanguageId,
                     PublishedDate = b.PublishedDate,
                     Description = b.Description,
                     AvailableCopies = b.AvailableCopies,
@@ -41,9 +41,9 @@ namespace PrivateLMS.Services
                     SelectedCategoryIds = b.BookCategories.Select(bc => bc.CategoryId).ToList(),
                     AvailableAuthors = _context.Authors.ToList(),
                     AvailablePublishers = _context.Publishers.ToList(),
-                    AvailableCategories = _context.Categories.ToList()
-                })
-                .ToListAsync();
+                    AvailableCategories = _context.Categories.ToList(),
+                    AvailableLanguages = _context.Languages.ToList()
+                }).ToListAsync();
         }
 
         public async Task<BookViewModel?> GetBookDetailsAsync(int bookId)
@@ -51,14 +51,11 @@ namespace PrivateLMS.Services
             var book = await _context.Books
                 .Include(b => b.Author)
                 .Include(b => b.Publisher)
-                .Include(b => b.BookCategories)
-                .ThenInclude(bc => bc.Category)
+                .Include(b => b.Language)
+                .Include(b => b.BookCategories).ThenInclude(bc => bc.Category)
                 .FirstOrDefaultAsync(b => b.BookId == bookId);
 
-            if (book == null)
-            {
-                return null;
-            }
+            if (book == null) return null;
 
             return new BookViewModel
             {
@@ -66,7 +63,7 @@ namespace PrivateLMS.Services
                 Title = book.Title,
                 AuthorId = book.AuthorId,
                 ISBN = book.ISBN,
-                Language = book.Language,
+                LanguageId = book.LanguageId,
                 PublishedDate = book.PublishedDate,
                 Description = book.Description,
                 AvailableCopies = book.AvailableCopies,
@@ -76,7 +73,8 @@ namespace PrivateLMS.Services
                 SelectedCategoryIds = book.BookCategories.Select(bc => bc.CategoryId).ToList(),
                 AvailableAuthors = await _context.Authors.ToListAsync(),
                 AvailablePublishers = await _context.Publishers.ToListAsync(),
-                AvailableCategories = await _context.Categories.ToListAsync()
+                AvailableCategories = await _context.Categories.ToListAsync(),
+                AvailableLanguages = await _context.Languages.ToListAsync()
             };
         }
 
@@ -87,7 +85,7 @@ namespace PrivateLMS.Services
                 Title = model.Title,
                 AuthorId = model.AuthorId,
                 ISBN = model.ISBN,
-                Language = model.Language,
+                LanguageId = model.LanguageId,
                 PublishedDate = model.PublishedDate,
                 Description = model.Description,
                 AvailableCopies = model.AvailableCopies,
@@ -99,8 +97,7 @@ namespace PrivateLMS.Services
             _context.Books.Add(book);
             await _context.SaveChangesAsync();
 
-            // Add categories
-            if (model.SelectedCategoryIds != null && model.SelectedCategoryIds.Any())
+            if (model.SelectedCategoryIds?.Any() == true)
             {
                 foreach (var categoryId in model.SelectedCategoryIds)
                 {
@@ -118,30 +115,24 @@ namespace PrivateLMS.Services
                 .Include(b => b.BookCategories)
                 .FirstOrDefaultAsync(b => b.BookId == id);
 
-            if (book == null)
-            {
-                return false;
-            }
+            if (book == null) return false;
 
             book.Title = model.Title;
             book.AuthorId = model.AuthorId;
             book.ISBN = model.ISBN;
-            book.Language = model.Language;
+            book.LanguageId = model.LanguageId;
             book.PublishedDate = model.PublishedDate;
             book.Description = model.Description;
             book.AvailableCopies = model.AvailableCopies;
             book.IsAvailable = model.IsAvailable;
             book.PublisherId = model.PublisherId;
+
             if (!string.IsNullOrEmpty(coverImagePath))
-            {
                 book.CoverImagePath = coverImagePath;
-            }
 
-            // Update categories
-            var existingCategories = book.BookCategories.ToList();
-            _context.BookCategories.RemoveRange(existingCategories);
+            _context.BookCategories.RemoveRange(book.BookCategories);
 
-            if (model.SelectedCategoryIds != null && model.SelectedCategoryIds.Any())
+            if (model.SelectedCategoryIds?.Any() == true)
             {
                 foreach (var categoryId in model.SelectedCategoryIds)
                 {
@@ -149,6 +140,20 @@ namespace PrivateLMS.Services
                 }
             }
 
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> DeleteBookAsync(int id)
+        {
+            var book = await _context.Books
+                .Include(b => b.BookCategories)
+                .FirstOrDefaultAsync(b => b.BookId == id);
+
+            if (book == null) return false;
+
+            _context.BookCategories.RemoveRange(book.BookCategories);
+            _context.Books.Remove(book);
             await _context.SaveChangesAsync();
             return true;
         }
@@ -168,35 +173,26 @@ namespace PrivateLMS.Services
             return await _context.Categories.ToListAsync();
         }
 
-        public async Task<bool> DeleteBookAsync(int id)
+        public async Task<List<Language>> GetAllLanguagesAsync()
         {
-            var book = await _context.Books
-                .Include(b => b.BookCategories)
-                .FirstOrDefaultAsync(b => b.BookId == id);
-
-            if (book == null)
-            {
-                return false;
-            }
-
-            _context.BookCategories.RemoveRange(book.BookCategories);
-            _context.Books.Remove(book);
-            await _context.SaveChangesAsync();
-            return true;
+            return await _context.Languages.ToListAsync();
         }
 
         public async Task<List<BookViewModel>> SearchBooksAsync(string? searchTerm)
         {
-            IQueryable<Book> query = _context.Books
+            var query = _context.Books
                 .Include(b => b.Author)
                 .Include(b => b.Publisher)
-                .Include(b => b.BookCategories)
-                .ThenInclude(bc => bc.Category);
+                .Include(b => b.Language)
+                .Include(b => b.BookCategories).ThenInclude(bc => bc.Category)
+                .AsQueryable();
 
             if (!string.IsNullOrEmpty(searchTerm))
             {
                 searchTerm = searchTerm.ToLower();
-                query = query.Where(b => b.Title.ToLower().Contains(searchTerm) || (b.Description != null && b.Description.ToLower().Contains(searchTerm)));
+                query = query.Where(b =>
+                    b.Title.ToLower().Contains(searchTerm) ||
+                    (b.Description != null && b.Description.ToLower().Contains(searchTerm)));
             }
 
             return await query.Select(b => new BookViewModel
@@ -205,7 +201,7 @@ namespace PrivateLMS.Services
                 Title = b.Title,
                 AuthorId = b.AuthorId,
                 ISBN = b.ISBN,
-                Language = b.Language,
+                LanguageId = b.LanguageId,
                 PublishedDate = b.PublishedDate,
                 Description = b.Description,
                 AvailableCopies = b.AvailableCopies,
@@ -215,27 +211,31 @@ namespace PrivateLMS.Services
                 SelectedCategoryIds = b.BookCategories.Select(bc => bc.CategoryId).ToList(),
                 AvailableAuthors = _context.Authors.ToList(),
                 AvailablePublishers = _context.Publishers.ToList(),
-                AvailableCategories = _context.Categories.ToList()
+                AvailableCategories = _context.Categories.ToList(),
+                AvailableLanguages = _context.Languages.ToList()
             }).ToListAsync();
         }
 
         public async Task<List<BookViewModel>> SearchBooksByCategoryAsync(string? searchTerm, int? categoryId)
         {
-            IQueryable<Book> query = _context.Books
+            var query = _context.Books
                 .Include(b => b.Author)
                 .Include(b => b.Publisher)
-                .Include(b => b.BookCategories)
-                .ThenInclude(bc => bc.Category);
+                .Include(b => b.Language)
+                .Include(b => b.BookCategories).ThenInclude(bc => bc.Category)
+                .AsQueryable();
 
             if (!string.IsNullOrEmpty(searchTerm))
             {
                 searchTerm = searchTerm.ToLower();
-                query = query.Where(b => b.Title.ToLower().Contains(searchTerm) || (b.Description != null && b.Description.ToLower().Contains(searchTerm)));
+                query = query.Where(b =>
+                    b.Title.ToLower().Contains(searchTerm) ||
+                    (b.Description != null && b.Description.ToLower().Contains(searchTerm)));
             }
 
             if (categoryId.HasValue)
             {
-                query = query.Where(b => b.BookCategories.Any(bc => bc.CategoryId == categoryId.Value));
+                query = query.Where(b => b.BookCategories.Any(bc => bc.CategoryId == categoryId));
             }
 
             return await query.Select(b => new BookViewModel
@@ -244,7 +244,7 @@ namespace PrivateLMS.Services
                 Title = b.Title,
                 AuthorId = b.AuthorId,
                 ISBN = b.ISBN,
-                Language = b.Language,
+                LanguageId = b.LanguageId,
                 PublishedDate = b.PublishedDate,
                 Description = b.Description,
                 AvailableCopies = b.AvailableCopies,
@@ -254,33 +254,63 @@ namespace PrivateLMS.Services
                 SelectedCategoryIds = b.BookCategories.Select(bc => bc.CategoryId).ToList(),
                 AvailableAuthors = _context.Authors.ToList(),
                 AvailablePublishers = _context.Publishers.ToList(),
-                AvailableCategories = _context.Categories.ToList()
+                AvailableCategories = _context.Categories.ToList(),
+                AvailableLanguages = _context.Languages.ToList()
             }).ToListAsync();
         }
 
-        public async Task<List<BookViewModel>> GetRecommendedBooksAsync(int userId)
+        public async Task<List<BookRecommendationViewModel>> GetRecommendedBooksAsync(int userId)
         {
-            // Simple recommendation: Books that the user hasn't loaned yet
-            var userLoans = await _context.LoanRecords
-                .Where(lr => lr.UserId == userId)
-                .Select(lr => lr.BookId)
+            // Fetch user preferences
+            var userCategoryPrefs = await _context.CategoryPreferences
+                .Where(p => p.UserId == userId)
+                .Select(p => p.CategoryId)
                 .ToListAsync();
 
-            return await _context.Books
-                .Where(b => !userLoans.Contains(b.BookId))
-                .OrderBy(b => Guid.NewGuid()) // Randomize for now
-                .Take(5)
-                .Select(b => new BookViewModel
-                {
-                    BookId = b.BookId,
-                    Title = b.Title,
-                    Description = b.Description,
-                    CoverImagePath = b.CoverImagePath,
-                    IsAvailable = b.IsAvailable,
-                    AvailableCopies = b.AvailableCopies
-                })
+            var userAuthorPrefs = await _context.AuthorPreferences
+                .Where(p => p.UserId == userId)
+                .Select(p => p.AuthorId)
                 .ToListAsync();
+
+            var userLanguagePrefs = await _context.LanguagePreferences
+                .Where(p => p.UserId == userId)
+                .Select(p => p.LanguageId)
+                .ToListAsync();
+
+            // Get all books with related data
+            var books = await _context.Books
+                .Include(b => b.Author)
+                .Include(b => b.Language)
+                .Include(b => b.BookCategories)
+                    .ThenInclude(bc => bc.Category)
+                .ToListAsync();
+
+            var recommendations = new List<BookRecommendationViewModel>();
+
+            foreach (var book in books)
+            {
+                // Preference scoring
+                float categoryMatch = book.BookCategories.Any(bc => userCategoryPrefs.Contains(bc.CategoryId)) ? 1f : 0f;
+                float authorMatch = userAuthorPrefs.Contains(book.AuthorId) ? 1f : 0f;
+                float languageMatch = userLanguagePrefs.Contains(book.LanguageId) ? 1f : 0f;
+
+                float score = (categoryMatch + authorMatch + languageMatch) / 3f;
+
+                if (score > 0f)
+                {
+                    recommendations.Add(new BookRecommendationViewModel
+                    {
+                        Book = book,
+                        RecommendationScore = score
+                    });
+                }
+            }
+
+            return recommendations
+                .OrderByDescending(r => r.RecommendationScore)
+                .ToList();
         }
+
 
         public async Task<List<BookViewModel>> GetNewBooksAsync(int count)
         {
@@ -295,8 +325,7 @@ namespace PrivateLMS.Services
                     CoverImagePath = b.CoverImagePath,
                     IsAvailable = b.IsAvailable,
                     AvailableCopies = b.AvailableCopies
-                })
-                .ToListAsync();
+                }).ToListAsync();
         }
 
         public async Task<List<BookViewModel>> GetPopularBooksAsync(int count)
@@ -318,8 +347,7 @@ namespace PrivateLMS.Services
                     CoverImagePath = x.Book.CoverImagePath,
                     IsAvailable = x.Book.IsAvailable,
                     AvailableCopies = x.Book.AvailableCopies
-                })
-                .ToListAsync();
+                }).ToListAsync();
         }
 
         public async Task<PagedResultViewModel<BookViewModel>> GetPagedBooksAsync(string? searchTerm, int? categoryId, int? authorId, int page, int pageSize)
@@ -327,16 +355,15 @@ namespace PrivateLMS.Services
             var query = _context.Books
                 .Include(b => b.Author)
                 .Include(b => b.Publisher)
-                .Include(b => b.BookCategories)
-                .ThenInclude(bc => bc.Category)
-                .Include(b => b.LoanRecords)
+                .Include(b => b.Language)
+                .Include(b => b.BookCategories).ThenInclude(bc => bc.Category)
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
                 searchTerm = searchTerm.Trim().ToLower();
                 query = query.Where(b => b.Title.ToLower().Contains(searchTerm) ||
-                                        (b.Description != null && b.Description.ToLower().Contains(searchTerm)));
+                                         (b.Description != null && b.Description.ToLower().Contains(searchTerm)));
             }
 
             if (categoryId.HasValue)
@@ -362,30 +389,25 @@ namespace PrivateLMS.Services
                     AuthorId = b.AuthorId,
                     PublisherId = b.PublisherId,
                     ISBN = b.ISBN,
-                    Language = b.Language,
+                    LanguageId = b.LanguageId,
                     PublishedDate = b.PublishedDate,
                     AvailableCopies = b.AvailableCopies,
                     IsAvailable = b.IsAvailable,
                     CoverImagePath = b.CoverImagePath,
-                    SelectedCategoryIds = b.BookCategories.Select(bc => bc.CategoryId).ToList(),
-                    AvailableCategories = b.BookCategories.Select(bc => new Category
-                    {
-                        CategoryId = bc.CategoryId,
-                        CategoryName = bc.Category.CategoryName
-                    }).ToList()
-                })
-                .ToListAsync();
+                    SelectedCategoryIds = b.BookCategories.Select(bc => bc.CategoryId).ToList()
+                }).ToListAsync();
 
-            // Populate AvailableAuthors, AvailablePublishers, and AvailableCategories for each view model
-            var availableAuthors = await _context.Authors.ToListAsync();
-            var availablePublishers = await _context.Publishers.ToListAsync();
-            var availableCategories = await _context.Categories.ToListAsync();
+            var authors = await _context.Authors.ToListAsync();
+            var publishers = await _context.Publishers.ToListAsync();
+            var categories = await _context.Categories.ToListAsync();
+            var languages = await _context.Languages.ToListAsync();
 
             foreach (var book in books)
             {
-                book.AvailableAuthors = availableAuthors;
-                book.AvailablePublishers = availablePublishers;
-                book.AvailableCategories = availableCategories;
+                book.AvailableAuthors = authors;
+                book.AvailablePublishers = publishers;
+                book.AvailableCategories = categories;
+                book.AvailableLanguages = languages;
             }
 
             return new PagedResultViewModel<BookViewModel>
@@ -398,5 +420,4 @@ namespace PrivateLMS.Services
             };
         }
     }
-
 }

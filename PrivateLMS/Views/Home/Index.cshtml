@@ -169,33 +169,49 @@
     </section>
 
     <!-- Recommendations Section -->
-    @if (User.Identity.IsAuthenticated && Model.Recommendations.Any())
+    @if (User.Identity.IsAuthenticated && Model.Recommendations?.Any() == true)
     {
         <section class="mb-5">
             <h3 class="text-center mb-4">You May Like to Read This</h3>
             <div class="row row-cols-1 row-cols-md-3 g-4">
-                @foreach (var book in Model.Recommendations)
+                @foreach (var rec in Model.Recommendations)
                 {
+                    var book = rec.Book;
+                    var score = rec.RecommendationScore;
+                    var label = score >= 0.8 ? "Perfect Match"
+                    : score >= 0.5 ? "Recommended"
+                    : score >= 0.3 ? "Somewhat Relevant"
+                    : "Low Match";
+                    var badgeClass = score >= 0.8 ? "bg-success"
+                    : score >= 0.5 ? "bg-primary"
+                    : score >= 0.3 ? "bg-warning text-dark"
+                    : "bg-secondary";
+
                     <div class="col">
-                        <div class="card h-100 text-center">
+                        <div class="card h-100 text-center shadow-sm position-relative">
                             @if (!string.IsNullOrEmpty(book.CoverImagePath))
                             {
-                                <img src="@book.CoverImagePath" class="card-img-top" alt="@book.Title Cover" />
+                                <img src="@book.CoverImagePath" class="card-img-top" alt="@book.Title Cover" style="height: 250px; object-fit: cover;" />
                             }
                             else
                             {
-                                <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center">
+                                <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 250px;">
                                     <span>No Cover</span>
                                 </div>
                             }
+
+                            <span class="position-absolute top-0 end-0 m-2 badge @badgeClass px-3 py-2 fs-6">
+                                @label
+                            </span>
+
                             <div class="card-body">
                                 <h5 class="card-title">@book.Title</h5>
-                                <p class="card-text">
-                                    @(book.Description?.Length > 100 ? book.Description.Substring(0, 100) + "..." : book.Description ?? "No description available")
+                                <p class="card-text small text-muted">
+                                    @(book.Description?.Length > 100 ? book.Description.Substring(0, 100) + "..." : book.Description ?? "No description available.")
                                 </p>
                             </div>
-                            <div class="card-footer">
-                                <a asp-controller="Books" asp-action="Details" asp-route-id="@book.BookId" class="btn btn-primary btn-sm">View Details</a>
+                            <div class="card-footer bg-transparent border-0">
+                                <a asp-controller="Books" asp-action="Details" asp-route-id="@book.BookId" class="btn btn-outline-primary btn-sm">View Details</a>
                             </div>
                         </div>
                     </div>

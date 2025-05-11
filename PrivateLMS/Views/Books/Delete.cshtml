@@ -39,7 +39,11 @@
                         <dd class="col-sm-8">@Model.ISBN</dd>
 
                         <dt class="col-sm-4 text-end">Language</dt>
-                        <dd class="col-sm-8">@Model.Language</dd>
+                        <dd class="col-sm-8">
+                            @(
+                                Model.AvailableLanguages.FirstOrDefault(l => l.LanguageId == Model.LanguageId)?.Name ?? "Unknown"
+                                )
+                        </dd>
 
                         <dt class="col-sm-4 text-end">Published Date</dt>
                         <dd class="col-sm-8">@Model.PublishedDate.ToShortDateString()</dd>

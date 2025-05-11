@@ -19,6 +19,6 @@ namespace PrivateLMS.ViewModels
         [Required(ErrorMessage = "Please enter your date of birth")]
         [DataType(DataType.Date)]
         [Display(Name = "Date of Birth")]
-        public DateTime DateOfBirth { get; set; }
+        public DateTime? DateOfBirth { get; set; }
     }
 }

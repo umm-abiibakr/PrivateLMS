@@ -22,6 +22,60 @@ namespace PrivateLMS.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("AuthorPreference", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AuthorId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserId", "AuthorId");
+
+                    b.HasIndex("AuthorId");
+
+                    b.HasIndex("UserId", "AuthorId")
+                        .IsUnique();
+
+                    b.ToTable("AuthorPreferences");
+                });
+
+            modelBuilder.Entity("CategoryPreference", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserId", "CategoryId");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("UserId", "CategoryId")
+                        .IsUnique();
+
+                    b.ToTable("CategoryPreferences");
+                });
+
+            modelBuilder.Entity("LanguagePreference", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LanguageId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserId", "LanguageId");
+
+                    b.HasIndex("LanguageId");
+
+                    b.HasIndex("UserId", "LanguageId")
+                        .IsUnique();
+
+                    b.ToTable("LanguagePreferences");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<int>", b =>
                 {
                     b.Property<int>("Id")
@@ -304,7 +358,7 @@ namespace PrivateLMS.Migrations
                             AccessFailedCount = 0,
                             Address = "123 Admin St.",
                             City = "Admin City",
-                            ConcurrencyStamp = "ec435309-39da-40bb-b6fa-77517db89cc2",
+                            ConcurrencyStamp = "9a0dce5f-174f-4790-b34f-8e1315389084",
                             Country = "Admin Country",
                             DateOfBirth = new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin@privatelms.com",
@@ -332,7 +386,7 @@ namespace PrivateLMS.Migrations
                             AccessFailedCount = 0,
                             Address = "456 User Rd.",
                             City = "User City",
-                            ConcurrencyStamp = "30047a8b-5334-4dae-986a-ac545bb75215",
+                            ConcurrencyStamp = "5ef88c33-6610-4daf-a800-a90f30a80940",
                             Country = "User Country",
                             DateOfBirth = new DateTime(1995, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "john.doe@example.com",
@@ -360,7 +414,7 @@ namespace PrivateLMS.Migrations
                             AccessFailedCount = 0,
                             Address = "456 Admin Ave",
                             City = "Admin City",
-                            ConcurrencyStamp = "a9a0e8df-e58a-4d2c-b7cc-d64b79d5e19c",
+                            ConcurrencyStamp = "9c38b3c0-1398-444d-85d8-66afd44e72b4",
                             Country = "Admin Country",
                             DateOfBirth = new DateTime(1985, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin2@privatelms.com",
@@ -460,10 +514,8 @@ namespace PrivateLMS.Migrations
                     b.Property<bool>("IsAvailable")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Language")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                    b.Property<int>("LanguageId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("PublishedDate")
                         .HasColumnType("datetime2");
@@ -480,6 +532,8 @@ namespace PrivateLMS.Migrations
 
                     b.HasIndex("AuthorId");
 
+                    b.HasIndex("LanguageId");
+
                     b.HasIndex("PublisherId");
 
                     b.ToTable("Books");
@@ -493,7 +547,7 @@ namespace PrivateLMS.Migrations
                             Description = "A foundational text on Islamic principles.",
                             ISBN = "978-0201616224",
                             IsAvailable = true,
-                            Language = "Arabic",
+                            LanguageId = 1,
                             PublishedDate = new DateTime(2021, 10, 30, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PublisherId = 1,
                             Title = "The Three Fundamental Principles"
@@ -506,7 +560,7 @@ namespace PrivateLMS.Migrations
                             Description = "A collection of forty hadiths.",
                             ISBN = "978-0132350884",
                             IsAvailable = true,
-                            Language = "Hausa",
+                            LanguageId = 2,
                             PublishedDate = new DateTime(2023, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PublisherId = 2,
                             Title = "Arbaun An-Nawawi"
@@ -519,7 +573,7 @@ namespace PrivateLMS.Migrations
                             Description = "Comprehensive exegesis of the Quran.",
                             ISBN = "978-0451616235",
                             IsAvailable = true,
-                            Language = "Arabic",
+                            LanguageId = 3,
                             PublishedDate = new DateTime(2022, 11, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PublisherId = 3,
                             Title = "Tafseer At-Tabari"
@@ -532,7 +586,7 @@ namespace PrivateLMS.Migrations
                             Description = "A widely respected Quranic commentary.",
                             ISBN = "978-4562350123",
                             IsAvailable = true,
-                            Language = "English",
+                            LanguageId = 3,
                             PublishedDate = new DateTime(2020, 8, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PublisherId = 4,
                             Title = "Tafseer Ibn Kathir"
@@ -690,6 +744,41 @@ namespace PrivateLMS.Migrations
                         });
                 });
 
+            modelBuilder.Entity("PrivateLMS.Models.Language", b =>
+                {
+                    b.Property<int>("LanguageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LanguageId"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("LanguageId");
+
+                    b.ToTable("Languages");
+
+                    b.HasData(
+                        new
+                        {
+                            LanguageId = 1,
+                            Name = "Arabic"
+                        },
+                        new
+                        {
+                            LanguageId = 2,
+                            Name = "English"
+                        },
+                        new
+                        {
+                            LanguageId = 3,
+                            Name = "Hausa"
+                        });
+                });
+
             modelBuilder.Entity("PrivateLMS.Models.LoanRecord", b =>
                 {
                     b.Property<int>("LoanRecordId")
@@ -834,6 +923,82 @@ namespace PrivateLMS.Migrations
                     b.ToTable("UserActivities");
                 });
 
+            modelBuilder.Entity("UserPreference", b =>
+                {
+                    b.Property<int>("UserPreferenceId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserPreferenceId"));
+
+                    b.Property<bool>("PreferencesSetup")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserPreferenceId");
+
+                    b.ToTable("UserPreferences");
+                });
+
+            modelBuilder.Entity("AuthorPreference", b =>
+                {
+                    b.HasOne("PrivateLMS.Models.Author", "Author")
+                        .WithMany()
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PrivateLMS.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Author");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("CategoryPreference", b =>
+                {
+                    b.HasOne("PrivateLMS.Models.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PrivateLMS.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("LanguagePreference", b =>
+                {
+                    b.HasOne("PrivateLMS.Models.Language", "Language")
+                        .WithMany()
+                        .HasForeignKey("LanguageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PrivateLMS.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Language");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<int>", null)
@@ -893,12 +1058,20 @@ namespace PrivateLMS.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("PrivateLMS.Models.Language", "Language")
+                        .WithMany()
+                        .HasForeignKey("LanguageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("PrivateLMS.Models.Publisher", "Publisher")
                         .WithMany()
                         .HasForeignKey("PublisherId")
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Author");
+
+                    b.Navigation("Language");
 
                     b.Navigation("Publisher");
                 });

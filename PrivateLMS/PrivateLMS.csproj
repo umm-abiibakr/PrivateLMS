@@ -8,6 +8,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Models\anfis_model.onnx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Models\anfis_model.onnx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="Services\IEmailService.cs" />
   </ItemGroup>
 
@@ -25,6 +35,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.22.0" />
     <PackageReference Include="NumSharp" Version="0.30.0" />
     <PackageReference Include="xunit" Version="2.9.3" />
   </ItemGroup>

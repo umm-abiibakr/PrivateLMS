@@ -19,6 +19,11 @@ namespace PrivateLMS.Data
         public DbSet<UserActivity> UserActivities { get; set; }
         public DbSet<BookRating> BookRatings { get; set; } = null!;
         public DbSet<Fine> Fines { get; set; } = null!;
+        public DbSet<Language> Languages { get; set; }
+        public DbSet<UserPreference> UserPreferences { get; set; }
+        public DbSet<CategoryPreference> CategoryPreferences { get; set; }
+        public DbSet<AuthorPreference> AuthorPreferences { get; set; }
+        public DbSet<LanguagePreference> LanguagePreferences { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -47,6 +52,15 @@ namespace PrivateLMS.Data
                 new Category { CategoryId = 3, CategoryName = "Tafsir" }
             );
 
+            // Seed Languages
+            modelBuilder.Entity<Language>().HasData(
+                new Language { LanguageId = 1, Name = "Arabic" },
+                new Language { LanguageId = 2, Name = "English" },
+                new Language { LanguageId = 3, Name = "Hausa" }
+            );
+
+
+
             // Seed Books
             modelBuilder.Entity<Book>().HasData(
                 new Book
@@ -55,7 +69,7 @@ namespace PrivateLMS.Data
                     Title = "The Three Fundamental Principles",
                     AuthorId = 1,
                     ISBN = "978-0201616224",
-                    Language = "Arabic",
+                    LanguageId = 1,
                     PublishedDate = new DateTime(2021, 10, 30),
                     Description = "A foundational text on Islamic principles.",
                     AvailableCopies = 5,
@@ -68,7 +82,7 @@ namespace PrivateLMS.Data
                     Title = "Arbaun An-Nawawi",
                     AuthorId = 2,
                     ISBN = "978-0132350884",
-                    Language = "Hausa",
+                    LanguageId = 2,
                     PublishedDate = new DateTime(2023, 8, 1),
                     Description = "A collection of forty hadiths.",
                     AvailableCopies = 3,
@@ -81,7 +95,7 @@ namespace PrivateLMS.Data
                     Title = "Tafseer At-Tabari",
                     AuthorId = 3,
                     ISBN = "978-0451616235",
-                    Language = "Arabic",
+                    LanguageId = 3,
                     PublishedDate = new DateTime(2022, 11, 22),
                     Description = "Comprehensive exegesis of the Quran.",
                     AvailableCopies = 2,
@@ -94,7 +108,7 @@ namespace PrivateLMS.Data
                     Title = "Tafseer Ibn Kathir",
                     AuthorId = 4,
                     ISBN = "978-4562350123",
-                    Language = "English",
+                    LanguageId = 3,
                     PublishedDate = new DateTime(2020, 8, 15),
                     Description = "A widely respected Quranic commentary.",
                     AvailableCopies = 4,
@@ -302,6 +316,56 @@ namespace PrivateLMS.Data
                 .HasForeignKey(br => br.BookId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            // CategoryPreference: composite key and relationship
+            modelBuilder.Entity<CategoryPreference>()
+                .HasKey(cp => new { cp.UserId, cp.CategoryId });
+
+            modelBuilder.Entity<CategoryPreference>()
+                .HasOne(cp => cp.User)
+                .WithMany()
+                .HasForeignKey(cp => cp.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CategoryPreference>()
+                .HasOne(cp => cp.Category)
+                .WithMany()
+                .HasForeignKey(cp => cp.CategoryId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // AuthorPreference: composite key and relationship
+            modelBuilder.Entity<AuthorPreference>()
+                .HasKey(ap => new { ap.UserId, ap.AuthorId });
+
+            modelBuilder.Entity<AuthorPreference>()
+                .HasOne(ap => ap.User)
+                .WithMany()
+                .HasForeignKey(ap => ap.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<AuthorPreference>()
+                .HasOne(ap => ap.Author)
+                .WithMany()
+                .HasForeignKey(ap => ap.AuthorId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // LanguagePreference: composite key and relationship
+            modelBuilder.Entity<LanguagePreference>()
+                .HasKey(lp => new { lp.UserId, lp.LanguageId });
+
+            modelBuilder.Entity<LanguagePreference>()
+                .HasOne(lp => lp.User)
+                .WithMany()
+                .HasForeignKey(lp => lp.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<LanguagePreference>()
+                .HasOne(lp => lp.Language)
+                .WithMany()
+                .HasForeignKey(lp => lp.LanguageId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+
+
             // Indexes
             modelBuilder.Entity<LoanRecord>().HasIndex(lr => lr.UserId);
             modelBuilder.Entity<LoanRecord>().HasIndex(lr => lr.DueDate);
@@ -311,6 +375,10 @@ namespace PrivateLMS.Data
             modelBuilder.Entity<UserActivity>().HasIndex(ua => ua.Timestamp);
             modelBuilder.Entity<BookRating>().HasIndex(br => br.UserId);
             modelBuilder.Entity<BookRating>().HasIndex(br => br.RatedOn);
+            modelBuilder.Entity<CategoryPreference>().HasIndex(cp => new { cp.UserId, cp.CategoryId }).IsUnique();
+            modelBuilder.Entity<AuthorPreference>().HasIndex(ap => new { ap.UserId, ap.AuthorId }).IsUnique();
+            modelBuilder.Entity<LanguagePreference>().HasIndex(lp => new { lp.UserId, lp.LanguageId }).IsUnique();
+
         }
     }
 }

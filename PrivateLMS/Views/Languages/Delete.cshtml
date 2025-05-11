@@ -1,0 +1,55 @@
+@model PrivateLMS.ViewModels.LanguageViewModel
+@{
+    ViewData["Title"] = "Delete Language";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Delete Language</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <p class="text-center">Are you sure you want to delete this language? This action cannot be undone if books are associated.</p>
+
+                    <dl class="row">
+                        <dt class="col-sm-4 text-end">Language Name</dt>
+                        <dd class="col-sm-8">@Model.Name</dd>
+
+                        <dt class="col-sm-4 text-end">Number of Books</dt>
+                        <dd class="col-sm-8">
+                            @Model.BookCount
+                            @if (Model.BookCount > 0)
+                            {
+                                <p class="text-danger mb-0">Cannot delete: This language has associated books.</p>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-4 text-end">Books</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.Books != null && Model.Books.Any())
+                            {
+                                <ul class="list-unstyled mb-0">
+                                    @foreach (var book in Model.Books)
+                                    {
+                                        <li>@book</li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <span class="text-muted">No books in this language.</span>
+                            }
+                        </dd>
+                    </dl>
+
+                    <form asp-action="Delete" method="post" class="text-center mt-4">
+                        <input type="hidden" asp-for="LanguageId" />
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-danger me-2 @(Model.BookCount > 0 ? "disabled" : "")">Delete</button>
+                        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
