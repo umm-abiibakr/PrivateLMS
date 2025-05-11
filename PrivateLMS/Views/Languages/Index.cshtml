@@ -1,0 +1,97 @@
+@model PrivateLMS.Models.PagedResultViewModel<PrivateLMS.ViewModels.LanguageViewModel>
+@{
+    ViewData["Title"] = "Languages";
+}
+
+<div class="container mt-5 mb-5">
+    <h2 class="text-center mb-4">Languages</h2>
+
+    <div class="card shadow-sm p-4 rounded-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">All Languages</h5>
+            <a asp-action="Create" class="btn btn-primary btn-lg rounded-3" aria-label="Add new language">
+                <i class="bi bi-plus-circle me-1"></i> Add Language
+            </a>
+        </div>
+
+        @if (!Model.Items.Any())
+        {
+            <p class="text-center text-muted">No languages found.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">Language Name</th>
+                            <th scope="col" class="text-center">Number of Books</th>
+                            <th scope="col" class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var language in Model.Items)
+                        {
+                            <tr>
+                                <td>@language.Name</td>
+                                <td class="text-center">@language.BookCount</td>
+                                <td class="text-center">
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a asp-action="Details" asp-route-id="@language.LanguageId" class="btn btn-outline-info btn-sm me-1" aria-label="View details for @language.Name">
+                                            Details
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@language.LanguageId" class="btn btn-outline-warning btn-sm me-1" aria-label="Edit @language.Name">
+                                            Edit
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@language.LanguageId" class="btn btn-outline-danger btn-sm" aria-label="Delete @language.Name">
+                                            Delete
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Controls -->
+            <nav aria-label="Languages navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    @if (Model.HasPreviousPage)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-route-page="@(Model.CurrentPage - 1)" asp-route-pageSize="@Model.PageSize" aria-label="Previous page">Previous</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">Previous</span>
+                        </li>
+                    }
+
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                            <a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-pageSize="@Model.PageSize" aria-label="Page @i">@i</a>
+                        </li>
+                    }
+
+                    @if (Model.HasNextPage)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-route-page="@(Model.CurrentPage + 1)" asp-route-pageSize="@Model.PageSize" aria-label="Next page">Next</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">Next</span>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        }
+
+    </div>
+</div>

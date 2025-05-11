@@ -13,9 +13,9 @@ namespace PrivateLMS.ViewModels
         [StringLength(100, ErrorMessage = "Title cannot exceed 100 characters.")]
         public string Title { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "The Language field is required.")]
-        [StringLength(100, ErrorMessage = "Language name cannot exceed 100 characters.")]
-        public string Language { get; set; } = string.Empty;
+        [Required(ErrorMessage = "Please select a Language")]
+        [Display(Name = "Language")]
+        public int LanguageId { get; set; }
 
         [Required(ErrorMessage = "Please select an Author")]
         [Display(Name = "Author")]
@@ -51,7 +51,7 @@ namespace PrivateLMS.ViewModels
         [Required(ErrorMessage = "Please select at least one category")]
         [Display(Name = "Categories")]
         public List<int> SelectedCategoryIds { get; set; } = new List<int>();
-
+        public List<Language> AvailableLanguages { get; set; } = new List<Language>();
         public List<Author> AvailableAuthors { get; set; } = new List<Author>();
         public List<Publisher> AvailablePublishers { get; set; } = new List<Publisher>();
         public List<Category> AvailableCategories { get; set; } = new List<Category>();

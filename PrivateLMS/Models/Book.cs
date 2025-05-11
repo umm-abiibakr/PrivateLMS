@@ -12,9 +12,8 @@ namespace PrivateLMS.Models
         [StringLength(100, ErrorMessage = "Title cannot exceed 100 characters.")]
         public string Title { get; set; }
 
-        [Required(ErrorMessage = "The Language field is required.")]
-        [StringLength(100, ErrorMessage = "Language name cannot exceed 100 characters.")]
-        public string Language { get; set; }
+        [Required(ErrorMessage = "Please select a Language")]
+        public int LanguageId { get; set; }
 
         [Required(ErrorMessage = "Please select an Author")]
         public int AuthorId { get; set; }
@@ -50,5 +49,6 @@ namespace PrivateLMS.Models
         public Publisher? Publisher { get; set; }
 
         public Author Author { get; set; }
+        public Language Language { get; set; }
     }
 }

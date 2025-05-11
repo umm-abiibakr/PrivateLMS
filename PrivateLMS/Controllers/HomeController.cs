@@ -101,6 +101,7 @@ namespace PrivateLMS.Controllers
 
                         // Recommendations
                         viewModel.Recommendations = await _bookService.GetRecommendedBooksAsync(user.Id);
+
                     }
                 }
 

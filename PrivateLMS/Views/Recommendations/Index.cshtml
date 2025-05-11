@@ -1,0 +1,195 @@
+﻿@model IEnumerable<BookRecommendationViewModel>
+@{
+    ViewData["Title"] = "Book Recommendations";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Book Recommendations</h2>
+
+    @if (!Model.Any())
+    {
+        <p class="text-center text-muted">No recommendations available. Set your preferences to get personalized suggestions!</p>
+    }
+
+    <div class="text-end mb-4">
+        <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#preferencesModal">
+            @(Model.Any() ? "Update Preferences" : "Set Preferences")
+        </button>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            @foreach (var item in Model)
+            {
+                var score = item.RecommendationScore;
+                var label = score >= 0.8 ? "Perfect Match"
+                : score >= 0.5 ? "Strongly Recommended"
+                : score >= 0.3 ? "Moderately Relevant"
+                : score > 0.0 ? "Less Aligned"
+                : "Not Relevant";
+                var badgeClass = score >= 0.8 ? "bg-success"
+                : score >= 0.5 ? "bg-primary"
+                : score >= 0.3 ? "bg-warning text-dark"
+                : score > 0.0 ? "bg-secondary"
+                : "bg-dark text-white";
+
+                <div class="col">
+                    <div class="card h-100 shadow-sm position-relative border">
+                        @if (!string.IsNullOrEmpty(item.Book.CoverImagePath))
+                        {
+                            <img src="@item.Book.CoverImagePath" alt="@item.Book.Title Cover" class="card-img-top" style="height: 250px; object-fit: cover;" />
+                        }
+                        else
+                        {
+                            <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 250px;">
+                                <span>No Cover</span>
+                            </div>
+                        }
+
+                        <span class="position-absolute top-0 end-0 m-2 badge @badgeClass px-3 py-2 fs-6">
+                            @label
+                        </span>
+
+                        <div class="card-body">
+                            <h5 class="card-title text-center">@item.Book.Title</h5>
+                            <p class="card-text small">
+                                <strong>Author:</strong> @item.Book.Author?.Name<br />
+                                <strong>Categories:</strong>
+                                @{
+                                    var categories = item.Book.BookCategories?.Select(bc => bc.Category?.CategoryName).Where(n => !string.IsNullOrEmpty(n)).ToList();
+                                    @string.Join(", ", categories ?? new List<string> { "None" })
+                                }<br />
+                                <strong>Language:</strong> @item.Book.Language?.Name<br />
+                                <strong>Copies:</strong> @item.Book.AvailableCopies<br />
+                                <strong>Status:</strong>
+                                @if (item.Book.IsAvailable)
+                                {
+                                    <span class="badge bg-success">✔ Available</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">✖ Not Available</span>
+                                }
+                            </p>
+                        </div>
+
+                        <div class="card-footer text-center">
+                            <a asp-action="Details" asp-controller="Books" asp-route-id="@item.Book.BookId" class="btn btn-outline-info btn-sm me-2">View</a>
+                            @if (item.Book.IsAvailable && item.Book.AvailableCopies > 0)
+                            {
+                                <a asp-action="Loan" asp-controller="Books" asp-route-id="@item.Book.BookId" class="btn btn-primary btn-sm">Loan</a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <div class="text-end mt-4">
+        <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Back to Books</a>
+    </div>
+</div>
+
+<!-- Preferences Modal (Always Rendered) -->
+<div class="modal fade" id="preferencesModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form asp-action="SavePreferences" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title">Your Reading Preferences</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <p>Select your preferred categories, authors, and languages:</p>
+
+                    <h6>Categories</h6>
+                    <div class="row">
+                        @foreach (var category in ViewBag.Categories)
+                        {
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="selectedCategories"
+                                           value="@category.CategoryId"
+                                           id="category-@category.CategoryId"
+                                    @(ViewBag.SelectedCategories != null && ((List<int>)ViewBag.SelectedCategories).Contains(category.CategoryId) ? "checked" : "") />
+                                    <label class="form-check-label" for="category-@category.CategoryId">
+                                        @category.CategoryName
+                                    </label>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <h6 class="mt-4">Authors</h6>
+                    <div class="row">
+                        @foreach (var author in ViewBag.Authors)
+                        {
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="selectedAuthors"
+                                           value="@author.AuthorId"
+                                           id="author-@author.AuthorId"
+                                    @(ViewBag.SelectedAuthors != null && ((List<int>)ViewBag.SelectedAuthors).Contains(author.AuthorId) ? "checked" : "") />
+                                    <label class="form-check-label" for="author-@author.AuthorId">
+                                        @author.Name
+                                    </label>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <h6 class="mt-4">Languages</h6>
+                    <div class="row">
+                        @foreach (var language in ViewBag.Languages)
+                        {
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="selectedLanguages"
+                                           value="@language.LanguageId"
+                                           id="language-@language.LanguageId"
+                                    @(ViewBag.SelectedLanguages != null && ((List<int>)ViewBag.SelectedLanguages).Contains(language.LanguageId) ? "checked" : "") />
+                                    <label class="form-check-label" for="language-@language.LanguageId">
+                                        @language.Name
+                                    </label>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Preferences</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Show Modal Automatically if needed -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        if (@(ViewBag.ShowPreferencesModal == true ? "true" : "false")) {
+            const modal = new bootstrap.Modal(document.getElementById('preferencesModal'));
+            modal.show();
+        }
+    });
+</script>
+
+<!-- Toast for feedback -->
+@if (TempData["PreferenceSaved"] != null)
+{
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+        <div class="toast align-items-center text-bg-success border-0 show" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">
+                    Preferences saved successfully!
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+}

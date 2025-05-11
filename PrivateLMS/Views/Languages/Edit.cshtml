@@ -1,0 +1,35 @@
+@model PrivateLMS.ViewModels.LanguageViewModel
+@{
+    ViewData["Title"] = "Edit Language";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Edit Language</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form asp-action="Edit" method="post">
+                        <input type="hidden" asp-for="LanguageId" />
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label">Language Name</label>
+                            <input asp-for="Name" class="form-control" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-primary btn-sm me-2">Update</button>
+                            <a asp-action="Details" asp-route-id="@Model.LanguageId" class="btn btn-secondary btn-sm">Back</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

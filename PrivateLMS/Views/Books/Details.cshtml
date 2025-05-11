@@ -45,7 +45,19 @@
                         <dd class="col-sm-8">@Model.ISBN</dd>
 
                         <dt class="col-sm-4 text-end">Language</dt>
-                        <dd class="col-sm-8">@Model.Language</dd>
+                        <dd class="col-sm-8">
+                            @{
+                                var language = Model.AvailableLanguages.FirstOrDefault(a => a.LanguageId == Model.LanguageId);
+                                if (User.Identity.IsAuthenticated && language != null)
+                                {
+                                    <a asp-controller="Language" asp-action="Details" asp-route-id="@Model.LanguageId">@language.Name</a>
+                                }
+                                else
+                                {
+                                    @(language?.Name ?? "Unknown")
+                                }
+                            }
+                        </dd>
 
                         <dt class="col-sm-4 text-end">Published Date</dt>
                         <dd class="col-sm-8">@Model.PublishedDate.ToShortDateString()</dd>

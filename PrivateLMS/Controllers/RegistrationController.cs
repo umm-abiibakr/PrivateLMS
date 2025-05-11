@@ -33,7 +33,8 @@ namespace PrivateLMS.Controllers
                 FirstName = TempData["FirstName"]?.ToString() ?? string.Empty,
                 LastName = TempData["LastName"]?.ToString() ?? string.Empty,
                 Gender = TempData["Gender"]?.ToString() ?? string.Empty,
-                DateOfBirth = TempData["DateOfBirth"] != null ? DateTime.Parse(TempData["DateOfBirth"].ToString()) : DateTime.Now
+                DateOfBirth = TempData["DateOfBirth"] != null ? DateTime.Parse(TempData["DateOfBirth"].ToString()) : (DateTime?)null
+
             };
             TempData.Keep();
             return View(model);
@@ -45,12 +46,28 @@ namespace PrivateLMS.Controllers
         {
             if (ModelState.IsValid)
             {
+                if (!model.DateOfBirth.HasValue)
+                {
+                    ModelState.AddModelError("DateOfBirth", "Date of birth is required.");
+                    return View(model);
+                }
+
+                var today = DateTime.Today;
+                var age = today.Year - model.DateOfBirth.Value.Year;
+                if (model.DateOfBirth.Value > today.AddYears(-age)) age--;
+
+                if (age < 13)
+                {
+                    ModelState.AddModelError("DateOfBirth", "You must be at least 13 years old to register.");
+                    return View(model);
+                }
+
                 try
                 {
                     TempData["FirstName"] = model.FirstName;
                     TempData["LastName"] = model.LastName;
                     TempData["Gender"] = model.Gender;
-                    TempData["DateOfBirth"] = model.DateOfBirth.ToString("yyyy-MM-dd");
+                    TempData["DateOfBirth"] = model.DateOfBirth?.ToString("yyyy-MM-dd");
                     TempData.Keep();
                     return RedirectToAction("Step2");
                 }
@@ -60,6 +77,7 @@ namespace PrivateLMS.Controllers
                     return View(model);
                 }
             }
+
             return View(model);
         }
 
@@ -149,7 +167,7 @@ namespace PrivateLMS.Controllers
                 PostalCode = TempData["PostalCode"]?.ToString() ?? string.Empty,
                 Country = TempData["Country"]?.ToString() ?? string.Empty,
                 // Populate dropdown lists
-                Countries = new List<string> { "Nigeria"},
+                Countries = new List<string> { "Nigeria" },
                 States = new List<string> { "Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayelsa", "Benue", "Borno", "Cross River", "Delta", "Ebonyi", "Edo", "Ekiti", "Enugu", "Gombe", "Imo", "Jigawa", "Kaduna", "Kano", "Katsina", "Kebbi", "Kogi", "Kwara", "Lagos", "Nasarawa", "Niger", "Ogun", "Ondo", "Osun", "Oyo", "Plateau", "Rivers", "Sokoto", "Taraba", "Yobe", "Zamfara", "FCT" } // Nigerian states
             };
             TempData.Keep();

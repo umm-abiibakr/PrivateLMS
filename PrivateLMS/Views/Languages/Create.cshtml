@@ -1,0 +1,41 @@
+@model PrivateLMS.ViewModels.LanguageViewModel
+@{
+    ViewData["Title"] = "Create Language";
+}
+
+<div class="container mt-5 mb-5">
+    <h2 class="text-center mb-4">Create Language</h2>
+    <p class="text-center text-muted mb-4">Add a new language to classify books effectively.</p>
+
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm p-4 rounded-4">
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label"></label>
+                            <input asp-for="Name" class="form-control" placeholder="e.g. Arabic" aria-describedby="languageNameValidation" />
+                            <span asp-validation-for="Name" class="text-danger" id="languageNameValidation"></span>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-3" aria-label="Save language">Save</button>
+                            <a asp-action="Index" class="btn btn-secondary btn-lg rounded-3 ms-2" aria-label="Back to languages list">
+                                <i class="bi bi-arrow-left-circle me-1"></i> Back to List
+                            </a>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center border-0 bg-transparent">
+                    <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-outline-secondary btn-sm rounded-3" aria-label="Back to admin dashboard">Back to Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

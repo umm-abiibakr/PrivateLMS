@@ -14,10 +14,12 @@ namespace PrivateLMS.Services
         Task<Book?> GetBookByIdAsync(int bookId);
         Task<List<Publisher>> GetAllPublishersAsync();
         Task<List<Category>> GetAllCategoriesAsync();
+        Task<List<Language>> GetAllLanguagesAsync();
+
         Task<bool> DeleteBookAsync(int id);
         Task<List<BookViewModel>> SearchBooksAsync(string? searchTerm);
         Task<List<BookViewModel>> SearchBooksByCategoryAsync(string? searchTerm, int? categoryId);
-        Task<List<BookViewModel>> GetRecommendedBooksAsync(int userId);
+        Task<List<BookRecommendationViewModel>> GetRecommendedBooksAsync(int userId);
         Task<List<BookViewModel>> GetNewBooksAsync(int count);
         Task<List<BookViewModel>> GetPopularBooksAsync(int count);
         Task<PagedResultViewModel<BookViewModel>> GetPagedBooksAsync(string? searchTerm, int? categoryId, int? authorId, int page, int pageSize);
