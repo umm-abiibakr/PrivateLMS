@@ -27,10 +27,7 @@
                     <thead class="table-light">
                         <tr>
                             <th scope="col">Name</th>
-                            @if (User.Identity.IsAuthenticated)
-                            {
-                                <th scope="col" class="text-center">Number of Books</th>
-                            }
+                            <th scope="col" class="text-center">Number of Books</th>
                             <th scope="col" class="text-center">Actions</th>
                         </tr>
                     </thead>
@@ -39,10 +36,7 @@
                         {
                             <tr>
                                 <td>@author.Name</td>
-                                @if (User.Identity.IsAuthenticated)
-                                {
-                                    <td class="text-center">@author.BookCount</td>
-                                }
+                                <td class="text-center">@author.BookCount</td>
                                 <td class="text-center">
                                     <div class="btn-group btn-group-sm" role="group">
                                         <a asp-action="Details" asp-route-id="@author.AuthorId" class="btn btn-outline-info btn-sm me-1" aria-label="View details for @author.Name">

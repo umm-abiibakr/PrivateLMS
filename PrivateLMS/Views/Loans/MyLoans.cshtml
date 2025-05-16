@@ -45,7 +45,7 @@
                                 </td>
                                 <td class="text-center">
                                     <a asp-action="Renew" asp-route-id="@loan.LoanRecordId" class="btn btn-outline-primary btn-sm me-1">Renew</a>
-                                    <a asp-action="Return" asp-route-loanRecordId="@loan.LoanRecordId" class="btn btn-outline-success btn-sm">Return</a>
+                                    
                                 </td>
                             </tr>
                         }
@@ -179,6 +179,6 @@
     </section>
 
     <div class="text-center">
-        <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Back to Books</a>
+        <a asp-controller="Dashboard" asp-action="Index" class="btn btn-secondary">Dashboard</a>
     </div>
 </div>

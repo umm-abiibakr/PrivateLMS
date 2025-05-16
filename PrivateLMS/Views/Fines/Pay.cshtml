@@ -1,16 +1,16 @@
 ﻿@model PrivateLMS.ViewModels.PayFineViewModel
 @{
-    ViewData["Title"] = "Pay Fine";
+    ViewData["Title"] = "Request Fine Payment";
 }
 
 <div class="container mt-5">
-    <h2 class="text-center mb-4">Pay Fine for <em>@Model.BookTitle</em></h2>
+    <h2 class="text-center mb-4">Request Payment for <em>@Model.BookTitle</em></h2>
 
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <p class="text-center mb-4">Please confirm payment of the following fine:</p>
+                    <p class="text-center mb-4">You're about to send a payment request for the following fine:</p>
 
                     <dl class="row mb-4">
                         <dt class="col-sm-5 text-end">Book Title</dt>
@@ -29,7 +29,7 @@
                     <form asp-action="Pay" method="post">
                         <input type="hidden" asp-for="FineId" />
                         <div class="d-flex justify-content-center gap-3">
-                            <button type="submit" class="btn btn-success">Confirm Payment</button>
+                            <button type="submit" class="btn btn-primary">Request Payment</button>
                             <a asp-action="MyFines" class="btn btn-secondary">Cancel</a>
                         </div>
                     </form>

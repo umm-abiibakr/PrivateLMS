@@ -308,6 +308,7 @@ namespace PrivateLMS.Services
 
             return recommendations
                 .OrderByDescending(r => r.RecommendationScore)
+                .Take(5)
                 .ToList();
         }
 

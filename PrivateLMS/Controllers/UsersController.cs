@@ -370,17 +370,20 @@ namespace PrivateLMS.Controllers
                     return PartialView("_NotFound");
                 }
 
-                var context = HttpContext.RequestServices.GetService<LibraryDbContext>();
-                if (context != null)
+                // Check only for active loans or unpaid fines
+                var hasActiveLoans = await _context.LoanRecords
+                    .AnyAsync(lr => lr.UserId == id && lr.ReturnDate == null);
+
+                var hasUnpaidFines = await _context.Fines
+                    .AnyAsync(f => f.UserId == id && !f.IsPaid);
+
+                if (hasActiveLoans || hasUnpaidFines)
                 {
-                    var hasLoans = await context.LoanRecords.AnyAsync(lr => lr.UserId == id);
-                    var hasFines = await context.Fines.AnyAsync(f => f.UserId == id);
-                    if (hasLoans || hasFines)
-                    {
-                        TempData["ErrorMessage"] = "Cannot delete user with active loans or fines.";
-                        return RedirectToAction(nameof(Index));
-                    }
+                    TempData["ErrorMessage"] = "Cannot delete user with active loans or unpaid fines.";
+                    return RedirectToAction(nameof(Index));
                 }
+
+                // Delete related data if needed (optional cleanup of user activities, ratings, etc.)
 
                 var result = await _userManager.DeleteAsync(user);
                 if (!result.Succeeded)
@@ -398,6 +401,7 @@ namespace PrivateLMS.Controllers
                 return RedirectToAction("Error", "Home");
             }
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -539,6 +543,8 @@ namespace PrivateLMS.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+
+
         public async Task<IActionResult> Profile()
         {
             try
@@ -650,5 +656,60 @@ namespace PrivateLMS.Controllers
             ViewBag.States = _locationService.GetNigerianStates();
             return View(model);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SendProfileUpdateRequest(
+        string? FirstName,
+        string? LastName,
+        string? PhoneNumber,
+        string? Email,
+        string? Address,
+        string? City,
+        string? State,
+        string? PostalCode,
+        string? Country,
+        string Reason)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "You must be logged in to send a profile update request.";
+                return RedirectToAction("Profile");
+            }
+
+            string adminEmail = "admin@warathatulambiya.com"; 
+
+            string body = $@"
+            <h4>Profile Update Request from {user.UserName} ({user.Email})</h4>
+            <p><strong>Reason:</strong> {Reason}</p>
+            <hr />
+            <p><strong>Requested Updates:</strong></p>
+            <ul>
+                <li><b>First Name:</b> {FirstName}</li>
+                <li><b>Last Name:</b> {LastName}</li>
+                <li><b>Phone Number:</b> {PhoneNumber}</li>
+                <li><b>Email:</b> {Email}</li>
+                <li><b>Address:</b> {Address}</li>
+                <li><b>City:</b> {City}</li>
+                <li><b>State:</b> {State}</li>
+                <li><b>Postal Code:</b> {PostalCode}</li>
+                <li><b>Country:</b> {Country}</li>
+            </ul>
+            <p>Sent at: {DateTime.UtcNow}</p>";
+
+            try
+            {
+                await _emailService.SendEmailAsync(adminEmail, "Profile Update Request", body);
+                TempData["SuccessMessage"] = "Your request has been sent to the admin.";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Failed to send email: " + ex.Message;
+            }
+
+            return RedirectToAction("Profile");
+        }
+
     }
 }

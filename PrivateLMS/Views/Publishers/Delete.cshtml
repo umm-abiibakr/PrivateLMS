@@ -33,10 +33,10 @@
                     <form asp-action="Delete" method="post" class="mt-4">
                         <input type="hidden" asp-for="PublisherId" />
                         @Html.AntiForgeryToken()
-                        <button type="submit" class="btn btn-danger btn-sm me-2">
+                        <button type="submit" class="btn btn-danger btn-md me-2">
                             Delete
                         </button>
-                        <a asp-action="Index" class="btn btn-secondary btn-sm">
+                        <a asp-action="Index" class="btn btn-secondary btn-md">
                             Back to List
                         </a>
                     </form>

@@ -18,7 +18,7 @@ namespace PrivateLMS.Controllers
             _authorService = authorService;
         }
 
-        [AllowAnonymous]
+        [Authorize (Roles="Admin")]
         public async Task<IActionResult> Index(int page = 1, int pageSize = 10)
         {
             try
@@ -53,7 +53,7 @@ namespace PrivateLMS.Controllers
             }
         }
 
-        [AllowAnonymous]
+        [Authorize]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)

@@ -76,8 +76,8 @@
                         <input type="hidden" asp-for="BookId" />
                         @Html.AntiForgeryToken()
 
-                        <button type="submit" class="btn btn-danger me-2">Confirm Delete</button>
-                        <a asp-action="Details" asp-route-id="@Model.BookId" class="btn btn-secondary">Back</a>
+                        <button type="submit" class="btn btn-danger btn-md me-2">Confirm Delete</button>
+                        <a asp-action="Details" asp-route-id="@Model.BookId" class="btn btn-secondary btn-md ">Back</a>
                     </form>
                 </div>
             </div>

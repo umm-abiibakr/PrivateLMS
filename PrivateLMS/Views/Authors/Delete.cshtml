@@ -21,10 +21,10 @@
                         <dd class="col-sm-8">@(!string.IsNullOrWhiteSpace(Model.Biography) ? Model.Biography : "No biography available")</dd>
 
                         <dt class="col-sm-4 text-end">Birth Date</dt>
-                        <dd class="col-sm-8">@Model.BirthDate?.ToShortDateString() ?? "Unknown"</dd>
+                        <dd class="col-sm-8">@Model.BirthDate?.ToShortDateString() </dd>
 
                         <dt class="col-sm-4 text-end">Death Date</dt>
-                        <dd class="col-sm-8">@Model.DeathDate?.ToShortDateString() ?? "N/A"</dd>
+                        <dd class="col-sm-8">@Model.DeathDate?.ToShortDateString() </dd>
 
                         <dt class="col-sm-4 text-end">Number of Books</dt>
                         <dd class="col-sm-8">
@@ -39,8 +39,8 @@
                     <form asp-action="Delete" method="post" class="text-center mt-4">
                         @Html.AntiForgeryToken()
                         <input type="hidden" asp-for="AuthorId" />
-                        <button type="submit" class="btn btn-danger me-2" @(Model.BookCount > 0 ? "disabled" : "")>Delete</button>
-                        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                        <button type="submit" class="btn btn-danger btn-md me-2" @(Model.BookCount > 0 ? "disabled" : "")>Delete</button>
+                        <a asp-action="Index" class="btn btn-secondary btn-md ">Back to List</a>
                     </form>
                 </div>
             </div>

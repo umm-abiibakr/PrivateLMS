@@ -39,7 +39,7 @@ namespace PrivateLMS.Controllers
             _context = context;
         }
 
-        [AllowAnonymous]
+        [Authorize]
         public async Task<IActionResult> Index(string? searchTerm = "", int? categoryId = null, int? authorId = null, int page = 1, int pageSize = 12)
         {
             try

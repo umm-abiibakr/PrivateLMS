@@ -17,15 +17,18 @@ namespace PrivateLMS.Controllers
         private readonly LibraryDbContext _context;
         private readonly IFineService _fineService;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IEmailService _emailService;
 
         public FinesController(
             LibraryDbContext context,
             IFineService fineService,
-            UserManager<ApplicationUser> userManager)
+            UserManager<ApplicationUser> userManager,
+            IEmailService emailService)
         {
             _context = context;
             _fineService = fineService;
             _userManager = userManager;
+            _emailService = emailService;
         }
 
         [Authorize(Roles = "Admin")]
@@ -115,6 +118,7 @@ namespace PrivateLMS.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "User")]
         public async Task<IActionResult> Pay(int id)
         {
             try
@@ -122,37 +126,50 @@ namespace PrivateLMS.Controllers
                 var user = await _userManager.GetUserAsync(User);
                 if (user == null)
                 {
-                    TempData["ErrorMessage"] = "You must be logged in to pay a fine.";
+                    TempData["ErrorMessage"] = "You must be logged in to request fine payment.";
                     return RedirectToAction("Index", "Login");
                 }
 
                 var fine = await _context.Fines
                     .Include(f => f.LoanRecord)
                         .ThenInclude(lr => lr.User)
+                    .Include(f => f.LoanRecord.Book)
                     .FirstOrDefaultAsync(f => f.Id == id && f.LoanRecord.User.UserName == user.UserName);
 
                 if (fine == null)
                 {
-                    TempData["ErrorMessage"] = "No fine found, or you do not have permission to pay it.";
+                    TempData["ErrorMessage"] = "Fine not found or you do not have permission to request payment.";
                     return RedirectToAction(nameof(MyFines));
                 }
 
-                var success = await _fineService.PayFineAsync(id);
-                if (!success)
+                // Log the request
+                _context.UserActivities.Add(new UserActivity
                 {
-                    TempData["ErrorMessage"] = "Failed to pay the fine. It may already be paid or not exist.";
-                    return RedirectToAction(nameof(MyFines));
-                }
+                    UserId = fine.UserId,
+                    Action = "RequestFinePayment",
+                    Timestamp = DateTime.UtcNow,
+                    Details = $"User requested to pay fine of NGN {fine.Amount} for book '{fine.LoanRecord.Book?.Title}'"
+                });
 
-                TempData["SuccessMessage"] = "Fine paid successfully.";
+                // Send admin email
+                var adminEmail = "admin@warathatulambiya.com"; 
+                var subject = "Fine Payment Request";
+                var body = $"User {user.FirstName} {user.LastName} ({user.Email}) has requested to pay a fine of NGN {fine.Amount} for the book '{fine.LoanRecord.Book?.Title}' (Loan ID: {fine.LoanId}).";
+
+                await _emailService.SendEmailAsync(adminEmail, subject, body);
+
+                TempData["SuccessMessage"] = "Your request has been sent to the admin. You will be contacted shortly.";
+                await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(MyFines));
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = $"An error occurred while paying the fine: {ex.Message}";
+                TempData["ErrorMessage"] = $"An error occurred while processing your request: {ex.Message}";
                 return RedirectToAction("Error", "Home");
             }
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
