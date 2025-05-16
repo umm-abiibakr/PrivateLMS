@@ -36,11 +36,11 @@
             <div class="text-center mt-4">
                 @if (User.IsInRole("Admin"))
                 {
-                    <a asp-action="Edit" asp-route-id="@Model.CategoryId" class="btn btn-warning btn-sm me-2 rounded-3" aria-label="Edit category @Model.CategoryName">
+                    <a asp-action="Edit" asp-route-id="@Model.CategoryId" class="btn btn-warning btn-md me-2 rounded-3" aria-label="Edit category @Model.CategoryName">
                         Edit
                     </a>
                 }
-                <a asp-action="Index" class="btn btn-secondary btn-sm rounded-3" aria-label="Back to categories list">
+                <a asp-action="Index" class="btn btn-secondary btn-md rounded-3" aria-label="Back to categories list">
                     Back to List
                 </a>
             </div>

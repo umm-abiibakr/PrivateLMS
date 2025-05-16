@@ -135,7 +135,7 @@
                                 <div class="col-md-5">
                                     <textarea name="Review" class="form-control" rows="2" placeholder="Add a review (optional)"></textarea>
                                 </div>
-                                <div class="col-md-2">
+                                <div class="mt-3">
                                     <button type="submit" class="btn btn-primary btn-sm">Submit</button>
                                 </div>
                             </div>
@@ -150,9 +150,9 @@
                         }
                         @if (Model.IsAvailable && Model.AvailableCopies > 0 && User.IsInRole("User"))
                         {
-                            <a asp-action="Loan" asp-route-id="@Model.BookId" class="btn btn-primary me-2">Loan</a>
+                            <a asp-action="Loan" asp-route-id="@Model.BookId" class="btn btn-primary btn-md me-2">Loan</a>
                         }
-                        <a asp-action="Index" class="btn btn-secondary">Back</a>
+                        <a asp-action="Index" class="btn btn-secondary btn-md">Back</a>
                     </div>
                 </div>
             </div>

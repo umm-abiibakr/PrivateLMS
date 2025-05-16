@@ -99,7 +99,6 @@ builder.Services.AddHostedService<DueDateReminderService>();
 builder.Services.AddHostedService<OverdueReminderAndFineService>();
 builder.Services.AddSingleton<RecommendationService>();
 
-//builder.Services.AddHttpClient<BookRecService>();
 
 
 var app = builder.Build();

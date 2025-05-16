@@ -11,9 +11,13 @@
         <p class="text-center text-muted">No recommendations available. Set your preferences to get personalized suggestions!</p>
     }
 
-    <div class="text-end mb-4">
+    <div class="d-flex justify-content-end mb-4 gap-2">
         <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#preferencesModal">
             @(Model.Any() ? "Update Preferences" : "Set Preferences")
+        </button>
+
+        <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#resetPreferencesModal">
+            Reset Preferences
         </button>
     </div>
 
@@ -26,13 +30,12 @@
                 var label = score >= 0.8 ? "Perfect Match"
                 : score >= 0.5 ? "Strongly Recommended"
                 : score >= 0.3 ? "Moderately Relevant"
-                : score > 0.0 ? "Less Aligned"
-                : "Not Relevant";
+                : "May Benefit";
+
                 var badgeClass = score >= 0.8 ? "bg-success"
                 : score >= 0.5 ? "bg-primary"
                 : score >= 0.3 ? "bg-warning text-dark"
-                : score > 0.0 ? "bg-secondary"
-                : "bg-dark text-white";
+                : "bg-secondary";
 
                 <div class="col">
                     <div class="card h-100 shadow-sm position-relative border">
@@ -56,10 +59,7 @@
                             <p class="card-text small">
                                 <strong>Author:</strong> @item.Book.Author?.Name<br />
                                 <strong>Categories:</strong>
-                                @{
-                                    var categories = item.Book.BookCategories?.Select(bc => bc.Category?.CategoryName).Where(n => !string.IsNullOrEmpty(n)).ToList();
-                                    @string.Join(", ", categories ?? new List<string> { "None" })
-                                }<br />
+                                @string.Join(", ", item.Book.BookCategories?.Select(bc => bc.Category?.CategoryName).Where(n => !string.IsNullOrWhiteSpace(n)) ?? new List<string> { "None" })<br />
                                 <strong>Language:</strong> @item.Book.Language?.Name<br />
                                 <strong>Copies:</strong> @item.Book.AvailableCopies<br />
                                 <strong>Status:</strong>
@@ -92,9 +92,9 @@
     </div>
 </div>
 
-<!-- Preferences Modal (Always Rendered) -->
+<!-- Preferences Modal -->
 <div class="modal fade" id="preferencesModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-lg animate__animated animate__fadeIn">
         <div class="modal-content">
             <form asp-action="SavePreferences" method="post">
                 <div class="modal-header">
@@ -169,7 +169,39 @@
     </div>
 </div>
 
-<!-- Show Modal Automatically if needed -->
+<!-- Reset Preferences Modal -->
+<div class="modal fade" id="resetPreferencesModal" tabindex="-1" aria-labelledby="resetPreferencesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered animate__animated animate__fadeInDown">
+        <div class="modal-content shadow border-0">
+            <form asp-action="ResetPreferences" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title" id="resetPreferencesModalLabel">Reset Preferences</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <p class="mb-2">
+                        You currently have:
+                        <ul>
+                            <li><strong>@ViewBag.PreferenceCounts.Categories</strong> category preference(s)</li>
+                            <li><strong>@ViewBag.PreferenceCounts.Authors</strong> author preference(s)</li>
+                            <li><strong>@ViewBag.PreferenceCounts.Languages</strong> language preference(s)</li>
+                        </ul>
+                    </p>
+                    <p class="text-danger fw-semibold">Are you sure you want to reset all your preferences?</p>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Yes, Reset</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Show preferences modal automatically -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         if (@(ViewBag.ShowPreferencesModal == true ? "true" : "false")) {
@@ -179,17 +211,25 @@
     });
 </script>
 
-<!-- Toast for feedback -->
+<!-- Toasts -->
 @if (TempData["PreferenceSaved"] != null)
 {
-    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
-        <div class="toast align-items-center text-bg-success border-0 show" role="alert">
-            <div class="d-flex">
-                <div class="toast-body">
-                    Preferences saved successfully!
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-        </div>
+    <div class="custom-toast success">
+        <span>Preferences saved successfully!</span>
+        <button type="button" class="close-btn" onclick="this.parentElement.remove();">&times;</button>
+    </div>
+}
+@if (TempData["PreferenceReset"] != null)
+{
+    <div class="custom-toast warning">
+        <span>@TempData["PreferenceReset"]</span>
+        <button type="button" class="close-btn" onclick="this.parentElement.remove();">&times;</button>
+    </div>
+}
+@if (TempData["PreferenceError"] != null)
+{
+    <div class="custom-toast error">
+        <span>@TempData["PreferenceError"]</span>
+        <button type="button" class="close-btn" onclick="this.parentElement.remove();">&times;</button>
     </div>
 }

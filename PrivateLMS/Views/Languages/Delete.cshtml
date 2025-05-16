@@ -45,8 +45,8 @@
                     <form asp-action="Delete" method="post" class="text-center mt-4">
                         <input type="hidden" asp-for="LanguageId" />
                         @Html.AntiForgeryToken()
-                        <button type="submit" class="btn btn-danger me-2 @(Model.BookCount > 0 ? "disabled" : "")">Delete</button>
-                        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                        <button type="submit" class="btn btn-danger btn-md me-2 @(Model.BookCount > 0 ? "disabled" : "")">Delete</button>
+                        <a asp-action="Index" class="btn btn-primary btn-md">Back to List</a>
                     </form>
                 </div>
             </div>

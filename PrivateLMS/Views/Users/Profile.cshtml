@@ -5,7 +5,6 @@
 
 <div class="container mt-5 mb-5">
     <h2 class="text-center mb-4">My Profile: @Model.UserName</h2>
-    <p class="text-center text-muted mb-4">View and update your personal information.</p>
 
     <div class="row justify-content-center">
         <div class="col-md-8">
@@ -28,8 +27,15 @@
                                 </div>
                                 <p class="text-muted">Upload a profile picture:</p>
                             }
+
                             <input asp-for="ProfilePicture" type="file" class="form-control mx-auto" accept="image/*" style="max-width: 300px;" aria-describedby="profilePictureValidation" />
                             <span asp-validation-for="ProfilePicture" class="text-danger" id="profilePictureValidation"></span>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary btn-sm" aria-label="Update profile picture">
+                                Change
+                            </button>
                         </div>
 
                         <h5 class="mb-3">Personal Information</h5>
@@ -105,18 +111,83 @@
                         </div>
 
                         <div class="text-center mt-4">
-                            <button type="submit" class="btn btn-primary btn-lg rounded-3" aria-label="Update profile">Update Profile</button>
-                            <a asp-controller="Home" asp-action="Index" class="btn btn-secondary btn-lg rounded-3 ms-2" aria-label="Back to home">
-                                <i class="bi bi-arrow-left-circle me-1"></i> Back
+                            <button type="button" class="btn btn-primary btn-md" data-bs-toggle="modal" data-bs-target="#requestUpdateModal">
+                                    Request Profile Update
+                            </button>
+                            <a asp-controller="Dashboard" asp-action="Index" class="btn btn-primary btn-md ms-2" aria-label="Back to dashboard">
+                                     Dashboard
                             </a>
                         </div>
                     </form>
                 </div>
-                <div class="card-footer text-center border-0 bg-transparent">
-                    <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-outline-secondary btn-sm rounded-3" aria-label="Back to dashboard">Back to Dashboard</a>
-                </div>
             </div>
         </div>
+    </div>
+</div>
+
+<div class="modal fade" id="requestUpdateModal" tabindex="-1" aria-labelledby="requestUpdateModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form asp-controller="Users" asp-action="SendProfileUpdateRequest" method="post">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="requestUpdateModalLabel">Request Profile Update</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <p class="text-muted small">You can edit any value below that you want updated. Leave unchanged fields as-is.</p>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">First Name</label>
+                            <input name="FirstName" class="form-control" value="@Model.FirstName" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Last Name</label>
+                            <input name="LastName" class="form-control" value="@Model.LastName" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Phone Number</label>
+                            <input name="PhoneNumber" class="form-control" value="@Model.PhoneNumber" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email</label>
+                            <input name="Email" class="form-control" value="@Model.Email" />
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Address</label>
+                            <input name="Address" class="form-control" value="@Model.Address" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">City</label>
+                            <input name="City" class="form-control" value="@Model.City" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">State</label>
+                            <input name="State" class="form-control" value="@Model.State" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Postal Code</label>
+                            <input name="PostalCode" class="form-control" value="@Model.PostalCode" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Country</label>
+                            <input name="Country" class="form-control" value="@Model.Country" />
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <label class="form-label">Reason for update request</label>
+                        <textarea name="Reason" class="form-control" rows="3" required placeholder="Explain why you need these updates..."></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Submit Request</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </form>
     </div>
 </div>
 

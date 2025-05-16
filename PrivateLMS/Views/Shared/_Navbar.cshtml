@@ -1,7 +1,8 @@
 ﻿<nav class="navbar navbar-expand-lg shadow-sm" style="background-color: #242424;">
     <div class="container-fluid">
         <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index" style="font-family: 'Cormorant Garamond', serif; color: #d8c9b4;">
-            <img src="~/images/lib-logo/WarathatulAmbiya-Logo.jpg"Logo" style="height: 32px; margin-right: 8px;" />Warathatul Ambiya
+            <img src="~/images/lib-logo/WarathatulAmbiya-Logo.jpg" alt="Logo" style="height: 32px; margin-right: 8px;" />
+            Warathatul Ambiya
         </a>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
@@ -11,6 +12,20 @@
 
         <div class="collapse navbar-collapse" id="navbarContent">
             <ul class="navbar-nav ms-auto align-items-lg-center">
+
+                @* Public content *@
+                <li class="nav-item">
+                    <a class="nav-link text-light" asp-controller="Home" asp-action="About"><i class="bi bi-info-circle me-1"></i> About Us</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-light" asp-controller="Home" asp-action="Terms"><i class="bi bi-file-earmark-text me-1"></i> Terms</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-light" asp-controller="Home" asp-action="Faq"><i class="bi bi-question-circle me-1"></i> FAQ</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-light" asp-controller="Home" asp-action="Privacy"><i class="bi bi-shield-check me-1"></i> Privacy</a>
+                </li>
 
                 @if (User.IsInRole("Admin"))
                 {
@@ -24,10 +39,10 @@
                             <li><hr class="dropdown-divider" /></li>
                             <li><a class="dropdown-item" asp-controller="Books" asp-action="Index"><i class="bi bi-book me-1"></i> Books</a></li>
                             <li><a class="dropdown-item" asp-controller="Authors" asp-action="Index"><i class="bi bi-person-lines-fill me-1"></i> Authors</a></li>
-                            <li><a class="dropdown-item" asp-controller="Languages" asp-action="Index"><i class="bi bi-person-lines-fill me-1"></i> Languages</a></li>
+                            <li><a class="dropdown-item" asp-controller="Languages" asp-action="Index"><i class="bi bi-translate me-1"></i> Languages</a></li>
                             <li><a class="dropdown-item" asp-controller="Categories" asp-action="Index"><i class="bi bi-tags me-1"></i> Categories</a></li>
                             <li><a class="dropdown-item" asp-controller="Publishers" asp-action="Index"><i class="bi bi-building me-1"></i> Publishers</a></li>
-                            <li><a class="dropdown-item" asp-controller="Recommendations" asp-action="Index"><i class="bi bi-person-lines-fill me-1"></i> Recommendations</a></li>
+                            <li><a class="dropdown-item" asp-controller="Recommendations" asp-action="Index"><i class="bi bi-stars me-1"></i> Recommendations</a></li>
                             <li><hr class="dropdown-divider" /></li>
                             <li><a class="dropdown-item" asp-controller="Loans" asp-action="Index"><i class="bi bi-journal-arrow-down me-1"></i> Loans</a></li>
                             <li><a class="dropdown-item" asp-controller="Fines" asp-action="Index"><i class="bi bi-currency-exchange me-1"></i> Fines</a></li>
@@ -55,28 +70,12 @@
                     <li class="nav-item">
                         <a class="nav-link text-light" asp-controller="Users" asp-action="Profile"><i class="bi bi-person me-1"></i> Profile</a>
                     </li>
-                   
                     <li class="nav-item">
                         <a class="nav-link text-light" asp-controller="Login" asp-action="Logout"><i class="bi bi-box-arrow-right me-1"></i> Logout</a>
                     </li>
                 }
                 else
                 {
-                    <li class="nav-item">
-                        <a class="nav-link text-light" asp-controller="Authors" asp-action="Index"><i class="bi bi-people me-1"></i> Authors</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-light" asp-controller="Home" asp-action="About"><i class="bi bi-info-circle me-1"></i> About Us</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-light" asp-controller="Home" asp-action="Terms"><i class="bi bi-file-earmark-text me-1"></i> Terms</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-light" asp-controller="Home" asp-action="Faq"><i class="bi bi-question-circle me-1"></i> FAQ</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-light" asp-controller="Home" asp-action="Privacy"><i class="bi bi-shield-check me-1"></i> Privacy</a>
-                    </li>
                     <li class="nav-item">
                         <a class="nav-link text-light" asp-controller="Login" asp-action="Index"><i class="bi bi-box-arrow-in-right me-1"></i> Login</a>
                     </li>

@@ -43,6 +43,13 @@ namespace PrivateLMS.Controllers
             {
                 ViewBag.ShowPreferencesModal = true;
             }
+            ViewBag.PreferenceCounts = new
+            {
+                Categories = await _context.CategoryPreferences.CountAsync(p => p.UserId == userId),
+                Authors = await _context.AuthorPreferences.CountAsync(p => p.UserId == userId),
+                Languages = await _context.LanguagePreferences.CountAsync(p => p.UserId == userId)
+            };
+
 
             await LoadPreferencesIntoViewBag(userId);
 
@@ -120,6 +127,34 @@ namespace PrivateLMS.Controllers
                 .ToListAsync();
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPreferences()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var userId = user.Id;
+
+            // Remove all preference records
+            var prefs = await _context.UserPreferences.FirstOrDefaultAsync(p => p.UserId == userId);
+            if (prefs != null)
+            {
+                _context.UserPreferences.Remove(prefs);
+            }
+
+            _context.CategoryPreferences.RemoveRange(
+                _context.CategoryPreferences.Where(p => p.UserId == userId));
+            _context.AuthorPreferences.RemoveRange(
+                _context.AuthorPreferences.Where(p => p.UserId == userId));
+            _context.LanguagePreferences.RemoveRange(
+                _context.LanguagePreferences.Where(p => p.UserId == userId));
+
+            await _context.SaveChangesAsync();
+
+            TempData["PreferenceReset"] = "Your preferences have been reset.";
+            return RedirectToAction(nameof(Index));
+        }
+
+
         private async Task<List<BookRecommendationViewModel>> GetUserRecommendations(int userId)
         {
             var books = await _context.Books
@@ -169,6 +204,7 @@ namespace PrivateLMS.Controllers
 
             return recommendations
                 .OrderByDescending(r => r.RecommendationScore)
+                .Take(10)
                 .ToList();
         }
     }

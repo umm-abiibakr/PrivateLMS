@@ -4,21 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Warathatul Ambiya Assistant</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Poppins:wght@400;500&family=Amiri:wght@400;700&family=Lato:wght@400&display=swap" rel="stylesheet">
-
-
+    <link rel="stylesheet" href="your-styles.css"> <!-- Replace with your CSS file path -->
 </head>
 <body>
-    <div class="chat-container">
+    <div class="chat-container" role="region" aria-label="Chatbot interface">
         <div class="chat-header">
             🤖 Warathatul Ambiya Assistant - The Private Library
         </div>
         <div class="chat-body" id="chat-body" aria-live="polite"></div>
+        <div id="quick-replies" class="quick-replies"></div>
         <div class="chat-input">
-            <input type="text" id="user-input" placeholder="Ask about the library or membership" aria-label="Chat with Warathatul Ambiya Assistant" />
+            <input type="text" id="user-input" placeholder="Ask about the library or membership" aria-label="Chat with Warathatul Ambiya Assistant" maxlength="200" />
             <button class="btn btn-primary" onclick="sendMessage()" aria-label="Send message">Send</button>
         </div>
-        <div id="quick-replies" class="quick-replies"></div>
         <button class="btn btn-secondary restart-button" onclick="restartChat()" style="display: none;" aria-label="Restart chat">Restart Chat</button>
     </div>
     <script>
@@ -29,26 +27,31 @@
             QUICK_REPLY_DELAY: 300,
             EMPTY_INPUT_FEEDBACK: 1000,
             REENABLE_CHAT_DELAY: 10000,
-            MAX_MESSAGES: 100
+            MAX_MESSAGES: 100,
+            DEBOUNCE_DELAY: 200
         };
 
         const RESPONSES = {
             learn: 'Warathatul Ambiya, meaning "Inheritors of the Prophets," is a private library dedicated to authentic Salafi literature. See our About Us for more information, baarakallahu feekum.',
             apply: 'You may apply for membership by clicking "Register", ahsanallahu ilaykum.',
             borrow: 'Approved members may borrow up to 2 books for 3 weeks, with trust and full responsibility, bi idhnillah.',
-            contact: 'You may contact the Admin at: <strong>admin@warathatulambiya.com</strong><br>Wa jazakumullahu khayran for reaching out. Fee amaanillah.',
+            contact: 'You may contact the Admin at: <span class="contact-email">admin@warathatulambiya.com</span><br>Wa jazakumullahu khayran for reaching out. Fee amaanillah.',
             default: 'I am sorry, I did not understand. Kindly select an option below or rephrase your query. Jazakumullahu khayran.'
         };
 
         const QUICK_REPLIES = [
-            { text: 'Learn about Warathatul Ambiya', keyword: 'learn'},
-            { text: 'Apply for Membership', keyword: 'apply'},
-            { text: 'Borrowing Rules', keyword: 'borrow'},
-            { text: 'Contact Admin', keyword: 'contact'}
+            { text: 'Learn about Warathatul Ambiya', keyword: 'learn' },
+            { text: 'Apply for Membership', keyword: 'apply' },
+            { text: 'Borrowing Rules', keyword: 'borrow' },
+            { text: 'Contact Admin', keyword: 'contact' }
         ];
 
+        // State management
+        let isTyping = false;
+        let lastInputTime = 0;
+
         // Initialize chat
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 showTypingAnimation();
                 setTimeout(() => {
@@ -59,7 +62,7 @@
             }, TIMING.INITIAL_DELAY);
 
             // Handle Enter key for input
-            document.getElementById('user-input').addEventListener('keypress', function (e) {
+            document.getElementById('user-input').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter' && !e.target.disabled) {
                     sendMessage();
                 }
@@ -67,11 +70,27 @@
         });
 
         function sendMessage() {
+            const now = Date.now();
+            if (now - lastInputTime < TIMING.DEBOUNCE_DELAY) return; // Debounce rapid inputs
+            lastInputTime = now;
+
             const inputField = document.getElementById('user-input');
-            const userText = inputField.value.trim();
+            const userText = inputField.value.trim().slice(0, 200); // Limit input length
             if (userText === '') {
                 inputField.classList.add('error');
-                setTimeout(() => inputField.classList.remove('error'), TIMING.EMPTY_INPUT_FEEDBACK);
+                inputField.setAttribute('aria-invalid', 'true');
+                inputField.setAttribute('aria-describedby', 'input-error');
+                const errorDiv = document.createElement('div');
+                errorDiv.id = 'input-error';
+                errorDiv.className = 'sr-only';
+                errorDiv.textContent = 'Please enter a message.';
+                inputField.parentElement.appendChild(errorDiv);
+                setTimeout(() => {
+                    inputField.classList.remove('error');
+                    inputField.removeAttribute('aria-invalid');
+                    inputField.removeAttribute('aria-describedby');
+                    errorDiv.remove();
+                }, TIMING.EMPTY_INPUT_FEEDBACK);
                 return;
             }
 
@@ -79,24 +98,26 @@
             inputField.value = '';
             inputField.focus();
 
-            setTimeout(() => {
-                showTypingAnimation();
+            if (!isTyping) {
                 setTimeout(() => {
-                    hideTypingAnimation();
-                    respondToUser(userText.toLowerCase());
-                }, TIMING.TYPING_DELAY);
-            }, TIMING.INITIAL_DELAY);
+                    showTypingAnimation();
+                    setTimeout(() => {
+                        hideTypingAnimation();
+                        respondToUser(userText.toLowerCase());
+                    }, TIMING.TYPING_DELAY);
+                }, TIMING.INITIAL_DELAY);
+            }
         }
 
         function appendUserMessage(message) {
             const chatBody = document.getElementById('chat-body');
             if (chatBody.children.length >= TIMING.MAX_MESSAGES) {
-                chatBody.removeChild(chatBody.firstChild); // Remove oldest message
+                chatBody.removeChild(chatBody.firstChild);
             }
-            const isScrolledToBottom = chatBody.scrollHeight - chatBody.scrollTop <= chatBody.clientHeight + 10;
+            const isScrolledToBottom = Math.abs(chatBody.scrollHeight - chatBody.scrollTop - chatBody.clientHeight) < 10;
             const userMessageDiv = document.createElement('div');
             userMessageDiv.className = 'user-message';
-            userMessageDiv.textContent = message; // Use textContent for XSS prevention
+            userMessageDiv.textContent = message; // Prevent XSS
             chatBody.appendChild(userMessageDiv);
             if (isScrolledToBottom) {
                 chatBody.scrollTop = chatBody.scrollHeight;
@@ -106,12 +127,14 @@
         function appendBotMessage(message) {
             const chatBody = document.getElementById('chat-body');
             if (chatBody.children.length >= TIMING.MAX_MESSAGES) {
-                chatBody.removeChild(chatBody.firstChild); // Remove oldest message
+                chatBody.removeChild(chatBody.firstChild);
             }
-            const isScrolledToBottom = chatBody.scrollHeight - chatBody.scrollTop <= chatBody.clientHeight + 10;
+            const isScrolledToBottom = Math.abs(chatBody.scrollHeight - chatBody.scrollTop - chatBody.clientHeight) < 10;
             const botMessageDiv = document.createElement('div');
             botMessageDiv.className = 'bot-message';
-            botMessageDiv.innerHTML = message; 
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = message;
+            botMessageDiv.append(...tempDiv.childNodes); // Move nodes safely
             chatBody.appendChild(botMessageDiv);
             if (isScrolledToBottom) {
                 chatBody.scrollTop = chatBody.scrollHeight;
@@ -119,11 +142,13 @@
         }
 
         function showTypingAnimation() {
+            if (isTyping) return;
+            isTyping = true;
             const chatBody = document.getElementById('chat-body');
             const typingDiv = document.createElement('div');
             typingDiv.id = 'typing';
             typingDiv.className = 'bot-message typing';
-            typingDiv.setAttribute('aria-hidden', 'true'); // Hide from screen readers
+            typingDiv.setAttribute('aria-hidden', 'true');
             typingDiv.textContent = 'The assistant is preparing a response...';
             chatBody.appendChild(typingDiv);
             chatBody.scrollTop = chatBody.scrollHeight;
@@ -133,19 +158,24 @@
             const typingDiv = document.getElementById('typing');
             if (typingDiv) {
                 typingDiv.remove();
+                isTyping = false;
             }
         }
 
         function showQuickReplies() {
             const quickRepliesDiv = document.getElementById('quick-replies');
-            quickRepliesDiv.innerHTML = QUICK_REPLIES.map(reply => `
-                <button class="btn btn-secondary quick-reply" onclick="quickReply('${reply.text}')" aria-label="${reply.text}">
-                    ${reply.text}
-                </button>
-            `).join('');
+            quickRepliesDiv.innerHTML = '';
+            QUICK_REPLIES.forEach(reply => {
+                const button = document.createElement('button');
+                button.className = 'btn btn-secondary quick-reply';
+                button.textContent = reply.text;
+                button.setAttribute('aria-label', reply.text);
+                button.onclick = () => quickReply(reply.text, reply.keyword);
+                quickRepliesDiv.appendChild(button);
+            });
         }
 
-        function quickReply(text) {
+        function quickReply(text, keyword) {
             const quickReplies = document.querySelectorAll('.quick-reply');
             quickReplies.forEach(btn => btn.disabled = true);
             appendUserMessage(text);
@@ -154,7 +184,7 @@
                 showTypingAnimation();
                 setTimeout(() => {
                     hideTypingAnimation();
-                    respondToUser(text.toLowerCase());
+                    respondToUser(keyword.toLowerCase());
                     quickReplies.forEach(btn => btn.disabled = false);
                 }, TIMING.TYPING_DELAY);
             }, TIMING.QUICK_REPLY_DELAY);

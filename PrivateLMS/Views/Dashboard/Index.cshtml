@@ -38,12 +38,11 @@
                                     }
                                     else
                                     {
-                                        <span class="badge bg-success">On Time</span>
+                                        <span class="badge bg-success">Active</span>
                                     }
                                 </td>
                                 <td class="text-center">
                                     <a asp-controller="Loans" asp-action="Renew" asp-route-id="@loan.LoanRecordId" class="btn btn-outline-primary btn-sm me-1">Renew</a>
-                                    <a asp-controller="Loans" asp-action="Return" asp-route-loanRecordId="@loan.LoanRecordId" class="btn btn-outline-success btn-sm">Return</a>
                                 </td>
                             </tr>
                         }
@@ -117,7 +116,7 @@
                                 <td>NGN @fine.Amount.ToString("F2")</td>
                                 <td>@fine.IssuedDate.ToString("g")</td>
                                 <td class="text-center">
-                                    <a asp-controller="Fines" asp-action="Pay" asp-route-id="@fine.Id" class="btn btn-warning btn-sm">Pay</a>
+                                    <a asp-controller="Fines" asp-action="Pay" asp-route-id="@fine.Id" class="btn btn-danger btn-sm">Pay</a>
                                 </td>
                             </tr>
                         }
@@ -191,7 +190,7 @@
                                 <td>@rating.Rating star@(rating.Rating == 1 ? "" : "s")</td>
                                 <td>@rating.RatedOn.ToString("g")</td>
                                 <td class="text-center">
-                                    <a asp-controller="Books" asp-action="Details" asp-route-id="@rating.BookId" class="btn btn-outline-primary btn-sm">View Book</a>
+                                    <a asp-controller="Books" asp-action="Details" asp-route-id="@rating.BookId" class="btn btn-outline-primary btn-sm">View</a>
                                 </td>
                             </tr>
                         }
@@ -237,8 +236,4 @@
             </nav>
         }
     </section>
-
-    <div class="text-center mt-4">
-        <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Back to Home</a>
-    </div>
 </div>
