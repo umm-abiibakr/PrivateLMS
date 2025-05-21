@@ -402,7 +402,7 @@ namespace PrivateLMS.Controllers
             }
         }
 
-
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Ban(int id, string banReason, string duration = "Permanent")
@@ -472,6 +472,7 @@ namespace PrivateLMS.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Unban(int id)
@@ -511,6 +512,7 @@ namespace PrivateLMS.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Approve(int id)
@@ -522,13 +524,16 @@ namespace PrivateLMS.Controllers
             await _userManager.UpdateAsync(user);
 
             // Send approval notification
-            var emailBody = $"Your account has been approved. You can now log in at <a href='{Url.Action("Index", "Login", null, Request.Scheme)}'>Warathatul Ambiya</a>.";
+            var emailBody = $"Your account has been approved. You can now log in at <a href='" +
+                $"{Url.Action("Index", "Login", null, Request.Scheme)}'>Warathatul Ambiya</a>.";
             await _emailService.SendEmailAsync(user.Email, "Account Approved", emailBody);
 
             TempData["SuccessMessage"] = $"{user.UserName} approved.";
             return RedirectToAction(nameof(Index));
         }
 
+
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Disapprove(int id)
@@ -544,7 +549,7 @@ namespace PrivateLMS.Controllers
         }
 
 
-
+        [Authorize]
         public async Task<IActionResult> Profile()
         {
             try

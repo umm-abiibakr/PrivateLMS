@@ -162,7 +162,7 @@ namespace PrivateLMS.Controllers
 
                 // Check active loan count
                 var activeLoanCount = await _loanService.GetActiveLoanCountAsync(user.Id);
-                if (activeLoanCount >= 3)
+                if (activeLoanCount >= 2)
                 {
                     TempData["ErrorMessage"] = "You cannot borrow more than two books at a time.";
                     return RedirectToAction("MyLoans");
@@ -217,7 +217,8 @@ namespace PrivateLMS.Controllers
                     <p>Baarakallaahu Feekum,<br/>Warathatul Ambiya Library System</p>";
                 await _emailService.SendEmailAsync("admin@warathatulambiya.com", "New Loan Request", adminEmailBody);
 
-                TempData["SuccessMessage"] = $"Successfully requested a loan: {model.BookTitle}. A confirmation email has been sent, and an admin will get back to you shortly bi idhnillaah.";
+                TempData["SuccessMessage"] = $"Successfully requested a loan: {model.BookTitle}. " +
+                    $"A confirmation email has been sent, and an admin will get back to you shortly bi idhnillaah.";
                 return RedirectToAction("MyLoans");
             }
             catch (Exception ex)

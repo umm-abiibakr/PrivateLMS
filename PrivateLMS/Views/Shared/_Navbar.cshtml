@@ -1,12 +1,12 @@
 ﻿<nav class="navbar navbar-expand-lg shadow-sm" style="background-color: #242424;">
     <div class="container-fluid">
-        <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index" style="font-family: 'Cormorant Garamond', serif; color: #d8c9b4;">
+        <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index" style="font-family: 'Lora', serif; color: #d8c9b4;">
             <img src="~/images/lib-logo/WarathatulAmbiya-Logo.jpg" alt="Logo" style="height: 32px; margin-right: 8px;" />
             Warathatul Ambiya
         </a>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
-                aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation" style="background-color: #d8c9b4;">
+                aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
@@ -33,7 +33,7 @@
                         <a class="nav-link dropdown-toggle text-light" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-person-circle me-1"></i> Hello, @User.Identity.Name
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
                             <li><a class="dropdown-item" asp-controller="Admin" asp-action="Dashboard"><i class="bi bi-speedometer2 me-1"></i> Dashboard</a></li>
                             <li><a class="dropdown-item" asp-controller="UserActivities" asp-action="Index"><i class="bi bi-clock-history me-1"></i> Activity Log</a></li>
                             <li><hr class="dropdown-divider" /></li>
@@ -56,7 +56,7 @@
                         <a class="nav-link dropdown-toggle text-light" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-person-check me-1"></i> Hello, @User.Identity.Name
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                             <li><a class="dropdown-item" asp-controller="Dashboard" asp-action="Index"><i class="bi bi-house-door me-1"></i> Dashboard</a></li>
                             <li><a class="dropdown-item" asp-controller="Recommendations" asp-action="Index"><i class="bi bi-stars me-1"></i> Recommendations</a></li>
                             <li><a class="dropdown-item" asp-controller="Loans" asp-action="MyLoans"><i class="bi bi-journal-bookmark me-1"></i> My Loans</a></li>

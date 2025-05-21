@@ -236,14 +236,97 @@ h5 {
 }
 
 .card-footer {
-    background-color: transparent;
+    background-color: #f3e6d4; /* Changed from bg-light to match your palette */
     border-top: none;
 }
 
-.card-header {
-    background-color: #f3e6d4;
-    border-bottom: 1px solid #e5d8c9;
+/* New class for success banner */
+.success-banner {
+    background-color: #A8D5BA; /* Your success color */
+    color: #3b2f2f;
+    padding: 1.5rem;
+    text-align: center;
 }
+
+/* New class for gradient background */
+.card-content-gradient {
+    background: linear-gradient(to bottom, #fffdf9, #fff6e9);
+    font-family: 'Lora', serif;
+    padding: 2rem;
+}
+
+/* New class for progress steps */
+.progress-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+}
+
+    .progress-step .rounded-circle {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .progress-step .bg-success {
+        background-color: #A8D5BA;
+    }
+
+    .progress-step .bg-warning {
+        background-color: #F7C59F;
+    }
+
+    .progress-step .bg-secondary {
+        background-color: #d8c9b4;
+        opacity: 0.6;
+    }
+
+    .progress-step span {
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+    }
+
+.progress-line {
+    position: absolute;
+    top: 15px;
+    left: 10%;
+    right: 10%;
+    height: 3px;
+    background-color: #e5d8c9;
+    z-index: 1;
+}
+
+/* Adjusted alert styling */
+.custom-alert {
+    background-color: #fffdf9;
+    border: 1px solid #e5d8c9;
+    border-left-width: 4px;
+    border-left-color: #8E9AAF; /* Info color from your palette */
+    padding: 1rem;
+    margin: 1rem 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+    .custom-alert .text-primary {
+        color: #8E9AAF !important;
+    }
+
+/* Adjusted warning box */
+.warning-box {
+    border-left: 4px solid #F7C59F;
+    background-color: rgba(247, 197, 159, 0.1);
+    padding: 1rem;
+    margin: 1rem 0;
+}
+
+    .warning-box .text-muted {
+        color: #6d5844;
+    }
 
 /* ================================
    Dashboard Cards
@@ -322,7 +405,7 @@ dl.row dd {
 }
 
 .table-actions {
-    white-space: nowrap; /* Replaces inline text-nowrap for table actions */
+    white-space: nowrap;
 }
 
 /* ================================
@@ -405,11 +488,11 @@ dl.row dd {
 }
 
 .mt-5 {
-    margin-top: 3rem;
+    margin-top: 1.5rem !important;
 }
 
 .mb-5 {
-    margin-bottom: 3rem;
+    margin-bottom: 1.5rem !important;
 }
 
 /* ================================
@@ -459,8 +542,9 @@ footer {
     font-family: 'Inter', sans-serif;
     background-color: #f3e6d4;
     border-left: 5px solid #a67c52;
-    padding: 30px;
     color: #4a3c2e;
+    padding: 5px;
+    margin-bottom: 1rem;
 }
 
 .hadith-arabic {
@@ -489,6 +573,7 @@ footer {
     text-align: center;
     color: #4a3c2e;
     margin: 0 0 20px;
+    font-style: italic;
 }
 
 .quote {
@@ -497,7 +582,34 @@ footer {
     color: #6d5844;
     border-left: 3px solid #a67c52;
     padding-left: 16px;
-    margin: 24px 0;
+    margin: 10px 0;
+}
+
+/* ================================
+   Accordion Styling (for FAQ)
+================================== */
+.accordion-item {
+    border: 1px solid #e5d8c9;
+    border-radius: 6px;
+    margin-bottom: 10px;
+}
+
+.accordion-button {
+    font-family: 'Lora', serif;
+    color: #4a3c2e;
+    background-color: #fdfbf7;
+    padding: 0.75rem 1rem;
+}
+
+    .accordion-button:not(.collapsed) {
+        background-color: #f3e6d4;
+        color: #3b2f2f;
+    }
+
+.accordion-body {
+    font-family: 'Inter', sans-serif;
+    color: #3b2f2f;
+    padding: 1rem;
 }
 
 /* ================================
@@ -526,6 +638,7 @@ footer {
 .modal-footer {
     border-top: 1px solid #e5d8c9;
 }
+
 /* ================================
    Chat Button Styles
 ================================== */
@@ -552,6 +665,7 @@ footer {
         background: #7c5e4a;
         transform: scale(1.05);
     }
+
 /* ================================
    Chatbot-Specific CSS
 ================================== */
@@ -564,7 +678,7 @@ footer {
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
     display: flex;
     flex-direction: column;
-    min-height: 300px; /* Ensure container has a minimum height */
+    min-height: 300px;
 }
 
 .chat-header {
@@ -573,14 +687,14 @@ footer {
     padding: 15px;
     font-size: 18px;
     font-weight: 600;
-    font-family: 'Cormorant Garamond', serif;
+    font-family: 'Lora', serif; /* Changed from Cormorant Garamond */
 }
 
 .chat-body {
     padding: 20px;
-    flex: 1; /* Allow chat-body to grow/shrink */
-    min-height: 150px; /* Minimum height for small screens */
-    max-height: 50vh; /* Limit height to half viewport */
+    flex: 1;
+    min-height: 150px;
+    max-height: 50vh;
     overflow-y: auto;
     font-size: 15px;
     line-height: 1.5;
@@ -590,7 +704,7 @@ footer {
     display: flex;
     border-top: 1px solid #ddd;
     padding: 10px;
-    flex-shrink: 0; /* Prevent input from shrinking */
+    flex-shrink: 0;
 }
 
     .chat-input input {
@@ -607,14 +721,14 @@ footer {
         font-size: 15px;
         border: none;
         border-radius: 6px;
-        background-color: #6c4f3d;
+        background-color: #a67c52; /* Changed to match your primary color */
         color: #fff;
         cursor: pointer;
         transition: background-color 0.3s ease;
     }
 
         .chat-input button:hover {
-            background-color: #533d2e;
+            background-color: #7c5e4a;
         }
 
 .bot-message, .user-message {
@@ -645,7 +759,7 @@ footer {
     padding: 10px;
     border-top: 1px solid #eee;
     background-color: #fbf7f1;
-    flex-shrink: 0; /* Prevent quick-replies from shrinking */
+    flex-shrink: 0;
 }
 
 .quick-reply {
@@ -668,7 +782,7 @@ footer {
     padding: 10px;
     background-color: #f8f8f8;
     text-align: center;
-    flex-shrink: 0; /* Prevent restart-button from shrinking */
+    flex-shrink: 0;
 }
 
     .restart-button button {
@@ -676,7 +790,7 @@ footer {
         font-size: 14px;
         border: none;
         border-radius: 6px;
-        background-color: #999;
+        background-color: #a67c52; /* Changed to match your primary color */
         color: #fff;
         cursor: pointer;
     }
@@ -684,14 +798,6 @@ footer {
 .typing {
     font-style: italic;
     color: #777;
-}
-
-.arabic-phrase {
-    font-family: 'Amiri', serif;
-    display: block;
-    margin-bottom: 6px;
-    font-size: 18px;
-    color: #4b3c2a;
 }
 
 .error {
@@ -730,7 +836,7 @@ footer {
     }
 
     .card {
-        padding: 1.5rem; /* Reduced padding for mobile */
+        padding: 1.5rem;
     }
 
     .card-body p.display-6 {
@@ -769,14 +875,14 @@ footer {
     .chat-container {
         width: 95%;
         margin: 10px auto;
-        min-height: 0; /* Allow container to shrink */
+        min-height: 0;
         max-height: 90vh;
         display: flex;
         flex-direction: column;
     }
 
     .chat-body {
-        max-height: 40vh; /* Reduce max-height for small screens */
+        max-height: 40vh;
         min-height: 100px;
         padding: 15px;
     }
@@ -865,32 +971,6 @@ footer {
 }
 
 /* ================================
-   Accordion Styling (for FAQ)
-================================== */
-.accordion-button {
-    font-family: 'Lora', serif;
-    color: #4a3c2e;
-    background-color: #fdfbf7;
-}
-
-    .accordion-button:not(.collapsed) {
-        background-color: #f3e6d4;
-        color: #3b2f2f;
-    }
-
-.accordion-body {
-    font-family: 'Inter', sans-serif;
-    color: #3b2f2f;
-}
-
-.accordion-item {
-    border: 1px solid #e5d8c9;
-    border-radius: 6px;
-    margin-bottom: 10px;
-}
-
-
-/* ================================
    Custom Toast Styling
 ================================== */
 .custom-toast {
@@ -899,7 +979,7 @@ footer {
     right: 20px;
     background-color: #fdfbf7;
     border: 1px solid #e5d8c9;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
     padding: 16px 20px;
     border-radius: 6px;
     font-family: 'Inter', sans-serif;

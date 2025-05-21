@@ -4,155 +4,295 @@
 }
 
 <div class="container mt-5">
-    <h2 class="text-center mb-4">Book Details</h2>
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow-sm">
-                <div class="card-body text-center">
-
-                    @if (!string.IsNullOrEmpty(Model.CoverImagePath))
-                    {
-                        <img src="@Model.CoverImagePath" alt="@Model.Title Cover" class="img-fluid mb-4 rounded shadow-sm" style="max-width: 300px;" />
-                    }
-                    else
-                    {
-                        <p class="text-muted mb-4">No Cover Image</p>
-                    }
-
-                    <dl class="row text-start">
-                        <dt class="col-sm-4 text-end">Title</dt>
-                        <dd class="col-sm-8">@Model.Title</dd>
-
-                        <dt class="col-sm-4 text-end">Author</dt>
-                        <dd class="col-sm-8">
-                            @{
-                                var author = Model.AvailableAuthors.FirstOrDefault(a => a.AuthorId == Model.AuthorId);
-                                if (User.Identity.IsAuthenticated && author != null)
-                                {
-                                    <a asp-controller="Authors" asp-action="Details" asp-route-id="@Model.AuthorId">@author.Name</a>
-                                }
-                                else
-                                {
-                                    @(author?.Name ?? "Unknown")
-                                }
-                            }
-                        </dd>
-
-                        <dt class="col-sm-4 text-end">Description</dt>
-                        <dd class="col-sm-8">@(Model.Description ?? "No description available")</dd>
-
-                        <dt class="col-sm-4 text-end">ISBN</dt>
-                        <dd class="col-sm-8">@Model.ISBN</dd>
-
-                        <dt class="col-sm-4 text-end">Language</dt>
-                        <dd class="col-sm-8">
-                            @{
-                                var language = Model.AvailableLanguages.FirstOrDefault(a => a.LanguageId == Model.LanguageId);
-                                if (User.Identity.IsAuthenticated && language != null)
-                                {
-                                    <a asp-controller="Language" asp-action="Details" asp-route-id="@Model.LanguageId">@language.Name</a>
-                                }
-                                else
-                                {
-                                    @(language?.Name ?? "Unknown")
-                                }
-                            }
-                        </dd>
-
-                        <dt class="col-sm-4 text-end">Published Date</dt>
-                        <dd class="col-sm-8">@Model.PublishedDate.ToShortDateString()</dd>
-
-                        <dt class="col-sm-4 text-end">Available Copies</dt>
-                        <dd class="col-sm-8">@Model.AvailableCopies</dd>
-
-                        <dt class="col-sm-4 text-end">Available</dt>
-                        <dd class="col-sm-8">
-                            @if (Model.IsAvailable)
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="text-center">Book Details</h2>
+                </div>
+                <div class="card-body p-0">
+                    <div class="row g-0">
+                        <!-- Book Cover Column -->
+                        <div class="col-md-4 p-4 text-center" style="background-color: #f3e6d4;">
+                            @if (!string.IsNullOrEmpty(Model.CoverImagePath))
                             {
-                                <span class="badge bg-success">Yes</span>
+                                <img src="@Model.CoverImagePath" alt="@Model.Title Cover" class="img-fluid rounded mb-3" style="max-width: 220px;" />
                             }
                             else
                             {
-                                <span class="badge bg-danger">No</span>
+                                <div class="border rounded p-5 mb-3 bg-white">
+                                    <i class="bi bi-book" style="font-size: 5rem; color: #ccc;"></i>
+                                    <p class="text-muted">No Cover Image</p>
+                                </div>
                             }
-                        </dd>
 
-                        <dt class="col-sm-4 text-end">Publisher</dt>
-                        <dd class="col-sm-8">
-                            @{
-                                var publisher = Model.AvailablePublishers.FirstOrDefault(p => p.PublisherId == Model.PublisherId);
-                                if (User.Identity.IsAuthenticated && publisher != null)
-                                {
-                                    <a asp-controller="Publishers" asp-action="Details" asp-route-id="@Model.PublisherId">@publisher.PublisherName</a>
-                                }
-                                else
-                                {
-                                    @(publisher?.PublisherName ?? "None")
-                                }
-                            }
-                        </dd>
-
-                        <dt class="col-sm-4 text-end">Categories</dt>
-                        <dd class="col-sm-8">
-                            @if (Model.SelectedCategoryIds?.Any() == true)
-                            {
-                                var categories = Model.AvailableCategories.Where(c => Model.SelectedCategoryIds.Contains(c.CategoryId));
-                                <ul class="list-unstyled mb-0">
-                                    @foreach (var cat in categories)
-                                    {
-                                        <li>@cat.CategoryName</li>
-                                    }
-                                </ul>
-                            }
-                            else
-                            {
-                                <span class="text-muted">No Categories</span>
-                            }
-                        </dd>
-
-                        <dt class="col-sm-4 text-end">Average Rating</dt>
-                        <dd class="col-sm-8">
-                            @(Model.RatingCount > 0
-                                ? $"{Model.AverageRating:F1} ({Model.RatingCount} rating{(Model.RatingCount == 1 ? "" : "s")})"
-                                : "Not yet rated")
-                        </dd>
-                    </dl>
-
-                    @if (Model.IsAvailable && Model.AvailableCopies > 0 && User.IsInRole("User"))
-                    {
-                        <form asp-controller="BookRatings" asp-action="Rate" method="post" class="mt-3">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="BookId" value="@Model.BookId" />
-                            <div class="row justify-content-center align-items-start">
-                                <div class="col-md-3">
-                                    <select name="Rating" class="form-select form-select-sm">
-                                        @for (int i = 1; i <= 5; i++)
+                            <!-- Quick Book Stats -->
+                            <div class="d-flex justify-content-center gap-3 mt-3">
+                                <div class="text-center">
+                                    <div class="small text-muted">Rating</div>
+                                    <div class="fw-bold">
+                                        @if (Model.RatingCount > 0)
                                         {
-                                            <option value="@i" selected="@(Model.UserRating == i)">@i</option>
+                                            <span class="text-warning"><i class="bi bi-star-fill"></i></span> @Model.AverageRating.ToString("F1")
                                         }
-                                    </select>
+                                        else
+                                        {
+                                            <span class="text-muted">—</span>
+                                        }
+                                    </div>
                                 </div>
-                                <div class="col-md-5">
-                                    <textarea name="Review" class="form-control" rows="2" placeholder="Add a review (optional)"></textarea>
+                                <div class="text-center">
+                                    <div class="small text-muted">Copies</div>
+                                    <div class="fw-bold">@Model.AvailableCopies</div>
                                 </div>
-                                <div class="mt-3">
-                                    <button type="submit" class="btn btn-primary btn-sm">Submit</button>
+                                <div class="text-center">
+                                    <div class="small text-muted">Status</div>
+                                    <div>
+                                        @if (Model.IsAvailable)
+                                        {
+                                            <span class="badge badge-returned">Available</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-overdue">Unavailable</span>
+                                        }
+                                    </div>
                                 </div>
                             </div>
-                        </form>
-                    }
+                        </div>
 
-                    <div class="mt-4">
-                        @if (User.IsInRole("Admin"))
-                        {
-                            <a asp-action="Edit" asp-route-id="@Model.BookId" class="btn btn-warning me-2">Edit</a>
-                            <a asp-action="Delete" asp-route-id="@Model.BookId" class="btn btn-danger me-2">Delete</a>
-                        }
-                        @if (Model.IsAvailable && Model.AvailableCopies > 0 && User.IsInRole("User"))
-                        {
-                            <a asp-action="Loan" asp-route-id="@Model.BookId" class="btn btn-primary btn-md me-2">Loan</a>
-                        }
-                        <a asp-action="Index" class="btn btn-secondary btn-md">Back</a>
+                        <!-- Book Details Column -->
+                        <div class="col-md-8 p-4">
+                            <h3 class="card-title mb-1">@Model.Title</h3>
+
+                            <!-- Author with link -->
+                            <h5 class="text-muted mb-3">
+                                @{
+                                    var author = Model.AvailableAuthors.FirstOrDefault(a => a.AuthorId == Model.AuthorId);
+                                    if (User.Identity.IsAuthenticated && author != null)
+                                    {
+                                        <a asp-controller="Authors" asp-action="Details" asp-route-id="@Model.AuthorId" class="text-decoration-none">@author.Name</a>
+                                    }
+                                    else
+                                    {
+                                        @(author?.Name ?? "Unknown")
+                                    }
+                                }
+                            </h5>
+
+                            <!-- Description in its own section -->
+                            <div class="mb-4">
+                                <h6 class="fw-bold">Description</h6>
+                                <p class="card-text">@(Model.Description ?? "No description available")</p>
+                            </div>
+
+                            <!-- Book metadata in a clean two-column layout -->
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item px-0">
+                                            <div class="d-flex">
+                                                <span class="fw-bold me-2">ISBN:</span>
+                                                <span>@Model.ISBN</span>
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item px-0">
+                                            <div class="d-flex">
+                                                <span class="fw-bold me-2">Language:</span>
+                                                <span>
+                                                    @{
+                                                        var language = Model.AvailableLanguages.FirstOrDefault(a => a.LanguageId == Model.LanguageId);
+                                                        if (User.Identity.IsAuthenticated && language != null)
+                                                        {
+                                                            <a asp-controller="Language" asp-action="Details" asp-route-id="@Model.LanguageId">@language.Name</a>
+                                                        }
+                                                        else
+                                                        {
+                                                            @(language?.Name ?? "Unknown")
+                                                        }
+                                                    }
+                                                </span>
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item px-0">
+                                            <div class="d-flex">
+                                                <span class="fw-bold me-2">Published:</span>
+                                                <span>@Model.PublishedDate.ToShortDateString()</span>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item px-0">
+                                            <div class="d-flex">
+                                                <span class="fw-bold me-2">Publisher:</span>
+                                                <span>
+                                                    @{
+                                                        var publisher = Model.AvailablePublishers.FirstOrDefault(p => p.PublisherId == Model.PublisherId);
+                                                        if (User.Identity.IsAuthenticated && publisher != null)
+                                                        {
+                                                            <a asp-controller="Publishers" asp-action="Details" asp-route-id="@Model.PublisherId">@publisher.PublisherName</a>
+                                                        }
+                                                        else
+                                                        {
+                                                            @(publisher?.PublisherName ?? "None")
+                                                        }
+                                                    }
+                                                </span>
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item px-0">
+                                            <div class="d-flex">
+                                                <span class="fw-bold me-2">Categories:</span>
+                                                <span>
+                                                    @if (Model.SelectedCategoryIds?.Any() == true)
+                                                    {
+                                                        var categories = Model.AvailableCategories.Where(c => Model.SelectedCategoryIds.Contains(c.CategoryId));
+                                                        @string.Join(", ", categories.Select(c => c.CategoryName))
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">None</span>
+                                                    }
+                                                </span>
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item px-0">
+                                            <div class="d-flex">
+                                                <span class="fw-bold me-2">Reviews:</span>
+                                                <span>
+                                                    @(Model.RatingCount > 0
+                                                        ? $"{Model.RatingCount} review{(Model.RatingCount == 1 ? "" : "s")}"
+                                                        : "No reviews yet")
+                                                </span>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- User's Review -->
+                            @if (User.Identity.IsAuthenticated && !string.IsNullOrEmpty(Model.UserReview))
+                            {
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h6 class="mb-0">Your Review</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <span class="text-warning me-2">
+                                                @for (int i = 0; i < (int)Model.UserRating; i++)
+                                                {
+                                                    <i class="bi bi-star-fill"></i>
+                                                }
+                                            </span>
+                                            <span class="text-muted small">@Model.UserRating.ToString("F1") / 5</span>
+                                        </div>
+                                        <p class="card-text">@Model.UserReview</p>
+                                        <a asp-action="EditRating" asp-controller="BookRatings" asp-route-bookId="@Model.BookId" class="btn btn-sm btn-outline-secondary">
+                                            <i class="bi bi-pencil"></i> Edit Review
+                                        </a>
+                                    </div>
+                                </div>
+                            }
+
+                            <!-- Rating Form -->
+                            @if (Model.IsAvailable && Model.AvailableCopies > 0 && User.Identity.IsAuthenticated && string.IsNullOrEmpty(Model.UserReview))
+                            {
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h6 class="mb-0">Rate this Book</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <form asp-controller="BookRatings" asp-action="Rate" method="post">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="BookId" value="@Model.BookId" />
+                                            <div class="row align-items-center g-3">
+                                                <div class="col-md-3">
+                                                    <label class="form-label small text-muted">Your Rating</label>
+                                                    <select name="Rating" class="form-select">
+                                                        @for (int i = 1; i <= 5; i++)
+                                                        {
+                                                            <option value="@i" selected="@(Model.UserRating == i)">@i @for (int j = 0; j < i; j++)
+                                                                {
+                                                                    <i class="bi bi-star-fill text-warning"></i>
+                                                                }</option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-7">
+                                                    <label class="form-label small text-muted">Your Review</label>
+                                                    <textarea name="Review" class="form-control" rows="2" placeholder="Share your thoughts about this book..."></textarea>
+                                                </div>
+
+                                            </div>
+                                            <div class="col-md-2 d-flex align-items-end">
+                                                <button type="submit" class="btn btn-primary mt-2 ">Submit</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            }
+
+                            <!-- All Reviews -->
+                            @if (Model.Reviews.Any())
+                            {
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h6 class="mb-0">Community Reviews</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        @foreach (var review in Model.Reviews)
+                                        {
+                                            <div class="border-bottom pb-3 mb-3">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <span class="text-warning me-2">
+                                                        @for (int i = 0; i < review.Rating; i++)
+                                                        {
+                                                            <i class="bi bi-star-fill"></i>
+                                                        }
+                                                    </span>
+                                                    <span class="text-muted small">@review.Rating / 5</span>
+                                                </div>
+                                                <p class="card-text">@review.Review</p>
+                                                <p class="text-muted small">Reviewed by @review.UserName on @review.RatedOn.ToShortDateString()</p>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="card mb-4">
+                                    <div class="card-body text-center">
+                                        <p class="card-text text-muted">No reviews yet. Be the first to share your thoughts!</p>
+                                    </div>
+                                </div>
+                            }
+
+                            <!-- Action Buttons -->
+                            <div class="d-flex gap-2 mt-4">
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <a asp-action="Edit" asp-route-id="@Model.BookId" class="btn btn-warning">
+                                        <i class="bi bi-pencil"></i> Edit
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@Model.BookId" class="btn btn-outline-danger">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </a>
+                                }
+                                @if (Model.IsAvailable && Model.AvailableCopies > 0 && User.IsInRole("User"))
+                                {
+                                    <a asp-action="Loan" asp-route-id="@Model.BookId" class="btn btn-primary">
+                                        <i class="bi bi-journal-arrow-down"></i> Borrow Book
+                                    </a>
+                                }
+                                <a asp-action="Index" class="btn btn-outline-secondary ms-auto">
+                                    <i class="bi bi-arrow-left"></i> Back to Books
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

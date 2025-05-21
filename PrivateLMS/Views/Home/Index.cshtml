@@ -11,7 +11,7 @@
     </div>
 
     <!-- Hadith Banner -->
-    <div class="hadith-banner text-center py-5 mb-5">
+    <div class="hadith-banner text-center py-5 mb-3">
         <p class="hadith-arabic mb-4">
             إِنَّ الْعُلَمَاءَ وَرَثَةُ الأَنْبِيَاءِ إِنَّ الأَنْبِيَاءَ لَمْ يُوَرِّثُوا دِينَارًا وَلاَ دِرْهَمًا إِنَّمَا وَرَّثُوا الْعِلْمَ فَمَنْ أَخَذَ بِهِ أَخَذَ بِحَظٍّ وَافِر
         </p>
@@ -25,8 +25,7 @@
 
     <!-- Browse Books Button -->
     <div class="text-center mb-5">
-        <p class="lead slogan">Now, take your goodly share!</p>
-        <a asp-controller="Books" asp-action="Index" class="btn btn-primary btn-lg">Browse Books</a>
+        <a asp-controller="Books" asp-action="Index" class="btn btn-primary btn-lg">Take your goodly share!</a>
     </div>
 
     <!-- Overdue Loan Notifications -->
@@ -60,7 +59,7 @@
         }
         else
         {
-            <div class="row row-cols-1 row-cols-md-3 g-4">
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-4 g-3">
                 @foreach (var book in Model.NewBooks)
                 {
                     <div class="col">
@@ -100,7 +99,7 @@
         }
         else
         {
-            <div class="row row-cols-1 row-cols-md-3 g-4">
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-4 g-3">
                 @foreach (var book in Model.PopularBooks)
                 {
                     <div class="col">
@@ -133,33 +132,53 @@
 
     <!-- Book Reviews Section -->
     <section class="mb-5">
-        <h3 class="text-center mb-4">Recent Book Reviews</h3>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="mb-0">Recent Reviews</h3>
+        </div>
+
         @if (!Model.RecentReviews.Any())
         {
-            <p class="text-center text-muted">No reviews available at the moment.</p>
+            <div class="card shadow-sm">
+                <div class="card-body py-5 text-center">
+                    <p class="text-muted mb-0">No reviews available at the moment.</p>
+                </div>
+            </div>
         }
         else
         {
-            <div class="row row-cols-1 row-cols-md-3 g-4">
+            <div class="row row-cols-1 row-cols-md-2 g-4">
                 @foreach (var review in Model.RecentReviews)
                 {
                     <div class="col">
-                        <div class="card h-100 text-center">
+                        <div class="card h-100 shadow-sm">
                             <div class="card-body">
-                                <h5 class="card-title">@review.BookTitle</h5>
-                                <p class="card-text">
-                                    <strong>@review.UserName</strong> rated it @review.Rating stars<br />
+                                <div class="d-flex justify-content-between mb-3">
+                                    <h5 class="card-title mb-0">@review.BookTitle</h5>
+                                    <div class="text-warning">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            <i class="bi @(i <= review.Rating ? "bi-star-fill" : "bi-star")"></i>
+                                        }
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
                                     @if (!string.IsNullOrEmpty(review.Review))
                                     {
-                                        <small class="text-muted">"@(review.Review.Length > 50 ? review.Review.Substring(0, 50) + "..." : review.Review)"</small>
-
-                                        <br />
+                                        <p class="fst-italic mb-2">
+                                            "@review.Review"
+                                        </p>
                                     }
-                                    <small class="text-muted">Reviewed on @review.RatedOn.ToString("g")</small>
-                                </p>
-                            </div>
-                            <div class="card-footer">
-                                <a asp-controller="Books" asp-action="Details" asp-route-id="@review.BookId" class="btn btn-primary btn-sm">View Book</a>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        By <strong>@review.UserName</strong> on @review.RatedOn.ToString("MMM d, yyyy")
+                                    </small>
+                                    <a asp-controller="Books" asp-action="Details" asp-route-id="@review.BookId" class="btn btn-primary btn-sm">
+                                        View Book
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -173,7 +192,7 @@
     {
         <section class="mb-5">
             <h3 class="text-center mb-4">You May Like to Read This</h3>
-            <div class="row row-cols-1 row-cols-md-3 g-4">
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-4 g-3">
                 @foreach (var rec in Model.Recommendations)
                 {
                     var book = rec.Book;
@@ -211,7 +230,7 @@
                                 </p>
                             </div>
                             <div class="card-footer bg-transparent border-0">
-                                <a asp-controller="Books" asp-action="Details" asp-route-id="@book.BookId" class="btn btn-outline-primary btn-sm">View Details</a>
+                                <a asp-controller="Books" asp-action="Details" asp-route-id="@book.BookId" class="btn btn-primary btn-sm">View Details</a>
                             </div>
                         </div>
                     </div>

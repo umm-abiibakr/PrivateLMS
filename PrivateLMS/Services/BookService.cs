@@ -57,7 +57,7 @@ namespace PrivateLMS.Services
 
             if (book == null) return null;
 
-            return new BookViewModel
+            var viewModel = new BookViewModel
             {
                 BookId = book.BookId,
                 Title = book.Title,
@@ -74,8 +74,33 @@ namespace PrivateLMS.Services
                 AvailableAuthors = await _context.Authors.ToListAsync(),
                 AvailablePublishers = await _context.Publishers.ToListAsync(),
                 AvailableCategories = await _context.Categories.ToListAsync(),
-                AvailableLanguages = await _context.Languages.ToListAsync()
+                AvailableLanguages = await _context.Languages.ToListAsync(),
+                AverageRating = await _context.BookRatings
+                    .Where(br => br.BookId == bookId)
+                    .AnyAsync()
+                    ? (float)await _context.BookRatings
+                        .Where(br => br.BookId == bookId)
+                        .AverageAsync(br => br.Rating)
+                    : 0f,
+                RatingCount = await _context.BookRatings
+                    .CountAsync(br => br.BookId == bookId)
             };
+
+            // Fetch reviews
+            viewModel.Reviews = await _context.BookRatings
+                .Where(br => br.BookId == bookId)
+                .Include(br => br.User) // Include ApplicationUser for user details
+                .Select(br => new BookReviewViewModel
+                {
+                    Rating = br.Rating,
+                    Review = br.Review ?? string.Empty,
+                    UserName = br.User != null ? br.User.UserName : "Anonymous",
+                    RatedOn = br.RatedOn
+                })
+                .OrderByDescending(br => br.RatedOn)
+                .ToListAsync();
+
+            return viewModel;
         }
 
         public async Task<bool> CreateBookAsync(BookViewModel model, string? coverImagePath)

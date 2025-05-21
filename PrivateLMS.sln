@@ -5,6 +5,8 @@ VisualStudioVersion = 17.13.35806.99
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrivateLMS", "PrivateLMS\PrivateLMS.csproj", "{B4683CC0-8527-48AD-ACA4-4932B6F7A17D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrivateLMSTests", "..\Proj tests\PrivateLMSTests\PrivateLMSTests.csproj", "{011B0BF5-EEB9-4FCD-948F-F61240BE4A1E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{B4683CC0-8527-48AD-ACA4-4932B6F7A17D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B4683CC0-8527-48AD-ACA4-4932B6F7A17D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B4683CC0-8527-48AD-ACA4-4932B6F7A17D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{011B0BF5-EEB9-4FCD-948F-F61240BE4A1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{011B0BF5-EEB9-4FCD-948F-F61240BE4A1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{011B0BF5-EEB9-4FCD-948F-F61240BE4A1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{011B0BF5-EEB9-4FCD-948F-F61240BE4A1E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

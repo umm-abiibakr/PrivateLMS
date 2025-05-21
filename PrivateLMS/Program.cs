@@ -41,7 +41,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole<int>>(options =>
 
     // Lockout settings
     options.Lockout.AllowedForNewUsers = true;
-    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15); // Reasonable lockout duration
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15); // lockout duration
     options.Lockout.MaxFailedAccessAttempts = 5;
 
     // Sign-in requirements
@@ -117,7 +117,7 @@ else
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-app.UseSession(); // Must be before UseAuthentication/UseAuthorization
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 

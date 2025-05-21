@@ -67,7 +67,7 @@ namespace PrivateLMS.Services
                 var activeLoanCount = await _context.LoanRecords
                     .Where(lr => lr.UserId == model.UserId && lr.ReturnDate == null)
                     .CountAsync();
-                if (activeLoanCount >= 2) // Adjusted to match LoansController limit
+                if (activeLoanCount >= 2) 
                 {
                     return false;
                 }

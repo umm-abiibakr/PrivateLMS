@@ -2,15 +2,43 @@
     ViewData["Title"] = "Account Created";
 }
 
-<div class="container mt-5 text-center">
-    <div class="card shadow-sm p-4 border-0 rounded-4" style="background-color: #fffaf3; font-family: 'Cormorant Garamond', serif;">
-        <h2 class="mb-3 text-success">Almost There!</h2>
-        <p class="mb-2">Thank you for registering with <strong>Warathatul Ambiya</strong>.</p>
-        <p>We’ve sent a confirmation link to <strong>your email address</strong>.</p>
-        <p>Please check your inbox (and spam/junk folder) and click the link to verify your account.</p>
-        <p class="text-muted">Once your email is confirmed, your account will be reviewed by an administrator. You'll receive another email when you're approved.</p>
-        <div class="mt-4">
-            <a asp-controller="Login" asp-action="Index" class="btn btn-primary me-2">Return to Login</a>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-5">
+            <div class="card shadow-lg border-0 rounded-5">
+                <div class="card-body p-3 text-center">
+                    <div class="text-success mb-1">
+                        <i class="bi bi-check-circle-fill" style="font-size: 2rem;"></i>
+                    </div>
+
+                    <h3 class="mb-2 text-success fw-normal">Almost There!</h3>
+
+                    <p class="mb-1">Thank you for registering with <strong>Warathatul Ambiya</strong>.</p>
+
+                    <hr class="my-3">
+
+                    <p class="mb-1">We've sent a confirmation link to <strong>your email address</strong>.</p>
+                    <p>Please check your inbox (and spam folder) and click the link to verify your account.</p>
+
+                    <div class="alert alert-light border my-3 py-2 px-3">
+                        <p class="small text-muted mb-0">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Once verified, your account will be reviewed by an administrator.
+                            You'll receive an email when approved.
+                        </p>
+                    </div>
+
+                    <div class="mt-4">
+                        <a asp-controller="Login" asp-action="Index" class="btn btn-success px-4">
+                            Return to Login
+                        </a>
+                    </div>
+
+                    <div class="mt-3">
+                        <a asp-action="ResendVerificationEmail" class="small text-decoration-none text-muted">Didn't receive the email?</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
