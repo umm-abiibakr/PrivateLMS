@@ -30,7 +30,8 @@ namespace PrivateLMS.Controllers
 
             var totalUsers = await _context.Users.CountAsync();
             var unapprovedUsers = await _context.Users.CountAsync(u => !u.IsApproved);
-            var bannedUsers = await _context.Users.CountAsync(u => u.LockoutEnd.HasValue && u.LockoutEnd > DateTimeOffset.UtcNow);
+            var bannedUsers = await _context.Users.CountAsync
+                (u => u.LockoutEnd.HasValue && u.LockoutEnd > DateTimeOffset.UtcNow);
 
             var recentLoans = await _context.LoanRecords
                 .OrderByDescending(l => l.LoanDate)

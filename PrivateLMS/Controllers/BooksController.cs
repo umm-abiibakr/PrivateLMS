@@ -40,7 +40,8 @@ namespace PrivateLMS.Controllers
         }
 
         [Authorize]
-        public async Task<IActionResult> Index(string? searchTerm = "", int? categoryId = null, int? authorId = null, int page = 1, int pageSize = 12)
+        public async Task<IActionResult> Index(string? searchTerm = "", int? categoryId = null, int? authorId = null, 
+            int page = 1, int pageSize = 12)
         {
             try
             {
@@ -106,7 +107,7 @@ namespace PrivateLMS.Controllers
                     book.UserRating = await _bookRatingService.GetUserRatingAsync(id.Value, user.Id);
                     var userRating = await _context.BookRatings
                         .FirstOrDefaultAsync(br => br.BookId == id.Value && br.UserId == user.Id);
-                    book.UserReview = userRating?.Review ?? string.Empty; 
+                    book.UserReview = userRating?.Review ?? string.Empty;
                 }
 
                 return View(book);

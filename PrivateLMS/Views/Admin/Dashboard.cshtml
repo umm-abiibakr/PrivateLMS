@@ -5,214 +5,380 @@
 }
 
 <div class="container mt-5 mb-5">
-    <h2 class="text-center mb-4">Welcome, Admin</h2>
+    <h2 class="text-center mb-4">Welcome, @(User.Identity?.Name ?? "Admin")</h2>
     <p class="text-center text-muted mb-5">Here is a summary of your library activity and insights.</p>
 
-    <!-- Overview Cards -->
-    <div class="row g-3 mb-4">
-        <div class="col-12 col-sm-6 col-md-3">
-            <div class="card shadow-sm p-3 rounded-4 dashboard-card dashboard-card-total-books">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Total Books</h5>
-                    <p class="display-6">@Model.TotalBooks</p>
+    <!-- Stats Summary -->
+    <div class="row g-4 mb-5">
+        <!-- Books Stats -->
+        <div class="col-md-6">
+            <div class="card border-0 h-100">
+                <div class="card-header d-flex align-items-center">
+                    <h5 class="mb-0">Books Overview</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="row g-0">
+                        <div class="col-4">
+                            <div class="p-3 border-end h-100 d-flex flex-column justify-content-center dashboard-card-total-books text-center">
+                                <h2 class="display-5 fw-bold mb-0">@(Model?.TotalBooks ?? 0)</h2>
+                                <p class="mb-0">Total Books</p>
+                            </div>
+                        </div>
+                        <div class="col-8">
+                            <div class="row g-0 h-100">
+                                <div class="col-12 border-bottom">
+                                    <div class="row g-0">
+                                        <div class="col-6 p-3 text-center border-end dashboard-card-loaned-out">
+                                            <h3 class="h5 mb-1">@(Model?.BooksLoanedOut ?? 0)</h3>
+                                            <p class="small mb-0">Loaned</p>
+                                        </div>
+                                        <div class="col-6 p-3 text-center dashboard-card-pending-returns">
+                                            <h3 class="h5 mb-1">@(Model?.PendingReturns ?? 0)</h3>
+                                            <p class="small mb-0">Pending</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="p-3 text-center dashboard-card-overdue-loans">
+                                        <h3 class="h5 mb-1">@(Model?.OverdueLoans ?? 0)</h3>
+                                        <p class="small mb-0">Overdue</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-12 col-sm-6 col-md-3">
-            <div class="card shadow-sm p-3 rounded-4 dashboard-card dashboard-card-loaned-out">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Books Loaned Out</h5>
-                    <p class="display-6">@Model.BooksLoanedOut</p>
+
+        <!-- Users Stats -->
+        <div class="col-md-6">
+            <div class="card border-0 h-100">
+                <div class="card-header d-flex align-items-center">
+                    <h5 class="mb-0">Users Overview</h5>
                 </div>
-            </div>
-        </div>
-        <div class="col-12 col-sm-6 col-md-3">
-            <div class="card shadow-sm p-3 rounded-4 dashboard-card dashboard-card-pending-returns">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Pending Returns</h5>
-                    <p class="display-6">@Model.PendingReturns</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-sm-6 col-md-3">
-            <div class="card shadow-sm p-3 rounded-4 dashboard-card dashboard-card-overdue-loans">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Overdue Loans</h5>
-                    <p class="display-6">@Model.OverdueLoans</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-sm-6 col-md-3">
-            <div class="card shadow-sm p-3 rounded-4 dashboard-card dashboard-card-total-users">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Total Users</h5>
-                    <p class="display-6">@Model.TotalUsers</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-sm-6 col-md-3">
-            <div class="card shadow-sm p-3 rounded-4 dashboard-card dashboard-card-unapproved-users">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Unapproved Users</h5>
-                    <p class="display-6">@Model.UnapprovedUsers</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-sm-6 col-md-3">
-            <div class="card shadow-sm p-3 rounded-4 dashboard-card dashboard-card-banned-users">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Banned Users</h5>
-                    <p class="display-6">@Model.BannedUsers</p>
+                <div class="card-body p-0">
+                    <div class="row g-0">
+                        <div class="col-4">
+                            <div class="p-3 border-end h-100 d-flex flex-column justify-content-center dashboard-card-total-users text-center">
+                                <h2 class="display-5 fw-bold mb-0">@(Model?.TotalUsers ?? 0)</h2>
+                                <p class="mb-0">Total Users</p>
+                            </div>
+                        </div>
+                        <div class="col-8">
+                            <div class="row g-0 h-100">
+                                <div class="col-12 border-bottom">
+                                    <div class="row g-0">
+                                        <div class="col-6 p-3 text-center border-end dashboard-card-unapproved-users">
+                                            <h3 class="h5 mb-1">@(Model?.UnapprovedUsers ?? 0)</h3>
+                                            <p class="small mb-0">Unapproved</p>
+                                        </div>
+                                        <div class="col-6 p-3 text-center dashboard-card-banned-users">
+                                            <h3 class="h5 mb-1">@(Model?.BannedUsers ?? 0)</h3>
+                                            <p class="small mb-0">Banned</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="p-3 text-center bg-white">
+                                        <h3 class="h5 mb-1">@(Model != null ? Model.TotalUsers - Model.UnapprovedUsers - Model.BannedUsers : 0)</h3>
+                                        <p class="small mb-0">Active Users</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Charts -->
-    <div class="row mt-5">
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm p-4 rounded-4">
-                <h5 class="text-center mb-3">Loan Status Overview</h5>
-                <figure>
-                    <canvas id="loanStatusChart" class="w-100" aria-label="Loan status overview chart"></canvas>
-                </figure>
+    <!-- Charts & Recent Activity -->
+    <div class="row g-4">
+        <!-- Chart Column -->
+        <div class="col-lg-5">
+            <div class="row g-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Loan Status</h5>
+                        </div>
+                        <div class="card-body py-4">
+                            <div class="d-flex justify-content-center">
+                                <div style="max-width: 100%; width: 240px; height: 240px;">
+                                    <canvas id="loanStatusChart" aria-label="Loan status overview (Returned, Pending, Overdue)"></canvas>
+                                </div>
+                            </div>
+                            <!-- Loan Status Legend -->
+                            <div class="d-flex justify-content-center mt-3" role="legend">
+                                <div class="d-flex gap-4 flex-wrap">
+                                    <div class="d-flex align-items-center">
+                                        <span class="d-inline-block me-2 rounded-circle" style="width: 12px; height: 12px; background-color: #A8D5BA;"></span>
+                                        <span>Returned (@(Model?.LoanStats?.Returned ?? 0))</span>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <span class="d-inline-block me-2 rounded-circle" style="width: 12px; height: 12px; background-color: #F7C59F;"></span>
+                                        <span>Pending (@(Model?.LoanStats?.Pending ?? 0))</span>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <span class="d-inline-block me-2 rounded-circle" style="width: 12px; height: 12px; background-color: #EF767A;"></span>
+                                        <span>Overdue (@(Model?.LoanStats?.Overdue ?? 0))</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">User Status</h5>
+                        </div>
+                        <div class="card-body py-4">
+                            <div class="d-flex justify-content-center">
+                                <div style="max-width: 100%; width: 240px; height: 240px;">
+                                    <canvas id="userStatusChart" aria-label="User status breakdown (Approved, Unapproved, Banned)"></canvas>
+                                </div>
+                            </div>
+                            <!-- User Status Legend -->
+                            <div class="d-flex justify-content-center mt-3" role="legend">
+                                <div class="d-flex gap-4 flex-wrap">
+                                    <div class="d-flex align-items-center">
+                                        <span class="d-inline-block me-2 rounded-circle" style="width: 12px; height: 12px; background-color: #8E9AAF;"></span>
+                                        <span>Approved (@(Model?.UserStats?.Approved ?? 0))</span>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <span class="d-inline-block me-2 rounded-circle" style="width: 12px; height: 12px; background-color: #EFD3D7;"></span>
+                                        <span>Unapproved (@(Model?.UserStats?.Unapproved ?? 0))</span>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <span class="d-inline-block me-2 rounded-circle" style="width: 12px; height: 12px; background-color: #C9ADA7;"></span>
+                                        <span>Banned (@(Model?.UserStats?.Banned ?? 0))</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm p-4 rounded-4">
-                <h5 class="text-center mb-3">User Status Breakdown</h5>
-                <figure>
-                    <canvas id="userStatusChart" class="w-100" aria-label="User status breakdown chart"></canvas>
-                </figure>
+
+        <!-- Activity Column -->
+        <div class="col-lg-7">
+            <div class="row g-4">
+                <!-- Recent Loans -->
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Recent Loans</h5>
+                            <a asp-controller="Loans" asp-action="Index" class="btn btn-sm btn-outline-secondary">
+                                View All
+                            </a>
+                        </div>
+                        <div class="card-body p-0">
+                            @if (Model?.RecentLoans?.Any() == true)
+                            {
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th scope="col">Book</th>
+                                                <th scope="col">User</th>
+                                                <th scope="col">Date</th>
+                                                <th scope="col">Due</th>
+                                                <th scope="col">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var loan in Model.RecentLoans)
+                                            {
+                                                var isOverdue = loan.DueDate.HasValue && loan.DueDate < DateTime.Now && !loan.ReturnDate.HasValue;
+                                                var status = loan.ReturnDate.HasValue ? "Returned"
+                                                : isOverdue ? "Overdue"
+                                                : loan.IsRenewed ? "Renewed"
+                                                : "Pending";
+
+                                                var badgeClass = loan.ReturnDate.HasValue ? "badge-returned"
+                                                : isOverdue ? "badge-overdue"
+                                                : loan.IsRenewed ? "badge-renewed"
+                                                : "badge-pending";
+
+                                                <tr>
+                                                    <td class="text-truncate" style="max-width: 150px;" title="@loan.BookTitle">@loan.BookTitle</td>
+                                                    <td>@loan.LoanerName</td>
+                                                    <td>@loan.LoanDate.ToShortDateString()</td>
+                                                    <td>@(loan.DueDate?.ToShortDateString() ?? "N/A")</td>
+                                                    <td><span class="badge @badgeClass" aria-label="@status loan status">@status</span></td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="p-4 text-center">
+                                    <p class="text-muted mb-0">No recent loans</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Borrowed Books -->
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Most Borrowed Books</h5>
+                            <a asp-controller="Books" asp-action="Index" class="btn btn-sm btn-outline-secondary">
+                                View All Books
+                            </a>
+                        </div>
+                        <div class="card-body p-0">
+                            @if (Model?.TopBorrowedBooks?.Any() == true)
+                            {
+                                <ul class="list-group list-group-flush">
+                                    @foreach (var book in Model.TopBorrowedBooks)
+                                    {
+                                        <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                            <div class="d-flex align-items-center">
+                                                <span class="me-3" style="font-family: 'Lora', serif; font-size: 1.1rem; opacity: 0.6; width: 24px; text-align: center;">
+                                                    @(Model.TopBorrowedBooks.IndexOf(book) + 1)
+                                                </span>
+                                                <span class="text-truncate" style="max-width: 350px;" title="@book.Title">@book.Title</span>
+                                            </div>
+                                            <span class="badge badge-loan-count rounded-pill" aria-label="@book.TotalLoans loans">
+                                                @book.TotalLoans loans
+                                            </span>
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <div class="p-4 text-center">
+                                    <p class="text-muted mb-0">No borrowing data available yet</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Recent Loans Table -->
-    <div class="card mt-5 shadow-sm p-4 rounded-4">
-        <div class="card-header bg-light">
-            <h5 class="mb-0">Recent Loans</h5>
+    <!-- Quick Actions -->
+    <div class="card mt-4">
+        <div class="card-body px-4 py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Quick Actions</h5>
+                <div class="d-flex gap-2">
+                    <a asp-controller="UserActivities" asp-action="Index" class="btn btn-primary btn-sm" aria-label="View user activity log">
+                         Activity Log
+                    </a>
+                    <a asp-controller="Books" asp-action="Index" class="btn btn-primary btn-sm" aria-label="View books">
+                        Manage Books
+                    </a>
+                    <a asp-controller="Users" asp-action="Index" class="btn btn-primary btn-sm" aria-label="View users">
+                        Manage Users
+                    </a>
+                    <a asp-controller="Fines" asp-action="Index" class="btn btn-primary btn-sm" aria-label="View fines">
+                        All Fines
+                    </a>
+                </div>
+            </div>
         </div>
-        <div class="card-body table-responsive">
-            @if (Model.RecentLoans.Any())
-            {
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th scope="col">Book</th>
-                            <th scope="col">User</th>
-                            <th scope="col">Loan Date</th>
-                            <th scope="col">Due</th>
-                            <th scope="col">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var loan in Model.RecentLoans)
-                        {
-                            var isOverdue = loan.DueDate.HasValue && loan.DueDate < DateTime.Now && !loan.ReturnDate.HasValue;
-                            var status = loan.ReturnDate.HasValue ? "Returned"
-                            : isOverdue ? "Overdue"
-                            : loan.IsRenewed ? "Renewed"
-                            : "Pending";
-
-                            var badgeClass = loan.ReturnDate.HasValue ? "badge-returned"
-                            : isOverdue ? "badge-overdue"
-                            : loan.IsRenewed ? "badge-renewed"
-                            : "badge-pending";
-
-                            <tr>
-                                <td>@loan.BookTitle</td>
-                                <td>@loan.LoanerName</td>
-                                <td>@loan.LoanDate.ToShortDateString()</td>
-                                <td>@(loan.DueDate?.ToShortDateString() ?? "N/A")</td>
-                                <td><span class="badge @badgeClass" aria-label="@status loan status">@status</span></td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            }
-            else
-            {
-                <p class="text-muted text-center">No recent loans.</p>
-            }
-        </div>
-    </div>
-
-    <!-- Top Borrowed Books List -->
-    <div class="card mt-4 shadow-sm p-4 rounded-4">
-        <div class="card-header bg-light">
-            <h5 class="mb-0">Most Borrowed Books</h5>
-        </div>
-        <div class="card-body">
-            @if (Model.TopBorrowedBooks.Any())
-            {
-                <ul class="list-group list-group-flush">
-                    @foreach (var book in Model.TopBorrowedBooks)
-                    {
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            @book.Title
-                            <span class="badge badge-loan-count rounded-pill" aria-label="@book.TotalLoans loans">
-                                @book.TotalLoans loans
-                            </span>
-                        </li>
-                    }
-                </ul>
-            }
-            else
-            {
-                <p class="text-muted text-center">No borrowing data yet.</p>
-            }
-        </div>
-    </div>
-
-    <div class="text-center mt-4">
-        <a asp-controller="UserActivities" asp-action="Index" class="btn btn-primary btn-sm me-2 rounded-3" aria-label="View user activity log">User Activity Log</a>
-        <a asp-controller="Books" asp-action="Index" class="btn btn-primary btn-sm me-2 rounded-3" aria-label="View books">Books</a>
-        <a asp-controller="Users" asp-action="Index" class="btn btn-primary btn-sm me-2 rounded-3" aria-label="View users">Users</a>
-        <a asp-controller="Loans" asp-action="Index" class="btn btn-primary btn-sm me-2 rounded-3" aria-label="View loans">Loans</a>
     </div>
 </div>
 
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js" defer></script>
     <script>
-        const loanStatusCtx = document.getElementById('loanStatusChart').getContext('2d');
-        new Chart(loanStatusCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Returned', 'Pending', 'Overdue'],
-                datasets: [{
-                    data: [@Model.LoanStats.Returned, @Model.LoanStats.Pending, @Model.LoanStats.Overdue],
-                    backgroundColor: ['#A8D5BA', '#F7C59F', '#EF767A']
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    }
-                }
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof Chart === 'undefined') {
+                console.error('Chart.js failed to load.');
+                return;
             }
-        });
 
-        const userStatusCtx = document.getElementById('userStatusChart').getContext('2d');
-        new Chart(userStatusCtx, {
-            type: 'pie',
-            data: {
-                labels: ['Approved', 'Unapproved', 'Banned'],
-                datasets: [{
-                    data: [@Model.UserStats.Approved, @Model.UserStats.Unapproved, @Model.UserStats.Banned],
-                    backgroundColor: ['#8E9AAF', '#EFD3D7', '#C9ADA7']
-                }]
-            },
-            options: {
+            // Custom chart options
+            const chartOptions = {
                 responsive: true,
+                maintainAspectRatio: false,
+                cutout: '65%',
                 plugins: {
                     legend: {
-                        position: 'bottom'
+                        display: false
+                    },
+                    tooltip: {
+                        displayColors: false,
+                        backgroundColor: 'rgba(59, 47, 47, 0.9)',
+                        padding: 10,
+                        titleFont: {
+                            size: 14,
+                            family: "'Lora', serif"
+                        },
+                        bodyFont: {
+                            size: 14,
+                            family: "'Inter', sans-serif"
+                        }
                     }
+                },
+                animation: {
+                    animateScale: true,
+                    animateRotate: true
                 }
+            };
+
+            // Loan Status Chart
+            const loanStatusData = [
+        @(Model?.LoanStats?.Returned ?? 0),
+        @(Model?.LoanStats?.Pending ?? 0),
+        @(Model?.LoanStats?.Overdue ?? 0)
+            ];
+            if (loanStatusData.some(val => val < 0)) {
+                console.error('Invalid loan status data:', loanStatusData);
+                return;
+            }
+            const loanStatusCtx = document.getElementById('loanStatusChart')?.getContext('2d');
+            if (loanStatusCtx) {
+                new Chart(loanStatusCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Returned', 'Pending', 'Overdue'],
+                        datasets: [{
+                            data: loanStatusData,
+                            backgroundColor: ['#A8D5BA', '#F7C59F', '#EF767A'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: chartOptions
+                });
+            }
+
+            // User Status Chart
+            const userStatusData = [
+        @(Model?.UserStats?.Approved ?? 0),
+        @(Model?.UserStats?.Unapproved ?? 0),
+        @(Model?.UserStats?.Banned ?? 0)
+            ];
+            if (userStatusData.some(val => val < 0)) {
+                console.error('Invalid user status data:', userStatusData);
+                return;
+            }
+            const userStatusCtx = document.getElementById('userStatusChart')?.getContext('2d');
+            if (userStatusCtx) {
+                new Chart(userStatusCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Approved', 'Unapproved', 'Banned'],
+                        datasets: [{
+                            data: userStatusData,
+                            backgroundColor: ['#8E9AAF', '#EFD3D7', '#C9ADA7'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: chartOptions
+                });
             }
         });
     </script>
