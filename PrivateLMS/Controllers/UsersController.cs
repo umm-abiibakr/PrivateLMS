@@ -383,7 +383,7 @@ namespace PrivateLMS.Controllers
                     return RedirectToAction(nameof(Index));
                 }
 
-                // Delete related data if needed (optional cleanup of user activities, ratings, etc.)
+                // Delete related data 
 
                 var result = await _userManager.DeleteAsync(user);
                 if (!result.Succeeded)

@@ -101,7 +101,7 @@ namespace PrivateLMS.HostedServices
                     }
                     catch (Exception ex)
                     {
-                        // Log error (consider using a logging framework like Serilog)
+                        // Log error 
                         Console.WriteLine($"Failed to process overdue reminder for LoanRecordId {loan.LoanRecordId}: {ex.Message}");
                     }
                 }
