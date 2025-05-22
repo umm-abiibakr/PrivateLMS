@@ -31,7 +31,7 @@ As a result:
 
 - Email-related features will not function without valid API credentials.
 - You may encounter errors when performing actions that depend on email (e.g., borrowing a book, profile update requests).
-- If the application fails to start due to missing email configuration, you can **comment out the email-related setup in `Program.cs`**. However, this will not prevent errors on other actions that rely on email functionality.
+- I have **commentted out the email-related setup in `Program.cs`** to stop the application from failing to run due to missing email configuration. However, this will not prevent errors on other actions that rely on email functionality.
 
 > Mailjet was used as the email provider in this application.
 
