@@ -76,13 +76,14 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+//Comment section to run application or add your secrete API in the appsettings.json
 // Configure Mailjet settings with validation
-var mailjetSection = builder.Configuration.GetSection("Mailjet");
-if (!mailjetSection.Exists())
-{
-    throw new InvalidOperationException("Mailjet configuration section is missing.");
-}
-builder.Services.Configure<MailjetSettings>(mailjetSection);
+//var mailjetSection = builder.Configuration.GetSection("Mailjet");
+//if (!mailjetSection.Exists())
+//{
+//    throw new InvalidOperationException("Mailjet configuration section is missing.");
+//}
+//builder.Services.Configure<MailjetSettings>(mailjetSection);
 
 // Register services
 builder.Services.AddScoped<ILoanService, LoanService>();
