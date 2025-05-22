@@ -58,7 +58,7 @@ namespace PrivateLMS.ViewModels
         public List<LoanRecord> LoanRecords { get; set; } = new List<LoanRecord>();
         public float AverageRating { get; set; } // Average rating (1-5)
         public int RatingCount { get; set; } // Number of ratings
-        public float UserRating { get; set; } // User's rating (0 if not rated)
+        public float UserRating { get; set; } 
         public string UserReview { get; set; } = string.Empty;
         public List<BookReviewViewModel> Reviews { get; set; } = new();
         public int TotalLoans { get; set; }

@@ -14,6 +14,6 @@ namespace PrivateLMS.ViewModels
 
         [Display(Name = "Number of Books")]
         public int BookCount { get; set; }
-        public List<string> Books { get; set; } = new List<string>(); // For Details page
+        public List<string> Books { get; set; } = new List<string>(); 
     }
 }

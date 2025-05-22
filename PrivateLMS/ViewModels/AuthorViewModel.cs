@@ -24,7 +24,6 @@ namespace PrivateLMS.ViewModels
         [Display(Name = "Number of Books")]
         public int BookCount { get; set; }
 
-        // Initialize Books to prevent null reference, no [Required] attribute
         public List<string> Books { get; set; } = new List<string>();
     }
 }
